@@ -72,6 +72,6 @@ maven_build:
   <<: *maven_project_setup
   <<: *validate
 
-#maven_test:
-# <<: *maven_project_setup
-# <<: *verify
+maven_test:
+ <<: *maven_project_setup
+ <<: *verify
