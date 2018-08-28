@@ -40,7 +40,7 @@ public class User {
     private String password;
 
     /**
-     * define whether the user is administrator or teacher
+     * admin,hr,candidate
      */
-    private boolean admin;
+    private String role;
 }
