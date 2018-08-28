@@ -13,6 +13,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -32,13 +34,40 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundException();
         }
         if (BCrypt.checkpw(loginDto.getPassword(), user.getPassword())) {
-            ApiToken apiToken = new ApiToken();
+            String tokenId=user.getUsername()+"stm"+user.getRole();
+            Optional<ApiToken> apiTokenOptional = apiTokenRepository.findById(tokenId);
+            if(!apiTokenOptional.isPresent()){
+                ApiToken apiToken = new ApiToken();
+                apiToken.setId(tokenId);
+                apiToken.setUser(user);
+                //apiToken.builder().id(tokenId).user(user);
+                apiTokenRepository.save(apiToken);
+                return ApiTokenDTO.builder()
+                        .token(apiToken.getId())
+                        .build();
+            }
             // TODO: create and save newly generated apiToken
             return ApiTokenDTO.builder()
-                    .token(apiToken.getId())
+                    .token(apiTokenOptional.get().getId())
                     .build();
         } else {
             throw new ForbiddenException("Wrong password or username");
         }
+    }
+
+    @Override
+    public User getUserByToken(String token) {
+        System.out.println("111");
+        Optional<ApiToken> apiTokenOptional = apiTokenRepository.findById(token);
+        if(apiTokenOptional.isPresent()){
+            ApiToken apiToken=apiTokenOptional.get();
+            return apiToken.getUser();
+        }
+        return null;
+    }
+
+    @Override
+    public Optional<ApiToken> findById(String token) {
+        return apiTokenRepository.findById(token);
     }
 }
