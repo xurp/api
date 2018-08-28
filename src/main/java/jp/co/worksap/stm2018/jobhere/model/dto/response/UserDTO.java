@@ -13,5 +13,5 @@ public class UserDTO {
 
     private String id;
     private String username;
-    private boolean admin;
+    private String role;
 }
