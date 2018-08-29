@@ -4,5 +4,6 @@ import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 
 public interface JobService {
 
-    public void update(JobDTO jobDTO);
+    public JobDTO update(String id,JobDTO jobDTO);
+    public JobDTO save(JobDTO jobDTO);
 }

@@ -14,6 +14,7 @@ import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository = userRepository;
         this.apiTokenRepository = apiTokenRepository;
     }
-
+    @Transactional
     @Override
     public ApiTokenDTO login(LoginDTO loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername());
@@ -56,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("Wrong password or username");
         }
     }
-
+    @Transactional
     @Override
     public ApiTokenDTO register(RegisterDTO registerDTO) {
 

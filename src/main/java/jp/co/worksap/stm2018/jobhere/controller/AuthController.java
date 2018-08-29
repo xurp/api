@@ -2,11 +2,13 @@ package jp.co.worksap.stm2018.jobhere.controller;
 
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.RegisterDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.UserDTO;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
+import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthController {
 
     private final AuthService authService;
+
 
     @Autowired
     AuthController(AuthService authService) {
@@ -38,10 +41,6 @@ public class AuthController {
         return UserDTO.builder().id(user.getId()).username(user.getUsername()).role(user.getRole()).build();
     }
 
-    @GetMapping("/test")
-    UserDTO showtest(HttpServletRequest request) {
-        return UserDTO.builder().id("1").build();
-    }
 
     @PostMapping("")
     ApiTokenDTO login(@RequestBody LoginDTO loginDto) {
@@ -53,6 +52,7 @@ public class AuthController {
 
         return authService.register(registerDTO);
     }
+
 
 
 }
