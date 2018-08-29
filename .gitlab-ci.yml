@@ -72,6 +72,7 @@ cache:
 maven_build:
   <<: *maven_project_setup
   <<: *validate
+  
 
 maven_test:
  <<: *maven_project_setup
