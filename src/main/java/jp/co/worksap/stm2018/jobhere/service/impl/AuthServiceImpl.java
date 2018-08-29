@@ -66,7 +66,15 @@ public class AuthServiceImpl implements AuthService {
             throw new ValidationException("Username Existed!");
         } else {
             String uuid = UUID.randomUUID().toString().replace("-", "");
-            userRepository.save(User.builder().id(uuid).username(registerDTO.getUsername()).password(registerDTO.getPassword()).role(registerDTO.getRole()).email(registerDTO.getEmail()).build());
+            
+            User userToSave = User.builder()
+                    .id(uuid)
+                    .username(registerDTO.getUsername())
+                    .password(registerDTO.getPassword())
+                    .role(registerDTO.getRole())
+                    .email(registerDTO.getEmail()).build();
+
+            userRepository.save(userToSave);
 
             String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
 
