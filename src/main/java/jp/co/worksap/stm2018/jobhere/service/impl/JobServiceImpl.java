@@ -58,7 +58,9 @@ public class JobServiceImpl implements JobService {
             job.setName(jobDTO.getName());
             job.setRemark(jobDTO.getRemark());
             jobRepository.save(job);
-            return JobDTO.builder().id(id).name(jobDTO.getName())
+            return JobDTO.builder()
+                    .id(id)
+                    .name(jobDTO.getName())
                     .detail(jobDTO.getDetail())
                     .count(jobDTO.getCount())
                     .department(jobDTO.getDepartment())
@@ -68,7 +70,6 @@ public class JobServiceImpl implements JobService {
         } else {
             throw new ValidationException("Job id does not exist!");
         }
-
     }
 
     @Transactional

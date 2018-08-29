@@ -41,7 +41,6 @@ public class AuthController {
         return UserDTO.builder().id(user.getId()).username(user.getUsername()).role(user.getRole()).build();
     }
 
-
     @PostMapping("")
     ApiTokenDTO login(@RequestBody LoginDTO loginDto) {
         return authService.login(loginDto);
@@ -50,7 +49,7 @@ public class AuthController {
     @PostMapping("/register")
     ApiTokenDTO register(@RequestBody RegisterDTO registerDTO) {
 
-        return authService.register(registerDTO);
+            return authService.register(registerDTO);
     }
 
 
