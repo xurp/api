@@ -4,6 +4,7 @@ import jp.co.worksap.stm2018.jobhere.dao.ApiTokenRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
+import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
@@ -60,10 +61,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ApiTokenDTO register(RegisterDTO registerDTO) {
 
+        User user = userRepository.findByUsername(registerDTO.getUsername());
+        if (user != null) {
+            throw new ValidationException("Username Existed!");
+        }
+
         String uuid = UUID.randomUUID().toString().replace("-", "");
         userRepository.save(User.builder().id(uuid).username(registerDTO.getUsername()).password(registerDTO.getPassword()).role(registerDTO.getRole()).email(registerDTO.getEmail()).build());
 
-        User user = userRepository.findByUsername(registerDTO.getUsername());
         String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
 
         ApiToken apiToken = new ApiToken();
