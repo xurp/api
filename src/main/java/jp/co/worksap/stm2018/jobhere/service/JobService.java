@@ -6,4 +6,5 @@ public interface JobService {
 
     public JobDTO update(String id,JobDTO jobDTO);
     public JobDTO save(JobDTO jobDTO);
+    public JobDTO getDetail(String id);
 }

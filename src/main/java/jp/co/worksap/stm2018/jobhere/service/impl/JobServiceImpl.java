@@ -32,6 +32,11 @@ public class JobServiceImpl implements JobService {
         if(jobOptional.isPresent()){
             Job job=jobOptional.get();
             job.setUpdateTime(timestamp);
+            job.setCount(jobDTO.getCount());
+            job.setDepartment(jobDTO.getDepartment());
+            job.setDetail(jobDTO.getDetail());
+            job.setName(jobDTO.getName());
+            job.setRemark(jobDTO.getRemark());
             jobRepository.save(job);
             return JobDTO.builder().id(id).name(jobDTO.getName())
                     .detail(jobDTO.getDetail())
@@ -68,6 +73,24 @@ public class JobServiceImpl implements JobService {
                 .remark(jobDTO.getRemark())
                 .createTime(timestamp)
                 .updateTime(timestamp).build();
+    }
+
+    @Override
+    public JobDTO getDetail(String id) {
+        Optional<Job> jobOptional=jobRepository.findById(id);
+        if(jobOptional.isPresent()){
+            Job job=jobOptional.get();
+            return JobDTO.builder().id(job.getId()).name(job.getName())
+                    .detail(job.getDetail())
+                    .count(job.getCount())
+                    .department(job.getDepartment())
+                    .remark(job.getRemark())
+                    .createTime(job.getCreateTime())
+                    .updateTime(job.getUpdateTime()).build();
+        }
+        else{
+            throw new ValidationException("Job id does not exist!");
+        }
     }
 }
 
