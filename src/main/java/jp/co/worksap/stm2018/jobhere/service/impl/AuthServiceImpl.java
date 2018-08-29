@@ -64,20 +64,20 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(registerDTO.getUsername());
         if (user != null) {
             throw new ValidationException("Username Existed!");
+        } else {
+            String uuid = UUID.randomUUID().toString().replace("-", "");
+            userRepository.save(User.builder().id(uuid).username(registerDTO.getUsername()).password(registerDTO.getPassword()).role(registerDTO.getRole()).email(registerDTO.getEmail()).build());
+
+            String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
+
+            ApiToken apiToken = new ApiToken();
+            apiToken.setId(tokenId);
+            apiToken.setUser(user);
+            apiTokenRepository.save(apiToken);
+            return ApiTokenDTO.builder()
+                    .token(apiToken.getId())
+                    .build();
         }
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        userRepository.save(User.builder().id(uuid).username(registerDTO.getUsername()).password(registerDTO.getPassword()).role(registerDTO.getRole()).email(registerDTO.getEmail()).build());
-
-        String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
-
-        ApiToken apiToken = new ApiToken();
-        apiToken.setId(tokenId);
-        apiToken.setUser(user);
-        apiTokenRepository.save(apiToken);
-        return ApiTokenDTO.builder()
-                .token(apiToken.getId())
-                .build();
     }
 
     @Override
