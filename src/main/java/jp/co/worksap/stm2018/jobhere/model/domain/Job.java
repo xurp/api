@@ -9,9 +9,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
-import java.sql.Timestamp;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 
 @Data
@@ -26,21 +27,20 @@ public class Job {
     @Id
     private String id;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
-
 
     @Column(nullable = false)
     private String detail;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     @CreationTimestamp
     private Timestamp createTime;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Timestamp updateTime;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private int count;
 
     @Column(nullable = false)
