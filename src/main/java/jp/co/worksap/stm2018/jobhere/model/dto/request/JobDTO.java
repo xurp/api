@@ -13,6 +13,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class JobDTO {
 
+    private String id;
+
     private String name;
 
     private String detail;
