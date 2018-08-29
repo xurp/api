@@ -7,6 +7,7 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.RegisterDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import org.mindrot.jbcrypt.BCrypt;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -34,9 +36,9 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundException();
         }
         if (BCrypt.checkpw(loginDto.getPassword(), user.getPassword())) {
-            String tokenId=user.getUsername()+"stm"+user.getRole();
+            String tokenId = user.getUsername() + "stm" + user.getRole();
             Optional<ApiToken> apiTokenOptional = apiTokenRepository.findById(tokenId);
-            if(!apiTokenOptional.isPresent()){
+            if (!apiTokenOptional.isPresent()) {
                 ApiToken apiToken = new ApiToken();
                 apiToken.setId(tokenId);
                 apiToken.setUser(user);
@@ -56,11 +58,29 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public ApiTokenDTO register(RegisterDTO registerDTO) {
+
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        userRepository.save(User.builder().id(uuid).username(registerDTO.getUsername()).password(registerDTO.getPassword()).role(registerDTO.getRole()).email(registerDTO.getEmail()).build());
+
+        User user = userRepository.findByUsername(registerDTO.getUsername());
+        String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
+
+        ApiToken apiToken = new ApiToken();
+        apiToken.setId(tokenId);
+        apiToken.setUser(user);
+        apiTokenRepository.save(apiToken);
+        return ApiTokenDTO.builder()
+                .token(apiToken.getId())
+                .build();
+    }
+
+    @Override
     public User getUserByToken(String token) {
         System.out.println("111");
         Optional<ApiToken> apiTokenOptional = apiTokenRepository.findById(token);
-        if(apiTokenOptional.isPresent()){
-            ApiToken apiToken=apiTokenOptional.get();
+        if (apiTokenOptional.isPresent()) {
+            ApiToken apiToken = apiTokenOptional.get();
             return apiToken.getUser();
         }
         return null;
