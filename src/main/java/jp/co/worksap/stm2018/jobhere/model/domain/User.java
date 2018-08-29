@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -30,6 +31,7 @@ public class User {
     @Id
     private String id;
 
+    @Column(nullable = false,unique = true)
     private String username;
 
     /**
@@ -37,10 +39,14 @@ public class User {
      * - bcrypt(sha1(origin))
      * - front-end will encrypt the `sha1` part
      */
+    @Column(nullable = false)
     private String password;
 
     /**
      * admin,hr,candidate
      */
     private String role;
+
+    @Column(nullable = false)
+    private String email;
 }
