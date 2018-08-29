@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,13 +26,31 @@ public class JobServiceImpl implements JobService {
         this.jobRepository = jobRepository;
     }
 
+    @Override
+    public List<JobDTO> list() {
+        List<Job> jobList = jobRepository.findAll();
+        List<JobDTO> jobDTOList = new ArrayList<>();
+        for (Job job : jobList) {
+            jobDTOList.add(JobDTO.builder()
+                    .id(job.getId())
+                    .name(job.getName())
+                    .detail(job.getDetail())
+                    .count(job.getCount())
+                    .department(job.getDepartment())
+                    .remark(job.getRemark())
+                    .createTime(job.getCreateTime())
+                    .updateTime(job.getUpdateTime()).build());
+        }
+        return jobDTOList;
+    }
+
     @Transactional
     @Override
-    public JobDTO update(String id,JobDTO jobDTO) {
+    public JobDTO update(String id, JobDTO jobDTO) {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        if(jobOptional.isPresent()){
-            Job job=jobOptional.get();
+        if (jobOptional.isPresent()) {
+            Job job = jobOptional.get();
             job.setUpdateTime(timestamp);
             job.setCount(jobDTO.getCount());
             job.setDepartment(jobDTO.getDepartment());
@@ -45,8 +65,7 @@ public class JobServiceImpl implements JobService {
                     .remark(jobDTO.getRemark())
                     .createTime(job.getCreateTime())
                     .updateTime(timestamp).build();
-        }
-        else{
+        } else {
             throw new ValidationException("Job id does not exist!");
         }
 
@@ -77,9 +96,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobDTO getDetail(String id) {
-        Optional<Job> jobOptional=jobRepository.findById(id);
-        if(jobOptional.isPresent()){
-            Job job=jobOptional.get();
+        Optional<Job> jobOptional = jobRepository.findById(id);
+        if (jobOptional.isPresent()) {
+            Job job = jobOptional.get();
             return JobDTO.builder().id(job.getId()).name(job.getName())
                     .detail(job.getDetail())
                     .count(job.getCount())
@@ -87,8 +106,7 @@ public class JobServiceImpl implements JobService {
                     .remark(job.getRemark())
                     .createTime(job.getCreateTime())
                     .updateTime(job.getUpdateTime()).build();
-        }
-        else{
+        } else {
             throw new ValidationException("Job id does not exist!");
         }
     }
