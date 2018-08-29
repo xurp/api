@@ -49,7 +49,6 @@ public class AuthServiceImpl implements AuthService {
                         .token(apiToken.getId())
                         .build();
             }
-            // TODO: create and save newly generated apiToken
             return ApiTokenDTO.builder()
                     .token(apiTokenOptional.get().getId())
                     .build();
@@ -66,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ValidationException("Username Existed!");
         } else {
             String uuid = UUID.randomUUID().toString().replace("-", "");
-            
+
             User userToSave = User.builder()
                     .id(uuid)
                     .username(registerDTO.getUsername())
@@ -80,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
             ApiToken apiToken = new ApiToken();
             apiToken.setId(tokenId);
-            apiToken.setUser(user);
+            apiToken.setUser(userToSave);
             apiTokenRepository.save(apiToken);
             return ApiTokenDTO.builder()
                     .token(apiToken.getId())
