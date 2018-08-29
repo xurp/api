@@ -7,6 +7,8 @@ import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Created by xu_xi-pc on 2018/8/29.
  */
@@ -14,23 +16,29 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/job")
 public class JobController {
     private final JobService jobService;
+
     @Autowired
-    public JobController(JobService jobService){
-        this.jobService=jobService;
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
     }
 
     @PostMapping("")
-    JobDTO save(@RequestBody JobDTO jobDto){
+    JobDTO save(@RequestBody JobDTO jobDto) {
         return jobService.save(jobDto);
     }
 
     @PutMapping("/{id}")
-    JobDTO update(@PathVariable("id") String id,@RequestBody JobDTO jobDto){
-        return jobService.update(id,jobDto);
+    JobDTO update(@PathVariable("id") String id, @RequestBody JobDTO jobDto) {
+        return jobService.update(id, jobDto);
     }
 
     @GetMapping("/{id}")
-    JobDTO detail(@PathVariable("id") String id){
+    JobDTO detail(@PathVariable("id") String id) {
         return jobService.getDetail(id);
+    }
+
+    @GetMapping("")
+    List<JobDTO> list() {
+        return jobService.list();
     }
 }
