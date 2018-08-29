@@ -28,4 +28,9 @@ public class JobController {
     JobDTO update(@PathVariable("id") String id,@RequestBody JobDTO jobDto){
         return jobService.update(id,jobDto);
     }
+
+    @GetMapping("/{id}")
+    JobDTO detail(@PathVariable("id") String id){
+        return jobService.getDetail(id);
+    }
 }
