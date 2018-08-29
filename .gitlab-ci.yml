@@ -75,5 +75,5 @@ maven_build:
   
 
 maven_test:
- <<: *maven_project_setup
- <<: *verify
+  <<: *maven_project_setup
+  <<: *verify
