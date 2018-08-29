@@ -42,8 +42,8 @@ cache:
   # Of course, it is our duty to actually configure a runner
   # with the tag 'maven' and a working maven installation
   tags:
-  #- maven
-   - master
+  - maven
+  # - master
   image: maven:3.5.2-jdk-8-alpine
 
 # This will only validate and compile stuff and run e.g. maven-enforcer-plugin.
