@@ -35,7 +35,11 @@ public class ReviewServiceImpl implements ReviewService {
                     userDTOList.add(UserDTO.builder()
                             .id(u.getId())
                             .username(u.getUsername())
-                            .role(u.getRole()).build());
+                            .email(u.getEmail())
+                            .role(u.getRole())
+                            .companyName(u.getCompany().getCompanyName())
+                            .legalPerson(u.getCompany().getLegalPerson())
+                            .build());
                 }
             }
 
@@ -47,7 +51,11 @@ public class ReviewServiceImpl implements ReviewService {
                         userDTOList.add(UserDTO.builder()
                                 .id(u.getId())
                                 .username(u.getUsername())
-                                .role(u.getRole()).build());
+                                .email(u.getEmail())
+                                .role(u.getRole())
+                                .companyName(u.getCompany().getCompanyName())
+                                .legalPerson(u.getCompany().getLegalPerson())
+                                .build());
                     }
                 }
             }
