@@ -68,19 +68,20 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void inspect(User inspector, String id, String pass) {
-        if (pass.equals(true)) {
+        if (pass.equals("true")) {
             String inspectorRole = inspector.getRole();
             if (inspectorRole.equals("hr") || inspectorRole.equals("admin")) {
                 Optional<User> userOptional = userRepository.findById(id);
                 if (userOptional.isPresent()) {
                     User user = userOptional.get();
-
+                    user.setRole("hr");
+                    userRepository.save(user);
                 }
             } else {
                 throw new ValidationException("Insufficient Permissions!");
             }
         } else {
-            
+
         }
 
 
