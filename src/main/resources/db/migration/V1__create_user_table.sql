@@ -7,5 +7,5 @@ create table "user" (
   "resume_id" varchar(255)
 );
 
-# add default administrator with username [admin] and password [123456]
-insert into "user" values (UUID(), 'admin@admin.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi ', 'admin', 'admin', null);
+-- add default administrator with username [admin] and password [123456]
+insert into "user" values ('1', 'admin@admin.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi ', 'admin', 'admin', null);
