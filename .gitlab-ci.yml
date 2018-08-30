@@ -99,6 +99,8 @@ maven-package:
 
 docker-build:
   image: docker:latest
+  services:
+  - docker:dind
   tags:
   - maven
   stage: deploy
