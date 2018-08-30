@@ -6,6 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JobhereApplication {
     public static void main(String[] args) {
-    SpringApplication.run(JobhereApplication.class, args);
-  }
+        SpringApplication.run(JobhereApplication.class, args);
+    }
 }
