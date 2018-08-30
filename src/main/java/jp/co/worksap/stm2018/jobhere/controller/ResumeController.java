@@ -1,14 +1,10 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
-import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
-import jp.co.worksap.stm2018.jobhere.service.JobService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/resume")
