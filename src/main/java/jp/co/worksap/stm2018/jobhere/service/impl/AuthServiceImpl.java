@@ -1,11 +1,13 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.ApiTokenRepository;
+import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
+import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
@@ -25,11 +27,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final ApiTokenRepository apiTokenRepository;
+    private final CompanyRepository companyRepository;
 
     @Autowired
-    AuthServiceImpl(UserRepository userRepository, ApiTokenRepository apiTokenRepository) {
+    AuthServiceImpl(UserRepository userRepository, ApiTokenRepository apiTokenRepository,CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.apiTokenRepository = apiTokenRepository;
+        this.companyRepository=companyRepository;
     }
     @Transactional
     @Override
@@ -67,22 +71,55 @@ public class AuthServiceImpl implements AuthService {
             throw new ValidationException("Username Existed!");
         } else {
             String uuid = UUID.randomUUID().toString().replace("-", "");
-            Resume resume=new Resume();
-            User userToSave = User.builder()
-                    .id(uuid)
-                    .username(registerDTO.getUsername())
-                    .role(registerDTO.getRole())
-                    .email(registerDTO.getEmail()).resume(resume).build();
-            userToSave.setPassword(registerDTO.getPassword());
-
-            userRepository.save(userToSave);
-
             String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
-
             ApiToken apiToken = new ApiToken();
             apiToken.setId(tokenId);
-            apiToken.setUser(userToSave);
-            apiTokenRepository.save(apiToken);
+            if(registerDTO.getRole().equals("candidate")) {
+                Resume resume = new Resume();
+                User userToSave = User.builder()
+                        .id(uuid)
+                        .username(registerDTO.getUsername())
+                        .role("candidate")
+                        .email(registerDTO.getEmail()).resume(resume).build();
+                userToSave.setPassword(registerDTO.getPassword());
+                userRepository.save(userToSave);
+                apiToken.setUser(userToSave);
+                apiTokenRepository.save(apiToken);
+            }
+            else{
+                //save one and many at one time(many not exists, else use many to save one)
+                Company c=companyRepository.findByCompanyNameAndLegalPerson(registerDTO.getCompanyName(),registerDTO.getLegalPerson());
+                if(c==null||c.getStatus().equals("company-n")) {//this is a new company or the old company is company-n, insert new company
+                    Company company = new Company();
+                    company.setId(UUID.randomUUID().toString().replace("-", ""));
+                    company.setCompanyName(registerDTO.getCompanyName());
+                    company.setLegalPerson(registerDTO.getLegalPerson());
+                    company.setStatus("company-n");
+                    User userToSave = User.builder()
+                            .id(uuid)
+                            .username(registerDTO.getUsername())
+                            .role("hr-n")
+                            .email(registerDTO.getEmail()).build();
+                    userToSave.setPassword(registerDTO.getPassword());
+
+                    userToSave.setCompany(company);
+                    company.addUser(userToSave);
+                    companyRepository.save(company);
+                    userRepository.save(userToSave);
+                    apiToken.setUser(userToSave);
+                    apiTokenRepository.save(apiToken);
+                }
+                else{//there is a real company
+                    User userToSave = User.builder()
+                            .id(uuid)
+                            .username(registerDTO.getUsername())
+                            .role("hr-n")
+                            .email(registerDTO.getEmail()).company(c).build();
+                    userToSave.setPassword(registerDTO.getPassword());
+                    c.addUser(userToSave);
+                    companyRepository.save(c);
+                }
+            }
             return ApiTokenDTO.builder()
                     .token(apiToken.getId())
                     .build();

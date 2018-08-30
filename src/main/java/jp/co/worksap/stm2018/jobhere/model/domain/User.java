@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,7 +48,12 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=true)
     @JoinColumn(name = "resume_id")
     private Resume resume;
+
+    @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH},optional=true)
+    @JoinColumn(name="company_id")
+    @JsonIgnore
+    private Company company;
 }

@@ -22,12 +22,12 @@ public class ResumeController {
         this.resumeService = resumeService;
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}")//userid
     void update(@PathVariable("id") String id, @RequestBody ResumeDTO resumeDTO) {
         resumeService.update(id, resumeDTO);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")//userid
     ResumeDTO find(@PathVariable("id") String id) {
         return resumeService.find(id);
     }
