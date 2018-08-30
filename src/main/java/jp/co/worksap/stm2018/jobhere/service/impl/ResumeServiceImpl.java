@@ -23,7 +23,7 @@ public class ResumeServiceImpl implements ResumeService {
         if(userOptional.isPresent()){
             User user=userOptional.get();
             Resume resume=user.getResume();
-            //resume.setName(resumeDTO.getName());
+            resume.setName(resumeDTO.getName());
             resume.setGender(resumeDTO.getGender());
             resume.setAge(resumeDTO.getAge());
             resume.setEmail(resumeDTO.getEmail());
@@ -47,6 +47,7 @@ public class ResumeServiceImpl implements ResumeService {
             Resume resume=user.getResume();
             return ResumeDTO.builder()
                     .id(resume.getId())
+                    .name(resume.getName())
                     .gender(resume.getGender())
                     .age(resume.getAge())
                     .email(resume.getEmail())
