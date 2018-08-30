@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @Builder
@@ -43,10 +40,14 @@ public class User {
     private String password;
 
     /**
-     * admin,hr,candidate
+     * admin,hr,candidate,hrn
      */
     private String role;
 
     @Column(nullable = false)
     private String email;
+
+    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "resume_id")
+    private Resume resume;
 }

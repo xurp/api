@@ -9,11 +9,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.UUID;
 
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "resume")
@@ -51,4 +51,8 @@ public class Resume {
 
     @Column(nullable = true)
     private boolean open;
+
+    public Resume(){
+        this.id= UUID.randomUUID().toString().replace("-", "");
+    }
 }

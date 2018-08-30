@@ -6,6 +6,7 @@ import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
+import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.RegisterDTO;
@@ -66,13 +67,13 @@ public class AuthServiceImpl implements AuthService {
             throw new ValidationException("Username Existed!");
         } else {
             String uuid = UUID.randomUUID().toString().replace("-", "");
-
+            Resume resume=new Resume();
             User userToSave = User.builder()
                     .id(uuid)
                     .username(registerDTO.getUsername())
-                    .password(registerDTO.getPassword())
                     .role(registerDTO.getRole())
-                    .email(registerDTO.getEmail()).build();
+                    .email(registerDTO.getEmail()).resume(resume).build();
+            userToSave.setPassword(registerDTO.getPassword());
 
             userRepository.save(userToSave);
 
