@@ -97,17 +97,17 @@ maven-package:
   <<: *maven-project-setup
   <<: *maven-package
 
-docker-build:
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay
-    DOCKER_HOST: tcp://localhost:2375
-  services:
-  - docker:dind
-  tags:
-  - maven
-  stage: deploy
-  script:
-  - echo "Building docker image"
-  - docker build -t registry.paas.workslan/jobhere/jobhere-api .
-  - docker images
+#docker-build:
+#  image: docker:latest
+#  variables:
+#    DOCKER_DRIVER: overlay
+#    DOCKER_HOST: tcp://localhost:2375
+#  services:
+#  - docker:dind
+#  tags:
+#  - maven
+#  stage: deploy
+#  script:
+#  - echo "Building docker image"
+#  - docker build -t registry.paas.workslan/jobhere/jobhere-api .
+#  - docker images
