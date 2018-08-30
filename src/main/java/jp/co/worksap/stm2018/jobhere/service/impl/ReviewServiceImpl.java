@@ -2,6 +2,7 @@ package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
+import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.UserDTO;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -62,5 +64,25 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return userDTOList;
+    }
+
+    @Override
+    public void inspect(User inspector, String id, String pass) {
+        if (pass.equals(true)) {
+            String inspectorRole = inspector.getRole();
+            if (inspectorRole.equals("hr") || inspectorRole.equals("admin")) {
+                Optional<User> userOptional = userRepository.findById(id);
+                if (userOptional.isPresent()) {
+                    User user = userOptional.get();
+
+                }
+            } else {
+                throw new ValidationException("Insufficient Permissions!");
+            }
+        } else {
+            
+        }
+
+
     }
 }
