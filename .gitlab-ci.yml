@@ -99,6 +99,8 @@ maven-package:
 
 docker-build:
   image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay
   services:
   - docker:dind
   tags:
@@ -106,5 +108,5 @@ docker-build:
   stage: deploy
   script:
   - echo "Building docker image"
-  - docker build . -t registry.paas.workslan/jobhere/jobhere-api
+  - docker build -t registry.paas.workslan/jobhere/jobhere-api .
   - docker images
