@@ -36,7 +36,7 @@ cache:
   paths:
   - .m2/repository
 
-.maven_project: &maven_project_setup
+.maven_project: &maven-project-setup
   # Since we require Maven for this job,
   # we can restrict the job to runners with a certain tag.
   # Of course, it is our duty to actually configure a runner
@@ -67,13 +67,33 @@ cache:
   - echo "Testing project with maven"
   - 'mvn $MAVEN_CLI_OPTS verify'
 
+.maven-package: &maven-package
+  stage: deploy
+  script:
+  - echo "Packaging project into jar"
+  - 'mvn $MAVEN_CLI_OPTS package'
+  artifacts:
+    paths:
+    - target/*.jar
+
 # This is the name of the job.
 # You can choose it freely.
-maven_build:
-  <<: *maven_project_setup
+maven-build:
+  <<: *maven-project-setup
   <<: *validate
   
 
-maven_test:
-  <<: *maven_project_setup
+maven-test:
+  <<: *maven-project-setup
   <<: *verify
+
+maven-package:
+  <<: *maven-project-setup
+  <<: *maven-package
+
+docker-build:
+  image: docker:latest
+  stage: package
+  script:
+  - echo "Building docker image"
+  - docker build . -t registry.paas.workslan/jobhere/jobhere-api
