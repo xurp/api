@@ -30,7 +30,7 @@ public class Job {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "text")
     private String detail;
 
     @Column(nullable = false)
