@@ -80,15 +80,19 @@ public class ReviewServiceImpl implements ReviewService {
             if (pass.equals("true")) {
                 Company company = user.getCompany();
                 user.setRole("hr");
+                userRepository.save(user);
                 company.setStatus("company");
+                companyRepository.save(company);
                 List<Company> companyList = companyRepository.findByStatus("company-n");
                 for (Company c : companyList) {
                     if (c.getCompanyName().equals(company.getCompanyName()) && c.getLegalPerson().equals(company.getLegalPerson())) {
+                        for (User u : c.getUsers()) {
+                            u.setCompany(company);
+                            userRepository.save(u);
+                        }
                         companyRepository.delete(c);
                     }
                 }
-                userRepository.save(user);
-                companyRepository.save(company);
             } else if (pass.equals("false")) {
                 userRepository.delete(user);
             }
