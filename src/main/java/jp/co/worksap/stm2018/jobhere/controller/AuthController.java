@@ -1,6 +1,7 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
+import jp.co.worksap.stm2018.jobhere.http.NotLoginException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
@@ -32,7 +33,7 @@ public class AuthController {
     UserDTO showStatus(HttpServletRequest request) throws Exception{
         String token = String.valueOf(request.getHeader("Api-Token"));
         if (token == null)
-            throw new LoginException();
+            throw new NotLoginException();
         User user=authService.getUserByToken(token);
         if(user==null)
             return null;
