@@ -28,6 +28,9 @@ public class Company {
     private String status;//company,company-n
     @OneToMany(mappedBy = "company",cascade= CascadeType.MERGE,fetch= FetchType.LAZY)
     private List<User> users;
+
+    @OneToMany(mappedBy = "company",cascade= CascadeType.MERGE,fetch= FetchType.LAZY)
+    private List<Job> jobs;
     public void addUser(User user) {
         if(this.users==null)
             this.users=new ArrayList<>();
@@ -37,6 +40,19 @@ public class Company {
         for (int index=0; index < this.users.size(); index ++ ) {
             if (users.get(index).getId() .equals(userId)) {
                 this.users.remove(index);
+                break;
+            }
+        }
+    }
+    public void addJob(Job job) {
+        if(this.jobs==null)
+            this.jobs=new ArrayList<>();
+        this.jobs.add(job);
+    }
+    public void removeJob(String jobId) {
+        for (int index=0; index < this.jobs.size(); index ++ ) {
+            if (jobs.get(index).getId() .equals(jobId)) {
+                this.jobs.remove(index);
                 break;
             }
         }

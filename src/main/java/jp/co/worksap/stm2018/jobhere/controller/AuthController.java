@@ -42,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("")
-    ApiTokenDTO login(@RequestBody LoginDTO loginDto) {
+    ApiTokenDTO login(HttpServletRequest request,@RequestBody LoginDTO loginDto) {
         return authService.login(loginDto);
     }
 

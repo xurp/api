@@ -1,14 +1,12 @@
 package jp.co.worksap.stm2018.jobhere.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -48,4 +46,9 @@ public class Job {
 
     @Column(nullable = false)
     private String remark;
+
+    @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH},optional=true)
+    @JoinColumn(name="company_id")
+    @JsonIgnore
+    private Company company;
 }

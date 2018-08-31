@@ -1,5 +1,8 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
+import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
@@ -7,6 +10,7 @@ import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -23,13 +27,17 @@ public class JobController {
     }
 
     @PostMapping("")
-    JobDTO save(@RequestBody JobDTO jobDto) {
-        return jobService.save(jobDto);
+    @NeedLogin
+    JobDTO save(HttpServletRequest request,@RequestBody JobDTO jobDto) {
+        Company company=((User)request.getAttribute("getuser")).getCompany();
+        return jobService.save(company,jobDto);
     }
 
     @PutMapping("/{id}")
-    JobDTO update(@PathVariable("id") String id, @RequestBody JobDTO jobDto) {
-        return jobService.update(id, jobDto);
+    @NeedLogin
+    JobDTO update(HttpServletRequest request,@PathVariable("id") String id, @RequestBody JobDTO jobDto) {
+        Company company=((User)request.getAttribute("getuser")).getCompany();
+        return jobService.update(company,id, jobDto);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +46,9 @@ public class JobController {
     }
 
     @GetMapping("")
-    List<JobDTO> list() {
-        return jobService.list();
+    @NeedLogin
+    List<JobDTO> list(HttpServletRequest request) {
+        Company company=((User)request.getAttribute("getuser")).getCompany();
+        return jobService.list(company);
     }
 }
