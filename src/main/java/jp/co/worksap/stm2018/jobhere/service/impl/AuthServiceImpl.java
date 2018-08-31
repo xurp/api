@@ -128,7 +128,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User getUserByToken(String token) {
-        System.out.println("111");
         Optional<ApiToken> apiTokenOptional = apiTokenRepository.findById(token);
         if (apiTokenOptional.isPresent()) {
             ApiToken apiToken = apiTokenOptional.get();

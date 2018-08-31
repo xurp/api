@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.model.dto.request;
 
+import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,4 +29,6 @@ public class JobDTO {
     private Timestamp createTime;
 
     private Timestamp updateTime;
+
+    private Company company;
 }

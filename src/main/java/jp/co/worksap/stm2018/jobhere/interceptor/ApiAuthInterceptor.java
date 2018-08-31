@@ -3,6 +3,7 @@ package jp.co.worksap.stm2018.jobhere.interceptor;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.NotLoginException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
+import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,9 +52,10 @@ public class ApiAuthInterceptor extends HandlerInterceptorAdapter {
         if (token == null) {  //if token exists
             return false;
         }
-        Optional<ApiToken> apiTokenOptional = authService.findById(token);
-        if(apiTokenOptional.isPresent()){
-            //ApiToken apiToken=apiTokenOptional.get();
+        User user = authService.getUserByToken(token);
+        if(user!=null){
+            //ApiToken apiToken=apiTokenOptional.get()
+            request.setAttribute("getuser",user);
             return true; //user and token exist
         } else {
             return false;
