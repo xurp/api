@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     public ApiTokenDTO login(LoginDTO loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername());
         if (user == null) {
-            throw new NotFoundException();
+            throw new ForbiddenException("Wrong password or username");
         }
         if (BCrypt.checkpw(loginDto.getPassword(), user.getPassword())) {
             String tokenId = user.getUsername() + "stm" + user.getRole();

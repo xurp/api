@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ReviewService {
     List<UserDTO> list(User user);
+
+    void inspect(User inspector,String id, String pass);
 }

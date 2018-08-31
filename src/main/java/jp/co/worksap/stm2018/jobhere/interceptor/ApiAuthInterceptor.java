@@ -1,8 +1,7 @@
 package jp.co.worksap.stm2018.jobhere.interceptor;
 
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
-import jp.co.worksap.stm2018.jobhere.dao.ApiTokenRepository;
-import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
+import jp.co.worksap.stm2018.jobhere.http.NotLoginException;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class ApiAuthInterceptor extends HandlerInterceptorAdapter {
                 // TODO: add permission check
                 if(!validateLogin(request, response, token)){
                     //response.setHeader("Access-Control-Allow-Origin", "*");
-                    throw new LoginException();
+                    throw new NotLoginException();
                 }
             }
         }
