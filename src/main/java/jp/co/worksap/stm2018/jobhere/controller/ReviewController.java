@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import jp.co.worksap.stm2018.jobhere.http.NotLoginException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.UserDTO;
@@ -29,7 +30,7 @@ public class ReviewController {
     List<UserDTO> list(HttpServletRequest request) throws LoginException {
         String token = String.valueOf(request.getHeader("Api-Token"));
         if (token == null)
-            throw new LoginException();
+            throw new NotLoginException();
         User user = authService.getUserByToken(token);
         return reviewService.list(user);
     }
@@ -39,7 +40,7 @@ public class ReviewController {
         String token = String.valueOf(request.getHeader("Api-Token"));
         pass = pass.replace("=", "");
         if (token == null)
-            throw new LoginException();
+            throw new NotLoginException();
         User inspector = authService.getUserByToken(token);
         reviewService.inspect(inspector, id, pass);
     }
