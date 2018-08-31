@@ -37,6 +37,7 @@ public class ReviewController {
     @PostMapping("/{id}")
     void inspect(HttpServletRequest request, @PathVariable("id") String id, @RequestBody String pass) throws LoginException {
         String token = String.valueOf(request.getHeader("Api-Token"));
+        pass = pass.replace("=", "");
         if (token == null)
             throw new LoginException();
         User inspector = authService.getUserByToken(token);

@@ -2,6 +2,7 @@ package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
+import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
@@ -68,20 +69,41 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void inspect(User inspector, String id, String pass) {
-        if (pass.equals("true")) {
-            String inspectorRole = inspector.getRole();
-            if (inspectorRole.equals("hr") || inspectorRole.equals("admin")) {
-                Optional<User> userOptional = userRepository.findById(id);
-                if (userOptional.isPresent()) {
-                    User user = userOptional.get();
-                    user.setRole("hr");
-                    userRepository.save(user);
+        String inspectorRole = inspector.getRole();
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            throw new ValidationException("ID Not Found!");
+        }
+        User user = userOptional.get();
+
+        if (inspectorRole.equals("admin")) {
+            if (pass.equals("true")) {
+                Company company = user.getCompany();
+                user.setRole("hr");
+                company.setStatus("company");
+                List<Company> companyList = companyRepository.findByStatus("company-n");
+                for (Company c : companyList) {
+                    if (c.getCompanyName().equals(company.getCompanyName()) && c.getLegalPerson().equals(company.getLegalPerson())) {
+                        companyRepository.delete(c);
+                    }
                 }
-            } else {
-                throw new ValidationException("Insufficient Permissions!");
+                userRepository.save(user);
+                companyRepository.save(company);
+            } else if (pass.equals("false")) {
+                userRepository.delete(user);
+            }
+        } else if (inspectorRole.equals("hr")) {
+            if (inspector.getCompany().equals(user.getCompany())) {
+                if (pass.equals("true")) {
+                    user.setRole("hr");
+                    user.setCompany(inspector.getCompany());//?
+                    userRepository.save(user);
+                } else if (pass.equals("false")) {
+                    userRepository.delete(user);
+                }
             }
         } else {
-
+            throw new ForbiddenException("Not Authorized!");
         }
 
 
