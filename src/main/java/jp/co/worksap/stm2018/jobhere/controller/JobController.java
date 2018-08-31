@@ -48,6 +48,7 @@ public class JobController {
     @GetMapping("")
     @NeedLogin
     List<JobDTO> list(HttpServletRequest request) {
+        //this function is only for hr. not for candidate(no matter login or not)
         Company company=((User)request.getAttribute("getuser")).getCompany();
         return jobService.list(company);
     }

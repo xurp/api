@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
@@ -19,11 +20,13 @@ public class ResumeController {
     }
 
     @PutMapping("/{id}")//userid
+    @NeedLogin
     void update(@PathVariable("id") String id, @RequestBody ResumeDTO resumeDTO) {
         resumeService.update(id, resumeDTO);
     }
 
     @GetMapping("/{id}")//userid
+    @NeedLogin
     ResumeDTO find(@PathVariable("id") String id) {
         return resumeService.find(id);
     }
