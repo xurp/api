@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -56,4 +58,21 @@ public class User {
     @JoinColumn(name="company_id")
     @JsonIgnore
     private Company company;
+
+    //can not use User.getApplications!
+    @OneToMany(mappedBy = "user",cascade= CascadeType.MERGE,fetch= FetchType.LAZY)
+    private List<Application> applications;
+    public void addApplication(Application application) {
+        if(this.applications==null)
+            this.applications=new ArrayList<>();
+        this.applications.add(application);
+    }
+    public void removeApplication(String applicationId) {
+        for (int index=0; index < this.applications.size(); index ++ ) {
+            if (applications.get(index).getId() .equals(applicationId)) {
+                this.applications.remove(index);
+                break;
+            }
+        }
+    }
 }
