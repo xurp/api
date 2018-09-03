@@ -140,6 +140,18 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationDTOList;
     }
 
+    @Override
+    public void update(String applicationId, String step) {
+        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            application.setStep(step);
+            applicationRepository.save(application);
+        } else {
+            throw new NotFoundException("Application not found");
+        }
+    }
+
 
 }
 
