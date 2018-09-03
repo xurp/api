@@ -31,4 +31,6 @@ public class JobDTO {
     private Timestamp updateTime;
 
     private Company company;
+
+    private boolean applied;//true:candidate can apply/false:candidate has applied
 }

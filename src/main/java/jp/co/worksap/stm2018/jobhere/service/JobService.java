@@ -9,7 +9,7 @@ public interface JobService {
 
     List<JobDTO> list(Company company);
 
-    List<JobDTO> listAll();
+    List<JobDTO> listAll(String userid);
 
     JobDTO update(Company company, String id, JobDTO jobDTO);
 

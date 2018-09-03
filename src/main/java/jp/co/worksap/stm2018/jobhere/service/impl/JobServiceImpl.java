@@ -51,10 +51,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDTO> listAll() {
+    public List<JobDTO> listAll(String userid) {
         List<Job> jobList = jobRepository.findAll();
         List<JobDTO> jobDTOList = new ArrayList<>();
         for (Job job : jobList) {
+
             jobDTOList.add(JobDTO.builder()
                     .id(job.getId())
                     .name(job.getName())
