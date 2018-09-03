@@ -52,15 +52,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobDTO> listAll() {
-//        private String id;
-//        private String name;
-//        private String detail;
-//        private int count;
-//        private String department;
-//        private String remark;
-//        private Timestamp createTime;
-//        private Timestamp updateTime;
-//        private Company company;
         List<Job> jobList = jobRepository.findAll();
         List<JobDTO> jobDTOList = new ArrayList<>();
         for (Job job : jobList) {
