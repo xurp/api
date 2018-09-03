@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,16 +29,16 @@ public class JobController {
 
     @PostMapping("")
     @NeedLogin
-    JobDTO save(HttpServletRequest request,@RequestBody JobDTO jobDto) {
-        Company company=((User)request.getAttribute("getuser")).getCompany();
-        return jobService.save(company,jobDto);
+    JobDTO save(HttpServletRequest request, @RequestBody JobDTO jobDto) {
+        Company company = ((User) request.getAttribute("getuser")).getCompany();
+        return jobService.save(company, jobDto);
     }
 
     @PutMapping("/{id}")
     @NeedLogin
-    JobDTO update(HttpServletRequest request,@PathVariable("id") String id, @RequestBody JobDTO jobDto) {
-        Company company=((User)request.getAttribute("getuser")).getCompany();
-        return jobService.update(company,id, jobDto);
+    JobDTO update(HttpServletRequest request, @PathVariable("id") String id, @RequestBody JobDTO jobDto) {
+        Company company = ((User) request.getAttribute("getuser")).getCompany();
+        return jobService.update(company, id, jobDto);
     }
 
     @GetMapping("/{id}")
@@ -48,8 +49,16 @@ public class JobController {
     @GetMapping("")
     @NeedLogin
     List<JobDTO> list(HttpServletRequest request) {
-        //this function is only for hr. not for candidate(no matter login or not)
-        Company company=((User)request.getAttribute("getuser")).getCompany();
-        return jobService.list(company);
+        //If the user is "hr" return jobList of the hr's company.
+        //For "admin" return jobList of all companies.
+        List<JobDTO> jobDTOList = new ArrayList<>();
+        User curUser = ((User) request.getAttribute("getuser"));
+        String role = curUser.getRole();
+        if (role.equals("hr")) {
+            jobDTOList = jobService.list(curUser.getCompany());
+        } else if (role.equals("candidate")) {
+            jobDTOList = jobService.listAll();
+        }
+        return jobDTOList;
     }
 }

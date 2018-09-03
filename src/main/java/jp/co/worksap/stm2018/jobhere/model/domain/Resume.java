@@ -3,7 +3,6 @@ package jp.co.worksap.stm2018.jobhere.model.domain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,13 +45,13 @@ public class Resume {
     @Column(nullable = true)
     private String major;
 
-    @Column(nullable = true,columnDefinition = "text")
+    @Column(nullable = true, columnDefinition = "text")
     private String intro;
 
     @Column(nullable = true)
     private boolean open;
 
-    public Resume(){
-        this.id= UUID.randomUUID().toString().replace("-", "");
+    public Resume() {
+        this.id = UUID.randomUUID().toString().replace("-", "");
     }
 }
