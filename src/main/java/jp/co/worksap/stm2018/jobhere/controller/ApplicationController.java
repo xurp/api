@@ -47,7 +47,7 @@ public class ApplicationController {
             //String uuid=UUID.randomUUID().toString().replace("-", "");
             //resume.setId(uuid);
             //resumeService.save(resume);
-            return applicationService.save(jobId,resumeId);
+            return applicationService.save(jobId,resumeId,user.getId());
 
         }
         else{

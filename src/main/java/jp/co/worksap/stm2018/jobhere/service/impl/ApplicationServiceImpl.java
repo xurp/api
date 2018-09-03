@@ -3,11 +3,9 @@ package jp.co.worksap.stm2018.jobhere.service.impl;
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.JobRepository;
 import jp.co.worksap.stm2018.jobhere.dao.ResumeRepository;
+import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
-import jp.co.worksap.stm2018.jobhere.model.domain.Application;
-import jp.co.worksap.stm2018.jobhere.model.domain.Company;
-import jp.co.worksap.stm2018.jobhere.model.domain.Job;
-import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
+import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
@@ -29,19 +27,21 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final JobRepository jobRepository;
     private final CompanyRepository companyRepository;
     private final ResumeRepository resumeRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    ApplicationServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,ResumeRepository resumeRepository) {
+    ApplicationServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,ResumeRepository resumeRepository,UserRepository userRepository) {
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
         this.resumeRepository=resumeRepository;
+        this.userRepository=userRepository;
     }
 
 
 
     @Transactional
     @Override
-    public ApplicationDTO save(String jobId,String resumeId) {
+    public ApplicationDTO save(String jobId,String resumeId,String userId) {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String uuid1 = UUID.randomUUID().toString().replace("-", "");
         Optional<Job> jobOptional=jobRepository.findById(jobId);
@@ -64,6 +64,10 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setId(uuid);
             application.setResume(resume);
             application.setStep("no");
+            Timestamp t=new Timestamp(System.currentTimeMillis());
+            application.setUpdateTime(t);
+            User user=userRepository.findById(userId).get();
+            application.setUser(user);
             Job job=jobOptional.get();
             application.setJob(job);
             job.addApplication(application);
@@ -71,7 +75,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             return ApplicationDTO.builder().id(application.getId())
                     .resume(application.getResume())
                     .job(application.getJob())
-                    .step(application.getStep()).build();
+                    .step(application.getStep()).createTime(t)
+                    .updateTime(t).build();
         }
         else{
             throw new ValidationException("Job id does not exist!");

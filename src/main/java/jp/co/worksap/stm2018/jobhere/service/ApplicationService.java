@@ -12,6 +12,6 @@ public interface ApplicationService {
 
 
 
-    ApplicationDTO save(String jobId, String resumeId);
+    ApplicationDTO save(String jobId, String resumeId,String userId);
 
 }
