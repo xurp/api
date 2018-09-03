@@ -52,6 +52,7 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=true)
     @JoinColumn(name = "resume_id")
+    @JsonIgnore
     private Resume resume;
 
     @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH},optional=true)

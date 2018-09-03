@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 public class Application {
     @Id
     private String id;
-    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=false)
+    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.EAGER,optional=false)
     @JoinColumn(name = "resume_id")
     @JsonIgnore
     private Resume resume;
