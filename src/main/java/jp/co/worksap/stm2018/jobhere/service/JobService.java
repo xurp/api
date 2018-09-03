@@ -9,9 +9,11 @@ public interface JobService {
 
     List<JobDTO> list(Company company);
 
-    JobDTO update(Company company,String id, JobDTO jobDTO);
+    List<JobDTO> listAll();
 
-    JobDTO save(Company company,JobDTO jobDTO);
+    JobDTO update(Company company, String id, JobDTO jobDTO);
+
+    JobDTO save(Company company, JobDTO jobDTO);
 
     JobDTO getDetail(String id);
 

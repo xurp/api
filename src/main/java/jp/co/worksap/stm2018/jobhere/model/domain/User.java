@@ -41,7 +41,7 @@ public class User {
     private String password;
 
     /**
-     * admin,hr,candidate,hrn
+     * admin,hr,candidate,hr-n
      */
     private String role;
 
