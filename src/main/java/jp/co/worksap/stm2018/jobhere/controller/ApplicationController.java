@@ -12,12 +12,10 @@ import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,26 +31,51 @@ public class ApplicationController {
     @Autowired
     public ApplicationController(ApplicationService applicationService, ResumeService resumeService, JobService jobService) {
         this.applicationService = applicationService;
-        this.resumeService=resumeService;
-        this.jobService=jobService;
+        this.resumeService = resumeService;
+        this.jobService = jobService;
     }
 
     @PostMapping("")
     @NeedLogin
     ApplicationDTO save(HttpServletRequest request, @RequestBody String jobId) {
-        jobId=jobId.substring(0,jobId.length()-1);
+        jobId = jobId.substring(0, jobId.length() - 1);
         User user = (User) request.getAttribute("getuser");
-        if(user.getRole().equals("candidate")){
-            String resumeId=user.getResume().getId();
+        if (user.getRole().equals("candidate")) {
+            String resumeId = user.getResume().getId();
             //String uuid=UUID.randomUUID().toString().replace("-", "");
             //resume.setId(uuid);
             //resumeService.save(resume);
-            return applicationService.save(jobId,resumeId,user.getId());
+            return applicationService.save(jobId, resumeId, user.getId());
 
-        }
-        else{
+        } else {
             throw new ValidationException("You are not candidate!");
         }
 
+    }
+
+    @GetMapping("")
+    @NeedLogin
+    List<ApplicationDTO> list(HttpServletRequest request, @RequestBody String jobId, @RequestBody String step) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            jobId = jobId.substring(0, jobId.length() - 1);
+            step = step.substring(0, jobId.length() - 1);
+
+            return applicationService.list(jobId, step);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+
+    }
+
+    @GetMapping("/{id}")
+    @NeedLogin
+    ApplicationDTO find(HttpServletRequest request, @PathVariable("id") String id) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            return applicationService.find(id);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
     }
 }
