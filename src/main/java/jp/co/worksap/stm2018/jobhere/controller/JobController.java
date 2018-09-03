@@ -57,7 +57,7 @@ public class JobController {
         if (role.equals("hr")) {
             jobDTOList = jobService.list(curUser.getCompany());
         } else if (role.equals("candidate")) {
-            jobDTOList = jobService.listAll();
+            jobDTOList = jobService.listAll(((User) request.getAttribute("getuser")).getId());
         }
         return jobDTOList;
     }

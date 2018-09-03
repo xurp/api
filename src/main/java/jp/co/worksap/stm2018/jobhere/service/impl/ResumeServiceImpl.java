@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
+import jp.co.worksap.stm2018.jobhere.dao.ResumeRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
@@ -16,6 +17,9 @@ public class ResumeServiceImpl implements ResumeService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ResumeRepository resumeRepository;
+
 
     @Override
     public void update(String id,ResumeDTO resumeDTO) {
@@ -62,5 +66,35 @@ public class ResumeServiceImpl implements ResumeService {
         else{
             throw new ValidationException("User id does not exist!");
         }
+    }
+
+    @Override
+    public ResumeDTO save(Resume resume) {
+        /*Resume resume=new Resume();
+        resume.setId(resumeDTO.getId());
+        resume.setAge(resumeDTO.getAge());
+        resume.setDegree(resumeDTO.getDegree());
+        resume.setEmail(resumeDTO.getEmail());
+        resume.setGender(resumeDTO.getGender());
+        resume.setIntro(resumeDTO.getIntro());
+        resume.setMajor(resumeDTO.getMajor());
+        resume.setName(resumeDTO.getName());
+        resume.setOpen(resumeDTO.isOpen());
+        resume.setPhone(resumeDTO.getPhone());
+        resume.setSchool(resumeDTO.getSchool());*/
+        resumeRepository.save(resume);
+        return ResumeDTO.builder()
+                .id(resume.getId())
+                .name(resume.getName())
+                .gender(resume.getGender())
+                .age(resume.getAge())
+                .email(resume.getEmail())
+                .phone(resume.getPhone())
+                .degree(resume.getDegree())
+                .school(resume.getSchool())
+                .major(resume.getMajor())
+                .intro(resume.getIntro())
+                .open(resume.isOpen())
+                .build();
     }
 }
