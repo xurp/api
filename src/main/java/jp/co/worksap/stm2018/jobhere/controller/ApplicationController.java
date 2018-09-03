@@ -11,6 +11,7 @@ import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import java.util.UUID;
  * Created by xu_xi-pc on 2018/9/3.
  */
 @RestController
+@Slf4j
 @RequestMapping("/application")
 public class ApplicationController {
     private final ApplicationService applicationService;
@@ -71,6 +73,7 @@ public class ApplicationController {
     @GetMapping("/{id}")
     @NeedLogin
     ApplicationDTO find(HttpServletRequest request, @PathVariable("id") String id) {
+        log.info("find");
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             return applicationService.find(id);
