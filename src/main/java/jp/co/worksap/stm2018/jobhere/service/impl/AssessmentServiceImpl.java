@@ -1,20 +1,15 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.*;
-import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
-import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
-import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
-import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
+import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,18 +25,19 @@ public class AssessmentServiceImpl implements AssessmentService {
 
 
     @Autowired
-    AssessmentServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository, UserRepository userRepository, ApplicationRepository applicationRepository,CooperatorRepository cooperatorRepository,AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository, UserRepository userRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
-        this.assessmentRepository=assessmentRepository;
+        this.assessmentRepository = assessmentRepository;
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
-        this.cooperatorRepository=cooperatorRepository;
+        this.cooperatorRepository = cooperatorRepository;
     }
+
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId) {
-        Assessment assessment=new Assessment();
+        Assessment assessment = new Assessment();
         assessment.setId(UUID.randomUUID().toString().replace("-", ""));
         assessment.setApplicationId(applicationId);
         assessment.setCooperator(cooperatorRepository.findById(cooperatorId).get());//assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
@@ -49,14 +45,31 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setComment("Here is your comment:");
         assessment.setPass("assessing");
         assessmentRepository.save(assessment);
-        return AssessmentDTO.builder().id(assessment.getId())
-                .applicationId(assessment.getApplicationId())
+        return AssessmentDTO.builder()
+                .id(assessment.getId())
                 .cooperator(assessment.getCooperator())
-                .step(assessment.getStep()).pass(assessment.getPass()).build();
+                .applicationId(assessment.getApplicationId())
+                .assessmentTime(assessment.getAssessmentTime())
+                .comment(assessment.getComment())
+                .step(assessment.getStep())
+                .pass(assessment.getPass()).build();
     }
 
-
-
+    public List<AssessmentDTO> list(String applicationId) {
+        List<AssessmentDTO> assessmentDTOList = new ArrayList<>();
+        List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
+        for (Assessment assessment : assessmentList) {
+            assessmentDTOList.add(AssessmentDTO.builder()
+                    .id(assessment.getId())
+                    .cooperator(assessment.getCooperator())
+                    .applicationId(assessment.getApplicationId())
+                    .assessmentTime(assessment.getAssessmentTime())
+                    .comment(assessment.getComment())
+                    .step(assessment.getStep())
+                    .pass(assessment.getPass()).build());
+        }
+        return assessmentDTOList;
+    }
 
 }
 

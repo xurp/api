@@ -1,4 +1,4 @@
-package jp.co.worksap.stm2018.jobhere.service.impl;
+package jp.co.worksap.stm2018.jobhere.service;
 
 import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
@@ -10,6 +10,7 @@ public interface AssessmentService {
 
     AssessmentDTO save(String applicationId, String cooperatorId);
 
+    List<AssessmentDTO> list(String applicationId);
 
 
 }
