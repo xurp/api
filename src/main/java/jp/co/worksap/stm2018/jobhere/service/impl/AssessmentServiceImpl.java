@@ -1,14 +1,11 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.*;
-import jp.co.worksap.stm2018.jobhere.model.domain.*;
+import jp.co.worksap.stm2018.jobhere.model.domain.Application;
+import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
-<<<<<<< HEAD
-import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
-import jp.co.worksap.stm2018.jobhere.util.Mail;
-=======
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
->>>>>>> master
+import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 @Service
 public class AssessmentServiceImpl implements AssessmentService {
@@ -46,22 +44,20 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setId(UUID.randomUUID().toString().replace("-", ""));
         assessment.setApplicationId(applicationId);
         assessment.setCooperator(cooperatorRepository.findById(cooperatorId).get());//assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
-        Application application=applicationRepository.findById(applicationId).get();
-        String step=application.getStep();
-        if(step.charAt(0)=='+'||step.charAt(0)=='-')
-            step=step.substring(1);
+        Application application = applicationRepository.findById(applicationId).get();
+        String step = application.getStep();
+        if (step.charAt(0) == '+' || step.charAt(0) == '-')
+            step = step.substring(1);
         assessment.setStep(step);
         assessment.setComment("Here is your comment:");
         assessment.setPass("assessing");
         assessmentRepository.save(assessment);
-<<<<<<< HEAD
-        Mail.send("chorespore@163.com","xu_xi@worksap.co.jp","Please give your comment","candidate name:"+application.getUser().getUsername());
-        return AssessmentDTO.builder().id(assessment.getId())
-                .applicationId(assessment.getApplicationId())
-=======
+
+        Mail.send("chorespore@163.com", "xu_xi@worksap.co.jp", "Please give your comment", "candidate name:" + application.getUser().getUsername());
+
         return AssessmentDTO.builder()
                 .id(assessment.getId())
->>>>>>> master
+
                 .cooperator(assessment.getCooperator())
                 .applicationId(assessment.getApplicationId())
                 .assessmentTime(assessment.getAssessmentTime())
