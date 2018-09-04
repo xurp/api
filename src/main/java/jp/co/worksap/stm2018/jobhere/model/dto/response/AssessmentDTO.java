@@ -33,4 +33,6 @@ public class AssessmentDTO {
 
     private String step;
 
+    private String pass;
+
 }

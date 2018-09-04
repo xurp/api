@@ -47,11 +47,12 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setCooperator(cooperatorRepository.findById(cooperatorId).get());//assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         assessment.setStep(applicationRepository.findById(applicationId).get().getStep());
         assessment.setComment("Here is your comment:");
+        assessment.setPass("assessing");
         assessmentRepository.save(assessment);
         return AssessmentDTO.builder().id(assessment.getId())
                 .applicationId(assessment.getApplicationId())
                 .cooperator(assessment.getCooperator())
-                .step(assessment.getStep()).build();
+                .step(assessment.getStep()).pass(assessment.getPass()).build();
     }
 
 
