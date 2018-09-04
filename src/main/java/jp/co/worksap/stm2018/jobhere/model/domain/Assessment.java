@@ -23,7 +23,7 @@ public class Assessment {
     @Id
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=true)
+    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.EAGER,optional=true)
     @JoinColumn(name = "cooperator_id")
     @JsonIgnore
     private Cooperator cooperator;
