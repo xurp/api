@@ -7,6 +7,7 @@ import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
+import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +46,12 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setId(UUID.randomUUID().toString().replace("-", ""));
         assessment.setApplicationId(applicationId);
         assessment.setCooperator(cooperatorRepository.findById(cooperatorId).get());//assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
-        assessment.setStep(applicationRepository.findById(applicationId).get().getStep());
+        Application application=applicationRepository.findById(applicationId).get();
+        assessment.setStep(application.getStep());
         assessment.setComment("Here is your comment:");
         assessment.setPass("assessing");
         assessmentRepository.save(assessment);
+        Mail.send("chorespore@163.com","xu_xi@worksap.co.jp","Please give your comment","candidate name:"+application.getUser().getUsername());
         return AssessmentDTO.builder().id(assessment.getId())
                 .applicationId(assessment.getApplicationId())
                 .cooperator(assessment.getCooperator())
