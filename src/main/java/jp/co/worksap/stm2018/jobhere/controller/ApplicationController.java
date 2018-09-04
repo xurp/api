@@ -11,6 +11,7 @@ import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 /**
  * Created by xu_xi-pc on 2018/9/3.
  */
+@Slf4j
 @RestController
 @RequestMapping("/application")
 public class ApplicationController {
@@ -80,6 +82,7 @@ public class ApplicationController {
 
             return applicationService.list(jobId, step);
         } else {
+            log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");
         }
     }
