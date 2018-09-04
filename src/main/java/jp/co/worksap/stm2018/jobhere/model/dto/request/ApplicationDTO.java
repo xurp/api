@@ -1,6 +1,8 @@
 package jp.co.worksap.stm2018.jobhere.model.dto.request;
 
-import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.Job;
+import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
+import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,29 +10,19 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
+/**
+ * Created by xu_xi-pc on 2018/9/3.
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobDTO {
-
+public class ApplicationDTO {
     private String id;
-
-    private String name;
-
-    private String detail;
-
-    private int count;
-
-    private String department;
-
-    private String remark;
-
+    private Resume resume;
+    private Job job;
+    private String step;
+    private User user;
     private Timestamp createTime;
-
     private Timestamp updateTime;
-
-    private Company company;
-
-    private boolean applied;//true:candidate can apply/false:candidate has applied
 }

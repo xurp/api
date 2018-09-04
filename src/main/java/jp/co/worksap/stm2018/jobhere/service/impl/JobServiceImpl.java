@@ -2,10 +2,13 @@ package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.JobRepository;
+import jp.co.worksap.stm2018.jobhere.dao.StepRepository;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
+import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import jp.co.worksap.stm2018.jobhere.model.domain.Job;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.JobStepDTO;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +26,13 @@ public class JobServiceImpl implements JobService {
     //    private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final CompanyRepository companyRepository;
+    private final StepRepository stepRepository;
 
     @Autowired
-    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository) {
+    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,StepRepository stepRepository) {
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
+        this.stepRepository=stepRepository;
     }
 
     @Override
@@ -51,10 +56,19 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDTO> listAll() {
+    public List<JobDTO> listAll(String userid) {
         List<Job> jobList = jobRepository.findAll();
         List<JobDTO> jobDTOList = new ArrayList<>();
         for (Job job : jobList) {
+            List<Application> applications=job.getApplications();
+            boolean flag=false;
+            for(Application a:applications){
+                if(a.getUser().getId().equals(userid)){
+                    flag=true;//has applied
+                    break;
+                }
+            }
+            if(flag)
             jobDTOList.add(JobDTO.builder()
                     .id(job.getId())
                     .name(job.getName())
@@ -64,7 +78,18 @@ public class JobServiceImpl implements JobService {
                     .remark(job.getRemark())
                     .createTime(job.getCreateTime())
                     .updateTime(job.getUpdateTime())
-                    .company(job.getCompany()).build());
+                    .company(job.getCompany()).applied(true).build());
+            else
+                jobDTOList.add(JobDTO.builder()
+                        .id(job.getId())
+                        .name(job.getName())
+                        .detail(job.getDetail())
+                        .count(job.getCount())
+                        .department(job.getDepartment())
+                        .remark(job.getRemark())
+                        .createTime(job.getCreateTime())
+                        .updateTime(job.getUpdateTime())
+                        .company(job.getCompany()).applied(false).build());
         }
         return jobDTOList;
     }
@@ -128,17 +153,20 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobDTO getDetail(String id) {
+    public JobStepDTO getDetail(String id) {
         Optional<Job> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
-            return JobDTO.builder().id(job.getId()).name(job.getName())
+            List stepList=stepRepository.findByJobId(job.getId());
+            if(stepList==null||stepList.size()==0)
+                stepList=stepRepository.findByJobId("-1");
+            return JobStepDTO.builder().id(job.getId()).name(job.getName())
                     .detail(job.getDetail())
                     .count(job.getCount())
                     .department(job.getDepartment())
                     .remark(job.getRemark())
                     .createTime(job.getCreateTime())
-                    .updateTime(job.getUpdateTime()).build();
+                    .updateTime(job.getUpdateTime()).step(stepList).build();
         } else {
             throw new ValidationException("Job id does not exist!");
         }
