@@ -98,18 +98,24 @@ maven-package:
   <<: *maven-package
 
 docker-build:
-  image: docker:latest
+  image: registry.paas.workslan/jobhere/yosolo
   services:
-  - docker:dind
+  - registry.paas.workslan/jobhere/dind
   stage: deploy
   only:
   - tags
   variables:
-    DOCKER_IMAGE_NAME: registry.paas.workslan/jobhere/jobhere-api:$CI_COMMIT_TAG
-  script:
-  - echo "Building docker image $DOCKER_IMAGE_NAME"
-  - docker build -t $DOCKER_IMAGE_NAME .
-  - docker login --username $DOCKER_HARBOR_USERNAME --password $DOCKER_HARBOR_PASSWORD
-  - docker push $DOCKER_IMAGE_NAME
+    DOCKER_HOST: "tcp://registry.paas.workslan__jobhere__dind:2375"
+    DOCKER_REGISTRY: registry.paas.workslan
+    PAAS_APP: jobhere-api
+    DOCKER_IMAGE: $DOCKER_REGISTRY/jobhere/$PAAS_APP:$CI_COMMIT_TAG
+  before_script:
+  - echo $DOCKER_HARBOR_PASSWORD | docker login $DOCKER_REGISTRY --username $DOCKER_HARBOR_USERNAME --password-stdin
   - yosolo login --username $DOCKER_HARBOR_USERNAME --password $DOCKER_HARBOR_PASSWORD
-  - yosolo deploy update -a=jobhere-api -e=sh-stm --image=$DOCKER_IMAGE_NAME
+  script:
+  - echo "Building docker image $DOCKER_IMAGE"
+  - docker build -t $DOCKER_IMAGE .
+  - echo "Pushing docker image $DOCKER_IMAGE"
+  - docker push $DOCKER_IMAGE
+  - echo "Deploying PaaS app $PAAS_APP"
+  - yosolo deploy update -a=$PAAS_APP -e=sh-stm --image=$DOCKER_IMAGE
