@@ -12,5 +12,6 @@ public interface ApplicationService {
 
     List<ApplicationDTO> list(String jobId, String step);
 
+    void update(String applicationId, String step);
 
 }

@@ -11,7 +11,6 @@ import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,6 @@ import java.util.UUID;
  * Created by xu_xi-pc on 2018/9/3.
  */
 @RestController
-@Slf4j
 @RequestMapping("/application")
 public class ApplicationController {
     private final ApplicationService applicationService;
@@ -55,25 +53,40 @@ public class ApplicationController {
 
     }
 
+//    @GetMapping("")
+//    @NeedLogin
+//    List<ApplicationDTO> list(HttpServletRequest request, @RequestBody String jobId, @RequestBody String step) {
+//        User user = (User) request.getAttribute("getuser");
+//        if (user.getRole().equals("hr")) {
+//            jobId = jobId.substring(0, jobId.length() - 1);
+//            step = step.substring(0, jobId.length() - 1);
+//
+//            return applicationService.list(jobId, step);
+//        } else {
+//            throw new ValidationException("Permission Denied!");
+//        }
+//
+//    }
+
     @GetMapping("")
     @NeedLogin
-    List<ApplicationDTO> list(HttpServletRequest request, @RequestBody String jobId, @RequestBody String step) {
+    List<ApplicationDTO> list(HttpServletRequest request) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            jobId = jobId.substring(0, jobId.length() - 1);
-            step = step.substring(0, jobId.length() - 1);
+            String jobId = request.getParameter("jobId");
+            String step = request.getParameter("step");
+            //jobId = jobId.substring(0, jobId.length() - 1);
+            //step = step.substring(0, jobId.length() - 1);
 
             return applicationService.list(jobId, step);
         } else {
             throw new ValidationException("Permission Denied!");
         }
-
     }
 
     @GetMapping("/{id}")
     @NeedLogin
     ApplicationDTO find(HttpServletRequest request, @PathVariable("id") String id) {
-        log.info("find");
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             return applicationService.find(id);
@@ -81,4 +94,18 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
+
+    @PutMapping("/{id}/step")
+    @NeedLogin
+    void update(HttpServletRequest request, @PathVariable("id") String id, @RequestBody String step) {
+        step = step.substring(0, step.length() - 1);
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            applicationService.update(id, step);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+    }
+
+
 }
