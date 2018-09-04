@@ -6,6 +6,7 @@ import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.JobStepDTO;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,7 @@ public class JobController {
     }
 
     @GetMapping("/{id}")
-    JobDTO detail(@PathVariable("id") String id) {
+    JobStepDTO detail(@PathVariable("id") String id) {
         return jobService.getDetail(id);
     }
 
