@@ -36,7 +36,7 @@ public class ApplicationController {
         this.resumeService = resumeService;
         this.jobService = jobService;
     }
-
+    
     @PostMapping("")
     @NeedLogin
     ApplicationDTO save(HttpServletRequest request, @RequestBody String jobId) {
