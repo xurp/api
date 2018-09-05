@@ -101,7 +101,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         Optional<Assessment> assessmentOptional = assessmentRepository.findById(id);
         if (assessmentOptional.isPresent()) {
             Assessment assessment = assessmentOptional.get();
-            if (assessment.getAssessmentTime() != null) {
+            if (assessment.getPass().equals("assessing")) {
                 String applicationId = assessment.getApplicationId();
                 Application application = applicationRepository.findById(applicationId).get();
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
@@ -120,8 +120,8 @@ public class AssessmentServiceImpl implements AssessmentService {
                         .assessments(sortedList)
                                 .stepList(stepList).build();
             } else {
-                return null;
-                //throw new ValidationException("You've done it, thank you.");
+                //return null;
+                throw new ValidationException("You've done it, thank you.");
             }
         } else {
             throw new ValidationException("The link is wrong, please contact HR.");
