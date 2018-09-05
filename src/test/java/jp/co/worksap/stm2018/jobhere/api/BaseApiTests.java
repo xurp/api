@@ -5,6 +5,7 @@ import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.model.domain.ApiToken;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
+@Ignore
 public class BaseApiTests {
 
     @Autowired
