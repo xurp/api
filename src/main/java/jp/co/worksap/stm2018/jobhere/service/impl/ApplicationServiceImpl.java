@@ -157,9 +157,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
             String pass = assessmentDTO.getPass();
-            if (pass.equals("true")) {
+            if (pass.equals("pass")) {
                 application.setStep("+" + assessmentDTO.getStep());
-            } else if (pass.equals("false")) {
+            } else if (pass.equals("fail")) {
                 application.setStep("-" + assessmentDTO.getStep());
             }
             applicationRepository.save(application);
