@@ -68,6 +68,7 @@ public class AssessmentController {
 
     @GetMapping("/{id}")
     ApplicationAndAssessmentDTO getDetail(HttpServletRequest request, @PathVariable("id") String id) {
+        //interviewer can get detail without signing in. delete @NeedLogin
         return assessmentService.getDetail(id);
     }
 
