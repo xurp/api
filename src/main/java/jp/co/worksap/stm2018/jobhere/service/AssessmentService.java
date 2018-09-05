@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface AssessmentService {
 
-    AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content);
+    AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId);
 
     List<AssessmentDTO> list(String applicationId);
 
