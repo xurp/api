@@ -75,6 +75,8 @@ stages:
 
 .maven-package: &maven-package
   stage: package
+  only:
+  - tags
   script:
   - echo "Packaging project into jar"
   - 'mvn $MAVEN_CLI_OPTS package'
