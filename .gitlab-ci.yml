@@ -30,8 +30,8 @@ variables:
   # `installAtEnd` and `deployAtEnd` are only effective with recent version of the corresponding plugins.
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -Dspring.profiles.active=staging -DinstallAtEnd=true -DdeployAtEnd=true"
 
-# Cache downloaded dependencies and plugins between builds.
-# To keep cache across branches add 'key: "$CI_JOB_REF_NAME"'
+image: maven:3.5.2-jdk-8-alpine
+
 cache:
   paths:
   - .m2/repository
@@ -42,60 +42,26 @@ stages:
 - package
 - deploy
 
-.maven-project: &maven-project-setup
-  # Since we require Maven for this job,
-  # we can restrict the job to runners with a certain tag.
-  # Of course, it is our duty to actually configure a runner
-  # with the tag 'maven' and a working maven installation
-  tags:
-  - maven
-  # - master
-  image: maven:3.5.2-jdk-8-alpine
-
-# This will only validate and compile stuff and run e.g. maven-enforcer-plugin.
-# Because some enforcer rules might check dependency convergence and class duplications
-# we use `test-compile` here instead of `validate`, so the correct classpath is picked up.
-.validate: &validate
-  # A job is always executed within a stage.
-  # If no stage is set, it defaults to 'test'.
+maven-build:
   stage: build
-  # Here you can execute arbitrate terminal commands.
-  # If any of the commands returns a non zero exit code the job fails.
   script:
   - echo "Building project with maven"
-  - 'mvn $MAVEN_CLI_OPTS test-compile'
+  - mvn $MAVEN_CLI_OPTS compile
 
-# For merge requests do not `deploy` but only run `verify`.
-# See https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
-.verify: &verify
+maven-test:
   stage: test
   script:
   - echo "Testing project with maven"
-  - 'mvn $MAVEN_CLI_OPTS verify'
+  - mvn $MAVEN_CLI_OPTS test
 
-.maven-package: &maven-package
+maven-package:
   stage: package
   script:
   - echo "Packaging project into jar"
-  - 'mvn $MAVEN_CLI_OPTS package'
+  - mvn $MAVEN_CLI_OPTS package
   artifacts:
     paths:
     - target/*.jar
-
-# This is the name of the job.
-# You can choose it freely.
-maven-build:
-  <<: *maven-project-setup
-  <<: *validate
-  
-
-maven-test:
-  <<: *maven-project-setup
-  <<: *verify
-
-maven-package:
-  <<: *maven-project-setup
-  <<: *maven-package
 
 docker-build:
   image: registry.paas.workslan/jobhere/yosolo
