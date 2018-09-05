@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Created by xu_xi-pc on 2018/9/4.
@@ -27,6 +28,11 @@ public class Assessment {
     @JoinColumn(name = "cooperator_id")
     @JsonIgnore
     private Cooperator cooperator;
+
+    /*@ManyToMany(cascade = {CascadeType.DETACH}, fetch = FetchType.EAGER) //CascadeType.MERGE may not need, because it is not necessary to add cooperator from assessment
+    @JoinTable(name = "assessmentCooperator", joinColumns = @JoinColumn(name = "assessment_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "cooperator_id", referencedColumnName = "id"))
+    private List<Cooperator> cooperators;*/
 
     @Column(nullable = false)
     private String applicationId;

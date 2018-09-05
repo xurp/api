@@ -5,6 +5,7 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
+import jp.co.worksap.stm2018.jobhere.model.domain.Cooperator;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
@@ -13,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -44,11 +43,15 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     @Transactional
     @Override
-    public AssessmentDTO save(String applicationId, String cooperatorId) {
+    public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content) {
+        System.out.println("save");
         Assessment assessment = new Assessment();
         assessment.setId(UUID.randomUUID().toString().replace("-", ""));
         assessment.setApplicationId(applicationId);
-        assessment.setCooperator(cooperatorRepository.findById(cooperatorId).get());//assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
+        //List<Cooperator> cooperators =cooperatorRepository.findAllById(Arrays.asList(cooperatorArr));
+        //assessment.setCooperators(cooperators);
+        Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
+        assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         Application application = applicationRepository.findById(applicationId).get();
         String step = application.getStep();
         if (step.charAt(0) == '+' || step.charAt(0) == '-')
@@ -60,8 +63,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         //step of application '+1'
         application.setStep((Integer.parseInt(step) + 1) + "");
         applicationRepository.save(application);
-        Mail.send("chorespore@163.com", "xu_xi@worksap.co.jp", "Please give your assessment by clicking the link",
-                "candidate name:" + application.getUser().getUsername() + "\n http://localhost:1234/jobhere/#/assessment/" + assessment.getId());
+        Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
 
         return AssessmentDTO.builder()
                 .id(assessment.getId())

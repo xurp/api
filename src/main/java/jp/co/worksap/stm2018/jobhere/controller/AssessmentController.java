@@ -3,6 +3,7 @@ package jp.co.worksap.stm2018.jobhere.controller;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
@@ -38,14 +39,12 @@ public class AssessmentController {
 
     @PostMapping("")
     @NeedLogin
-    void save(HttpServletRequest request) {
+    void save(HttpServletRequest request,@RequestBody EmailDTO emailDTO ) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            String applicationId = request.getParameter("applicationId");
-            String cooperatorId = request.getParameter("cooperatorId");
             //hr views application detail then click 'send email'
             //create assessment and send email
-            assessmentService.save(applicationId, cooperatorId);
+            assessmentService.save(emailDTO.getApplicationId(), emailDTO.getCooperatorId(),emailDTO.getSubject(),emailDTO.getContent());
         } else {
             log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");
