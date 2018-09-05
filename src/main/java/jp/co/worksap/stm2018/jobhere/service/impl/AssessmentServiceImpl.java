@@ -107,11 +107,18 @@ public class AssessmentServiceImpl implements AssessmentService {
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
                 List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                 sortedList.remove(sortedList.size()-1);
+
+                List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
+                if (stepList == null || stepList.size() == 0)
+                    stepList = stepRepository.findByJobId("-1");
+                stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
                 return ApplicationAndAssessmentDTO.builder().applicationId(applicationId)
                         .job(application.getJob())
                         .resume(application.getResume())
                         .step(application.getStep())
-                        .assessments(sortedList).build();
+                        .assessments(sortedList)
+                                .stepList(stepList).build();
             } else {
                 return null;
                 //throw new ValidationException("You've done it, thank you.");
@@ -137,7 +144,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         }
     }
 
-    public String hrUpdate(String applicationId) {
+    /*public String hrUpdate(String applicationId) {
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
@@ -151,6 +158,33 @@ public class AssessmentServiceImpl implements AssessmentService {
                 if (stepOptional.isPresent()) {
                     return stepOptional.get().getIndex() + "";
                     //application.setStep(stepOptional.get().getIndex() + "");
+                }
+                else {
+                    throw new ValidationException("Step in system has errors.");
+                }
+            } else {
+                throw new ValidationException("The application has been turn down");
+            }
+        } else {
+            throw new NotFoundException("Application no found");
+        }
+    }*/
+    public String hrUpdate(String applicationId) {
+        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            Job job = application.getJob();
+            List<Step> stepList = stepRepository.findByJobId(job.getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if (Double.valueOf(application.getStep()) - stepList.get(0).getIndex() == 0 || application.getStep().charAt(0) == '+') {
+                Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
+                if (stepOptional.isPresent()) {
+                    //application.setStep(stepOptional.get().getIndex() + "");
+                    return stepOptional.get().getIndex() + "";
                 }
                 else {
                     throw new ValidationException("Step in system has errors.");

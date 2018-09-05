@@ -74,10 +74,10 @@ public class ApplicationServiceImpl implements ApplicationService {
             User user = userRepository.findById(userId).get();
             application.setUser(user);
             Job job = jobOptional.get();
-            List<Step> stepList=stepRepository.findByJobId(job.getId());
-            if(stepList==null||stepList.size()==0)
-                stepList=stepRepository.findByJobId("-1");
-            List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+            List<Step> stepList = stepRepository.findByJobId(job.getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+            List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(), b.getIndex())).collect(Collectors.toList());
             application.setStep(String.valueOf(sortedList.get(0).getIndex()));//there may be error of '.'
             application.setJob(job);
             job.addApplication(application);
@@ -173,11 +173,15 @@ public class ApplicationServiceImpl implements ApplicationService {
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
-            if (application.getStep().charAt(0) == '+') {
-                Job job = application.getJob();
-                List<Step> stepList = stepRepository.findByJobId(job.getId());
-                List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(), b.getIndex())).collect(Collectors.toList());
-                Optional<Step> stepOptional = sortedList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
+            Job job = application.getJob();
+            List<Step> stepList = stepRepository.findByJobId(job.getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if (Double.valueOf(application.getStep()) - stepList.get(0).getIndex() == 0 || application.getStep().charAt(0) == '+') {
+                Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     application.setStep(stepOptional.get().getIndex() + "");
                 }
