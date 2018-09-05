@@ -44,7 +44,7 @@ public class AssessmentController {
         if (user.getRole().equals("hr")) {
             //hr views application detail then click 'send email'
             //create assessment and send email
-            assessmentService.save(emailDTO.getApplicationId(), emailDTO.getCooperatorId(),emailDTO.getSubject(),emailDTO.getContent());
+            assessmentService.save(emailDTO.getApplicationId(), emailDTO.getCooperatorId(),emailDTO.getSubject(),emailDTO.getContent(),emailDTO.getAssessId());
         } else {
             log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");

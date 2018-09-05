@@ -4,9 +4,7 @@ import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.JobRepository;
 import jp.co.worksap.stm2018.jobhere.dao.StepRepository;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
-import jp.co.worksap.stm2018.jobhere.model.domain.Application;
-import jp.co.worksap.stm2018.jobhere.model.domain.Company;
-import jp.co.worksap.stm2018.jobhere.model.domain.Job;
+import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.JobStepDTO;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -157,16 +156,17 @@ public class JobServiceImpl implements JobService {
         Optional<Job> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
-            List stepList=stepRepository.findByJobId(job.getId());
+            List<Step> stepList=stepRepository.findByJobId(job.getId());
             if(stepList==null||stepList.size()==0)
                 stepList=stepRepository.findByJobId("-1");
+            List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
             return JobStepDTO.builder().id(job.getId()).name(job.getName())
                     .detail(job.getDetail())
                     .count(job.getCount())
                     .department(job.getDepartment())
                     .remark(job.getRemark())
                     .createTime(job.getCreateTime())
-                    .updateTime(job.getUpdateTime()).step(stepList).build();
+                    .updateTime(job.getUpdateTime()).step(sortedList).build();
         } else {
             throw new ValidationException("Job id does not exist!");
         }

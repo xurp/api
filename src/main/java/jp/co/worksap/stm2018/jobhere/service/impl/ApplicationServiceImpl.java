@@ -68,12 +68,17 @@ public class ApplicationServiceImpl implements ApplicationService {
             Application application = new Application();
             application.setId(uuid);
             application.setResume(resume);
-            application.setStep("no");
+            //application.setStep("no");
             Timestamp t = new Timestamp(System.currentTimeMillis());
             application.setUpdateTime(t);
             User user = userRepository.findById(userId).get();
             application.setUser(user);
             Job job = jobOptional.get();
+            List<Step> stepList=stepRepository.findByJobId(job.getId());
+            if(stepList==null||stepList.size()==0)
+                stepList=stepRepository.findByJobId("-1");
+            List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+            application.setStep(String.valueOf(sortedList.get(0).getIndex()));//there may be error of '.'
             application.setJob(job);
             job.addApplication(application);
             jobRepository.save(job);
