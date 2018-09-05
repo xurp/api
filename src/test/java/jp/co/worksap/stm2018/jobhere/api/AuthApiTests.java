@@ -3,58 +3,40 @@ package jp.co.worksap.stm2018.jobhere.api;
 import com.google.gson.Gson;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.RegisterDTO;
-import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-public class AuthApiTests {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class AuthApiTests extends BaseApiTests {
 
     @Test
     public void unauthorized() throws Exception {
-        mockMvc
-                .perform(get("/auth").header("Api-Token", "xxx"))
+        mvc
+                .perform(get("/auth").header("Api-Token", "none-existed-token"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void authorized() throws Exception {
+        mvc
+                .perform(get("/auth").header("Api-Token", "token-admin"))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void loginSuccess() throws Exception {
         LoginDTO loginDTO = LoginDTO.builder()
-                .username("admin")
-                .password("123456")
+                .username("user-admin")
+                .password("pwd-admin")
                 .build();
-        String responseBody = mockMvc
+        mvc
                 .perform(
                         post("/auth")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new Gson().toJson(loginDTO))
-                )
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        String apiToken = new Gson().fromJson(responseBody, ApiTokenDTO.class).getToken();
-        mockMvc
-                .perform(
-                        get("/auth")
-                                .header("Api-Token", apiToken)
                 )
                 .andExpect(status().isOk());
     }
@@ -63,9 +45,9 @@ public class AuthApiTests {
     public void loginFailed() throws Exception {
         LoginDTO loginDTO = LoginDTO.builder()
                 .username("admin")
-                .password("123456111")
+                .password("wrong-password")
                 .build();
-        mockMvc
+        mvc
                 .perform(
                         post("/auth")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,12 +66,28 @@ public class AuthApiTests {
                 .legalPerson("lp")
                 .role("hr")
                 .build();
-        mockMvc
+        mvc
                 .perform(
                         post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new Gson().toJson(registerDTO))
                 )
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void registerWithExistedUsername() throws Exception {
+        RegisterDTO registerDTO = RegisterDTO.builder()
+                .username("user-admin")
+                .password("test")
+                .role("candidate")
+                .build();
+        mvc
+                .perform(
+                        post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new Gson().toJson(registerDTO))
+                )
+                .andExpect(status().isUnprocessableEntity());
     }
 }
