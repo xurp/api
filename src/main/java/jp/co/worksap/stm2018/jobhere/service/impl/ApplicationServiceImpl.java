@@ -6,6 +6,7 @@ import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,11 +142,16 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public void update(String applicationId, String step) {
-        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+    public void update(AssessmentDTO assessmentDTO) {
+        Optional<Application> applicationOptional = applicationRepository.findById(assessmentDTO.getApplicationId());
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
-            application.setStep(step);
+            String pass = assessmentDTO.getPass();
+            if (pass.equals("true")) {
+                application.setStep("+" + assessmentDTO.getStep());
+            } else if (pass.equals("false")) {
+                application.setStep("-" + assessmentDTO.getStep());
+            }
             applicationRepository.save(application);
         } else {
             throw new NotFoundException("Application not found");

@@ -72,4 +72,11 @@ public class AssessmentController {
         return assessmentService.getDetail(id);
     }
 
+    @PutMapping("/{id}")
+    void update(HttpServletRequest request, @RequestBody AssessmentDTO assessmentDTO) {
+        //interviewer can get detail without signing in. delete @NeedLogin
+        assessmentService.update(assessmentDTO);
+        applicationService.update(assessmentDTO);
+    }
+
 }
