@@ -15,4 +15,6 @@ public interface ApplicationService {
 
     void update(AssessmentDTO assessmentDTO);
 
+    void hrUpdate(String applicationId);
+
 }

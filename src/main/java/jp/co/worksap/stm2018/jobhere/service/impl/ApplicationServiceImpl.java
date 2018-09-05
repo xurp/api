@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -28,14 +29,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
+    private final StepRepository stepRepository;
 
     @Autowired
-    ApplicationServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository, ResumeRepository resumeRepository, UserRepository userRepository, ApplicationRepository applicationRepository) {
+    ApplicationServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,
+                           ResumeRepository resumeRepository, UserRepository userRepository,
+                           ApplicationRepository applicationRepository, StepRepository stepRepository) {
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
+        this.stepRepository = stepRepository;
     }
 
 
@@ -155,6 +160,27 @@ public class ApplicationServiceImpl implements ApplicationService {
             applicationRepository.save(application);
         } else {
             throw new NotFoundException("Application not found");
+        }
+    }
+
+    @Override
+    public void hrUpdate(String applicationId) {
+        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            if (application.getStep().charAt(0) == '+') {
+                Job job = application.getJob();
+                List<Step> stepList = stepRepository.findByJobId(job.getId());
+                List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(), b.getIndex())).collect(Collectors.toList());
+                Optional<Step> stepOptional = sortedList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
+                if (stepOptional.isPresent()) {
+                    application.setStep(stepOptional.get().getIndex() + "");
+                }
+            } else {
+                throw new ValidationException("The application has been turn down");
+            }
+        } else {
+            throw new NotFoundException("Application no found");
         }
     }
 
