@@ -1,7 +1,5 @@
 package jp.co.worksap.stm2018.jobhere.service;
 
-import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
-import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 
@@ -15,5 +13,6 @@ public interface AssessmentService {
 
     ApplicationAndAssessmentDTO getDetail(String id);
 
+    void update(AssessmentDTO assessmentDTO);
 
 }

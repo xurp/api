@@ -1,6 +1,7 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.*;
+import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,10 +58,10 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setPass("assessing");
         assessmentRepository.save(assessment);
         //step of application '+1'
-        application.setStep((Integer.parseInt(step)+1)+"");
+        application.setStep((Integer.parseInt(step) + 1) + "");
         applicationRepository.save(application);
         Mail.send("chorespore@163.com", "xu_xi@worksap.co.jp", "Please give your assessment by clicking the link",
-                "candidate name:" + application.getUser().getUsername()+"\n http://localhost:1234/jobhere/#/assessment/"+assessment.getId());
+                "candidate name:" + application.getUser().getUsername() + "\n http://localhost:1234/jobhere/#/assessment/" + assessment.getId());
 
         return AssessmentDTO.builder()
                 .id(assessment.getId())
@@ -91,10 +93,10 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public ApplicationAndAssessmentDTO getDetail(String id) {
         //id:assessmentId
-        Optional<Assessment> assessmentOptional=assessmentRepository.findById(id);
-        if(assessmentOptional.isPresent()){
-            Assessment assessment=assessmentOptional.get();
-            if(assessment.getAssessmentTime()!=null) {
+        Optional<Assessment> assessmentOptional = assessmentRepository.findById(id);
+        if (assessmentOptional.isPresent()) {
+            Assessment assessment = assessmentOptional.get();
+            if (assessment.getAssessmentTime() != null) {
                 String applicationId = assessment.getApplicationId();
                 Application application = applicationRepository.findById(applicationId).get();
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
@@ -103,17 +105,31 @@ public class AssessmentServiceImpl implements AssessmentService {
                         .resume(application.getResume())
                         .step(application.getStep())
                         .assessments(assessmentList).build();
-            }
-            else{
+            } else {
                 return null;
                 //throw new ValidationException("You've done it, thank you.");
             }
-        }
-        else{
+        } else {
             throw new ValidationException("The link is wrong, please contact HR.");
         }
 
     }
+
+    @Override
+    public void update(AssessmentDTO assessmentDTO) {
+        Optional<Assessment> assessmentOptional = assessmentRepository.findById(assessmentDTO.getId());
+        if (assessmentOptional.isPresent()) {
+            Assessment assessment = assessmentOptional.get();
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            assessment.setAssessmentTime(timestamp);
+            assessment.setPass(assessmentDTO.getPass());
+            assessment.setComment(assessmentDTO.getComment());
+            assessmentRepository.save(assessment);
+        } else {
+            throw new NotFoundException("Application not found");
+        }
+    }
+
 
 }
 
