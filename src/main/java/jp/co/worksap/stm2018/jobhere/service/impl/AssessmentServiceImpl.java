@@ -1,8 +1,10 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.*;
+import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
 import jp.co.worksap.stm2018.jobhere.util.Mail;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -52,8 +55,11 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setComment("Here is your comment:");
         assessment.setPass("assessing");
         assessmentRepository.save(assessment);
-
-        Mail.send("chorespore@163.com", "xu_xi@worksap.co.jp", "Please give your comment", "candidate name:" + application.getUser().getUsername());
+        //step of application '+1'
+        application.setStep((Integer.parseInt(step)+1)+"");
+        applicationRepository.save(application);
+        Mail.send("chorespore@163.com", "xu_xi@worksap.co.jp", "Please give your assessment by clicking the link",
+                "candidate name:" + application.getUser().getUsername()+"\n http://localhost:1234/jobhere/#/assessment/"+assessment.getId());
 
         return AssessmentDTO.builder()
                 .id(assessment.getId())
@@ -80,6 +86,33 @@ public class AssessmentServiceImpl implements AssessmentService {
                     .pass(assessment.getPass()).build());
         }
         return assessmentDTOList;
+    }
+
+    @Override
+    public ApplicationAndAssessmentDTO getDetail(String id) {
+        //id:assessmentId
+        Optional<Assessment> assessmentOptional=assessmentRepository.findById(id);
+        if(assessmentOptional.isPresent()){
+            Assessment assessment=assessmentOptional.get();
+            if(assessment.getAssessmentTime()!=null) {
+                String applicationId = assessment.getApplicationId();
+                Application application = applicationRepository.findById(applicationId).get();
+                List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
+                return ApplicationAndAssessmentDTO.builder().applicationId(applicationId)
+                        .job(application.getJob())
+                        .resume(application.getResume())
+                        .step(application.getStep())
+                        .assessments(assessmentList).build();
+            }
+            else{
+                return null;
+                //throw new ValidationException("You've done it, thank you.");
+            }
+        }
+        else{
+            throw new ValidationException("The link is wrong, please contact HR.");
+        }
+
     }
 
 }

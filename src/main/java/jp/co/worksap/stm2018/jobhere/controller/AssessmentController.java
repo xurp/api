@@ -3,6 +3,7 @@ package jp.co.worksap.stm2018.jobhere.controller;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
@@ -63,6 +64,11 @@ public class AssessmentController {
             log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");
         }
+    }
+
+    @GetMapping("/{id}")
+    ApplicationAndAssessmentDTO getDetail(HttpServletRequest request, @PathVariable("id") String id) {
+        return assessmentService.getDetail(id);
     }
 
 }
