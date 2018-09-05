@@ -36,7 +36,7 @@ public class ApplicationController {
         this.resumeService = resumeService;
         this.jobService = jobService;
     }
-    
+
     @PostMapping("")
     @NeedLogin
     ApplicationDTO save(HttpServletRequest request, @RequestBody String jobId) {
@@ -98,17 +98,16 @@ public class ApplicationController {
         }
     }
 
-//    @PutMapping("/{id}/step")
-//    @NeedLogin
-//    void update(HttpServletRequest request, @PathVariable("id") String id, @RequestBody String step) {
-//        step = step.substring(0, step.length() - 1);
-//        User user = (User) request.getAttribute("getuser");
-//        if (user.getRole().equals("hr")) {
-//            applicationService.update(id, step);
-//        } else {
-//            throw new ValidationException("Permission Denied!");
-//        }
-//    }
+    @PutMapping("/{id}/step")
+    @NeedLogin
+    void update(HttpServletRequest request, @PathVariable("id") String id) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            applicationService.hrUpdate(id);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+    }
 
 
 }
