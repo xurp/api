@@ -33,13 +33,6 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public List<OfferDTO> list(String companyId) {
 
-//        private String id;
-//        private Resume resume;
-//        private Job job;
-//        private String step;
-//        private User user;
-//        private Timestamp createTime;
-//        private Timestamp updateTime;
         List<Offer> offerList = offerRepository.findByCompanyId(companyId);
         List<OfferDTO> offerDTOList = new ArrayList<>();
         for (Offer offer : offerList) {
