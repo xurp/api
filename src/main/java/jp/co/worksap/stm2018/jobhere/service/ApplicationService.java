@@ -17,4 +17,6 @@ public interface ApplicationService {
 
     void hrUpdate(String applicationId);
 
+    public void updateApplicationStep(String applicationId);
+
 }

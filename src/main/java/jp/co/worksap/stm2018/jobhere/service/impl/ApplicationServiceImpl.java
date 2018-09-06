@@ -134,7 +134,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             for (Application application : job.getApplications()) {
-                if (step.equals("ALL") || application.getStep().equals(step)) {
+                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep())-Double.parseDouble(step))<0.01) {
                     applicationDTOList.add(ApplicationDTO.builder()
                             .id(application.getId())
                             .resume(application.getResume())
@@ -184,6 +184,37 @@ public class ApplicationServiceImpl implements ApplicationService {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     application.setStep(stepOptional.get().getIndex() + "");
+                }
+            } else {
+                throw new ValidationException("The application has been turn down");
+            }
+        } else {
+            throw new NotFoundException("Application no found");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void updateApplicationStep(String applicationId) {
+        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            Job job = application.getJob();
+            List<Step> stepList = stepRepository.findByJobId(job.getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
+                Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
+                if (stepOptional.isPresent()) {
+                    application.setStep(stepOptional.get().getIndex() + "");
+                    applicationRepository.save(application);
+                    //return stepOptional.get().getIndex() + "";
+                }
+                else {
+                    throw new ValidationException("Step in system has errors.");
                 }
             } else {
                 throw new ValidationException("The application has been turn down");

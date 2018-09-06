@@ -103,7 +103,7 @@ public class ApplicationController {
     void update(HttpServletRequest request, @PathVariable("id") String id) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            applicationService.hrUpdate(id);
+            applicationService.updateApplicationStep(id);
         } else {
             throw new ValidationException("Permission Denied!");
         }
