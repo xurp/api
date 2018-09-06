@@ -37,8 +37,6 @@ public class AuthController {
         User user=authService.getUserByToken(token);
         if(user==null)
             return null;
-        // TODO: match token with ApiTokenRepository
-        // TODO: throw NotLoginException if not login (no use-able token found)
         return UserDTO.builder().id(user.getId()).username(user.getUsername()).role(user.getRole()).build();
     }
 

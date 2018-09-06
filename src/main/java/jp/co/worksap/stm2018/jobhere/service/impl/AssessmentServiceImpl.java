@@ -144,31 +144,6 @@ public class AssessmentServiceImpl implements AssessmentService {
         }
     }
 
-    /*public String hrUpdate(String applicationId) {
-        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
-        if (applicationOptional.isPresent()) {
-            Application application = applicationOptional.get();
-            if (application.getStep().charAt(0) == '+') {
-                Job job = application.getJob();
-                List<Step> stepList = stepRepository.findByJobId(job.getId());
-                if(stepList==null||stepList.size()==0)
-                    stepList=stepRepository.findByJobId("-1");
-                List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(), b.getIndex())).collect(Collectors.toList());
-                Optional<Step> stepOptional = sortedList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
-                if (stepOptional.isPresent()) {
-                    return stepOptional.get().getIndex() + "";
-                    //application.setStep(stepOptional.get().getIndex() + "");
-                }
-                else {
-                    throw new ValidationException("Step in system has errors.");
-                }
-            } else {
-                throw new ValidationException("The application has been turn down");
-            }
-        } else {
-            throw new NotFoundException("Application no found");
-        }
-    }*/
     public String hrUpdate(String applicationId) {
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {

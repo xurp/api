@@ -27,17 +27,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     //    private final UserRepository userRepository;
     private final JobRepository jobRepository;
-    private final CompanyRepository companyRepository;
+    private final OfferRepository offerRepository;
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
     private final StepRepository stepRepository;
 
     @Autowired
-    ApplicationServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,
+    ApplicationServiceImpl(JobRepository jobRepository, OfferRepository offerRepository,
                            ResumeRepository resumeRepository, UserRepository userRepository,
                            ApplicationRepository applicationRepository, StepRepository stepRepository) {
-        this.companyRepository = companyRepository;
+        this.offerRepository = offerRepository;
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
@@ -207,12 +207,20 @@ public class ApplicationServiceImpl implements ApplicationService {
                 stepList = stepRepository.findByJobId("-1");
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-
-            if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
+            //May should use the following if
+            //if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(stepList.size()-2).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
+            if (application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     application.setStep(stepOptional.get().getIndex() + "");
                     applicationRepository.save(application);
+                    Offer offer=new Offer();
+                    offer.setId(UUID.randomUUID().toString().replace("-", ""));
+                    offer.setApplicationId(applicationId);
+                    offer.setCompanyId(application.getJob().getCompany().getId());
+                    offer.setOfferTime( new Timestamp(System.currentTimeMillis()));
+                    offer.setSendStatus("0");
+                    offerRepository.save(offer);
                     //return stepOptional.get().getIndex() + "";
                 }
                 else {
