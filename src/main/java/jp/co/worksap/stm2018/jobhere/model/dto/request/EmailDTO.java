@@ -18,4 +18,5 @@ public class EmailDTO {
     private String subject;
     private String content;
     private String assessId;
+    private String receiver;
 }

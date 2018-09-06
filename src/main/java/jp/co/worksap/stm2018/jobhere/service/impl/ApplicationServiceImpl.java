@@ -232,10 +232,23 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
             String step=application.getStep();
-            if(application.getStep().charAt(0) == '-'){
+
+            List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if(step.charAt(0) == '-'){
                 application.setStep("-"+step);
                 applicationRepository.save(application);
-                Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+            }
+            else if(Math.abs(Double.valueOf(step) - stepList.get(0).getIndex())<0.01){
+                application.setStep("--"+step);
+                applicationRepository.save(application);
+                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
             }
             else{
                 throw new ValidationException("The interviewer has not rejected the candidate.");
