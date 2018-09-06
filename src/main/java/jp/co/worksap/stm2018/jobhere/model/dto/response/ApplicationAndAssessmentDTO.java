@@ -1,9 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.model.dto.response;
 
-import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
-import jp.co.worksap.stm2018.jobhere.model.domain.Job;
-import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
-import jp.co.worksap.stm2018.jobhere.model.domain.Step;
+import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +20,6 @@ public class ApplicationAndAssessmentDTO {
     private Resume resume;
     private Job job;
     private String step;
-    private List<Assessment> assessments;
+    private List<AssessmentDTO> assessments;
     private List<Step> stepList;
 }

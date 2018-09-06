@@ -107,18 +107,35 @@ public class AssessmentServiceImpl implements AssessmentService {
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
                 List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                 sortedList.remove(sortedList.size()-1);
-
                 List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
                 if (stepList == null || stepList.size() == 0)
                     stepList = stepRepository.findByJobId("-1");
                 stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
 
+
+                //assessmentList's assessment has cooperator, but when converted to JSON, cooperator is...
+                List<AssessmentDTO> assessmentDTOList = new ArrayList<>();
+                for (Assessment a : assessmentList) {
+                    assessmentDTOList.add(AssessmentDTO.builder()
+                            .id(a.getId())
+                            .cooperator(a.getCooperator())
+                            .applicationId(a.getApplicationId())
+                            .assessmentTime(a.getAssessmentTime())
+                            .comment(a.getComment())
+                            .step(a.getStep())
+                            .pass(a.getPass()).build());
+                }
+                List<Assessment> assessmentListIncludingCooperator=new ArrayList<>();
+                Assessment assessment1=new Assessment();
+                assessment1.setCooperator(sortedList.get(0).getCooperator());
+                assessmentListIncludingCooperator.add(assessment1);
                 return ApplicationAndAssessmentDTO.builder().applicationId(applicationId)
                         .job(application.getJob())
                         .resume(application.getResume())
                         .step(application.getStep())
-                        .assessments(sortedList)
-                                .stepList(stepList).build();
+                        .assessments(assessmentDTOList)
+                                .stepList(stepList)
+                        .build();
             } else {
                 //return null;
                 throw new ValidationException("You've done it, thank you.");
