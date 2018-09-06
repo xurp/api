@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class EmailDTO {
     private String applicationId;
     private String cooperatorId;
+    private String offerId;
     private String subject;
     private String content;
     private String assessId;
