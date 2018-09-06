@@ -1,12 +1,15 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
+import jp.co.worksap.stm2018.jobhere.dao.ApplicationRepository;
 import jp.co.worksap.stm2018.jobhere.dao.OfferRepository;
 import jp.co.worksap.stm2018.jobhere.dao.ResumeRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
+import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Offer;
 import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.OfferDTO;
 import jp.co.worksap.stm2018.jobhere.service.OfferService;
@@ -23,22 +26,45 @@ public class OfferServiceImpl implements OfferService {
 
     @Autowired
     private OfferRepository offerRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
 
     @Override
     public List<OfferDTO> list(String companyId) {
+
+//        private String id;
+//        private Resume resume;
+//        private Job job;
+//        private String step;
+//        private User user;
+//        private Timestamp createTime;
+//        private Timestamp updateTime;
         List<Offer> offerList = offerRepository.findByCompanyId(companyId);
         List<OfferDTO> offerDTOList = new ArrayList<>();
         for (Offer offer : offerList) {
-            offerDTOList.add(OfferDTO.builder()
-                    .id(offer.getId())
-                    .result(offer.getResult())
-                    .sendStatus(offer.getSendStatus())
-                    .remark(offer.getRemark())
-                    .applicationId(offer.getApplicationId())
-                    .companyId(offer.getCompanyId())
-                    .offerTime(offer.getOfferTime())
-                    .respondTime(offer.getRespondTime()).build());
+            Optional<Application> applicationOptional = applicationRepository.findById(offer.getApplicationId());
+            if (applicationOptional.isPresent()) {
+                Application application = applicationOptional.get();
+                ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                        .id(application.getId())
+                        .resume(application.getResume())
+                        .job(application.getJob())
+                        .step(application.getStep())
+                        .user(application.getUser())
+                        .createTime(application.getCreateTime())
+                        .updateTime(application.getUpdateTime()).build();
+
+                offerDTOList.add(OfferDTO.builder()
+                        .id(offer.getId())
+                        .result(offer.getResult())
+                        .sendStatus(offer.getSendStatus())
+                        .remark(offer.getRemark())
+                        .applicationDTO(applicationDTO)
+                        .companyId(offer.getCompanyId())
+                        .offerTime(offer.getOfferTime())
+                        .respondTime(offer.getRespondTime()).build());
+            }
         }
         return offerDTOList;
     }
