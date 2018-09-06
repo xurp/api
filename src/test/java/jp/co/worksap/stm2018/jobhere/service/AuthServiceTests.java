@@ -36,7 +36,7 @@ import java.util.Optional;
 public class AuthServiceTests {
 
     @Autowired
-    protected MockMvc mvc;
+    private MockMvc mvc;
 
     @Mock
     private UserRepository userRepository;
