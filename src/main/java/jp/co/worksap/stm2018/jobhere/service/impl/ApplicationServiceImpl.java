@@ -136,7 +136,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             for (Application application : job.getApplications()) {
-                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep())-Double.parseDouble(step))<0.01) {
+                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replaceAll("-",""))-Double.parseDouble(step.replaceAll("-","")))<0.01) {
                     applicationDTOList.add(ApplicationDTO.builder()
                             .id(application.getId())
                             .resume(application.getResume())
