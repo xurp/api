@@ -9,5 +9,5 @@ import java.util.List;
 
 @Transactional
 public interface OfferRepository extends JpaRepository<Offer, String> {
-    List<Step> findByCompanyId(String id);
+    List<Offer> findByCompanyId(String companyId);
 }
