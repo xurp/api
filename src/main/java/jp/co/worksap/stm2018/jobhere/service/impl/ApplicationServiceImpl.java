@@ -5,10 +5,12 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
+import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,7 +136,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             for (Application application : job.getApplications()) {
-                if (step.equals("ALL") || application.getStep().equals(step)) {
+                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep())-Double.parseDouble(step))<0.01) {
                     applicationDTOList.add(ApplicationDTO.builder()
                             .id(application.getId())
                             .resume(application.getResume())
@@ -191,6 +193,72 @@ public class ApplicationServiceImpl implements ApplicationService {
         } else {
             throw new NotFoundException("Application no found");
         }
+    }
+
+    @Transactional
+    @Override
+    public void updateApplicationStep(String applicationId) {
+        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            Job job = application.getJob();
+            List<Step> stepList = stepRepository.findByJobId(job.getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
+                Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
+                if (stepOptional.isPresent()) {
+                    application.setStep(stepOptional.get().getIndex() + "");
+                    applicationRepository.save(application);
+                    //return stepOptional.get().getIndex() + "";
+                }
+                else {
+                    throw new ValidationException("Step in system has errors.");
+                }
+            } else {
+                throw new ValidationException("The application has been turn down");
+            }
+        } else {
+            throw new NotFoundException("Application no found");
+        }
+    }
+    @Transactional
+    @Override
+    public void decline(EmailDTO emailDTO) {
+        Optional<Application> applicationOptional = applicationRepository.findById(emailDTO.getApplicationId());
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            String step=application.getStep();
+
+            List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+
+            if(step.charAt(0) == '-'){
+                application.setStep("-"+step);
+                applicationRepository.save(application);
+                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+            }
+            else if(Math.abs(Double.valueOf(step) - stepList.get(0).getIndex())<0.01){
+                application.setStep("--"+step);
+                applicationRepository.save(application);
+                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+            }
+            else{
+                throw new ValidationException("The interviewer has not rejected the candidate.");
+            }
+
+        }
+        else {
+            throw new NotFoundException("Application no found");
+        }
+
     }
 
 }

@@ -128,7 +128,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         }
 
     }
-
+    @Transactional
     @Override
     public void update(AssessmentDTO assessmentDTO) {
         Optional<Assessment> assessmentOptional = assessmentRepository.findById(assessmentDTO.getId());
@@ -180,7 +180,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
 
-            if (Double.valueOf(application.getStep()) - stepList.get(0).getIndex() == 0 || application.getStep().charAt(0) == '+') {
+            if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     //application.setStep(stepOptional.get().getIndex() + "");
@@ -196,6 +196,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             throw new NotFoundException("Application no found");
         }
     }
+
 
 
 }

@@ -7,6 +7,7 @@ import jp.co.worksap.stm2018.jobhere.model.domain.Company;
 import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
@@ -103,7 +104,18 @@ public class ApplicationController {
     void update(HttpServletRequest request, @PathVariable("id") String id) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            applicationService.hrUpdate(id);
+            applicationService.updateApplicationStep(id);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+    }
+
+    @PutMapping("/decline")
+    @NeedLogin
+    void decline(HttpServletRequest request,@RequestBody EmailDTO emailDTO) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            applicationService.decline(emailDTO);
         } else {
             throw new ValidationException("Permission Denied!");
         }
