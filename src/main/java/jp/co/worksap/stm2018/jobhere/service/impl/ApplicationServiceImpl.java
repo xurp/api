@@ -5,10 +5,12 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ApplicationService;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
+import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -222,6 +224,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         } else {
             throw new NotFoundException("Application no found");
         }
+    }
+    @Transactional
+    @Override
+    public void decline(EmailDTO emailDTO) {
+        Optional<Application> applicationOptional = applicationRepository.findById(emailDTO.getApplicationId());
+        if (applicationOptional.isPresent()) {
+            Application application = applicationOptional.get();
+            String step=application.getStep();
+            if(application.getStep().charAt(0) == '-'){
+                application.setStep("-"+step);
+                applicationRepository.save(application);
+                Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
+            }
+            else{
+                throw new ValidationException("The interviewer has not rejected the candidate.");
+            }
+
+        }
+        else {
+            throw new NotFoundException("Application no found");
+        }
+
     }
 
 }
