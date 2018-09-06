@@ -56,21 +56,6 @@ public class ApplicationController {
 
     }
 
-//    @GetMapping("")
-//    @NeedLogin
-//    List<ApplicationDTO> list(HttpServletRequest request, @RequestBody String jobId, @RequestBody String step) {
-//        User user = (User) request.getAttribute("getuser");
-//        if (user.getRole().equals("hr")) {
-//            jobId = jobId.substring(0, jobId.length() - 1);
-//            step = step.substring(0, jobId.length() - 1);
-//
-//            return applicationService.list(jobId, step);
-//        } else {
-//            throw new ValidationException("Permission Denied!");
-//        }
-//
-//    }
-
     @GetMapping("")
     @NeedLogin
     List<ApplicationDTO> list(HttpServletRequest request) {
@@ -102,6 +87,7 @@ public class ApplicationController {
     @PutMapping("/{id}/step")
     @NeedLogin
     void update(HttpServletRequest request, @PathVariable("id") String id) {
+        //last step:offer, change step of application
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             applicationService.updateApplicationStep(id);
