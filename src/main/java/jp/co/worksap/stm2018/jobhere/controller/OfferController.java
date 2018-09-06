@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 /**
@@ -35,6 +36,17 @@ public class OfferController {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             return offerService.list(user.getCompany().getId());
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+    }
+
+    @PutMapping("")
+    @NeedLogin
+    void update(HttpServletRequest request, EmailDTO emailDTO) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            offerService.update(emailDTO);
         } else {
             throw new ValidationException("Permission Denied!");
         }

@@ -10,12 +10,15 @@ import jp.co.worksap.stm2018.jobhere.model.domain.Offer;
 import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.OfferDTO;
 import jp.co.worksap.stm2018.jobhere.service.OfferService;
 import jp.co.worksap.stm2018.jobhere.service.ResumeService;
+import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,5 +63,20 @@ public class OfferServiceImpl implements OfferService {
             }
         }
         return offerDTOList;
+    }
+    @Transactional
+    @Override
+    public void update(EmailDTO emailDTO) {
+        String offerId=emailDTO.getOfferId();
+        Optional<Offer> offerOptional=offerRepository.findById(offerId);
+        if(offerOptional.isPresent()) {
+            Offer offer=offerOptional.get();
+            offer.setSendStatus("1");
+            offerRepository.save(offer);
+            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
+        }
+        else{
+            throw new ValidationException("Wrong offer ID.");
+        }
     }
 }
