@@ -9,7 +9,7 @@ import java.util.List;
  * Created by xu_xi-pc on 2018/8/30.
  */
 public interface CompanyRepository extends JpaRepository<Company, String> {
-    Company findByCompanyNameAndLegalPerson(String companyName, String legalPerson);
+    Company findFirstByCompanyNameAndLegalPerson(String companyName, String legalPerson);
 
     Company findByCompanyName(String companyName);
 

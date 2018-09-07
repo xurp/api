@@ -169,7 +169,7 @@ public class AuthServiceTests {
                 .when(userRepository.findByUsername("hr"))
                 .thenReturn(null);
         Mockito
-                .when(companyRepository.findByCompanyNameAndLegalPerson("works", "Tom"))
+                .when(companyRepository.findFirstByCompanyNameAndLegalPerson("works", "Tom"))
                 .thenReturn(null);
         Assert.assertEquals(authService.register(registerDTO).getToken(), "hrstmhr");
 
@@ -180,7 +180,7 @@ public class AuthServiceTests {
                 .status("company-n")
                 .build();
         Mockito
-                .when(companyRepository.findByCompanyNameAndLegalPerson("works", "Tom"))
+                .when(companyRepository.findFirstByCompanyNameAndLegalPerson("works", "Tom"))
                 .thenReturn(company);
         Assert.assertEquals(authService.register(registerDTO).getToken(), "hrstmhr");
     }
@@ -204,7 +204,7 @@ public class AuthServiceTests {
                 .when(userRepository.findByUsername("hr"))
                 .thenReturn(null);
         Mockito
-                .when(companyRepository.findByCompanyNameAndLegalPerson("works", "Tom"))
+                .when(companyRepository.findFirstByCompanyNameAndLegalPerson("works", "Tom"))
                 .thenReturn(company);
         Assert.assertEquals(authService.register(registerDTO).getToken(), "hrstmhr");
     }
