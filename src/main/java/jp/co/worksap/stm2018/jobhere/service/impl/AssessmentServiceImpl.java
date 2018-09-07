@@ -101,6 +101,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                 Application application = applicationRepository.findById(applicationId).get();
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
                 List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
+                if(sortedList.size()>0)
                 sortedList.remove(sortedList.size()-1);
                 List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
                 if (stepList == null || stepList.size() == 0)
@@ -108,9 +109,9 @@ public class AssessmentServiceImpl implements AssessmentService {
                 stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
 
 
-                //assessmentList's assessment has cooperator, but when converted to JSON, cooperator is...
+                //sortedList's assessment has cooperator, but when converted to JSON, cooperator is...
                 List<AssessmentDTO> assessmentDTOList = new ArrayList<>();
-                for (Assessment a : assessmentList) {
+                for (Assessment a : sortedList) {
                     assessmentDTOList.add(AssessmentDTO.builder()
                             .id(a.getId())
                             .cooperator(a.getCooperator())
@@ -120,10 +121,11 @@ public class AssessmentServiceImpl implements AssessmentService {
                             .step(a.getStep())
                             .pass(a.getPass()).build());
                 }
-                List<Assessment> assessmentListIncludingCooperator=new ArrayList<>();
+                /*List<Assessment> assessmentListIncludingCooperator=new ArrayList<>();
                 Assessment assessment1=new Assessment();
+                if(sortedList.size()>0)
                 assessment1.setCooperator(sortedList.get(0).getCooperator());
-                assessmentListIncludingCooperator.add(assessment1);
+                assessmentListIncludingCooperator.add(assessment1);*/
                 return ApplicationAndAssessmentDTO.builder().applicationId(applicationId)
                         .job(application.getJob())
                         .resume(application.getResume())
