@@ -166,7 +166,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 stepList = stepRepository.findByJobId("-1");
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-            //May should use the following if
+            //May should use the following if, but no one will use /{id}/step on purpose
             //if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(stepList.size()-2).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
             if (application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
