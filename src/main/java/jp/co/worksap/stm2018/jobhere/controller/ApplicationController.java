@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import io.swagger.annotations.ApiOperation;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
@@ -37,7 +38,7 @@ public class ApplicationController {
         this.resumeService = resumeService;
         this.jobService = jobService;
     }
-
+    @ApiOperation(value="save new application", notes="use Job to save Application(and consume)")
     @PostMapping("")
     @NeedLogin
     ApplicationDTO save(HttpServletRequest request, @RequestBody String jobId) {
@@ -55,7 +56,7 @@ public class ApplicationController {
         }
 
     }
-
+    @ApiOperation(value="list applications of a step", notes="if step is ALL or the step of application equals to request, return it")
     @GetMapping("")
     @NeedLogin
     List<ApplicationDTO> list(HttpServletRequest request) {
@@ -63,16 +64,13 @@ public class ApplicationController {
         if (user.getRole().equals("hr")) {
             String jobId = request.getParameter("jobId");
             String step = request.getParameter("step");
-            //jobId = jobId.substring(0, jobId.length() - 1);
-            //step = step.substring(0, jobId.length() - 1);
-
             return applicationService.list(jobId, step);
         } else {
             log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");
         }
     }
-
+    @ApiOperation(value="get application detail", notes="get application detail")
     @GetMapping("/{id}")
     @NeedLogin
     ApplicationDTO find(HttpServletRequest request, @PathVariable("id") String id) {
@@ -83,7 +81,7 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-
+    @ApiOperation(value="update step of application and send offer", notes="update step of application and send offer")
     @PutMapping("/{id}/step")
     @NeedLogin
     void update(HttpServletRequest request, @PathVariable("id") String id) {
@@ -95,7 +93,7 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-
+    @ApiOperation(value="decline the application and send email to the candidate ", notes="if step is resume filter, set --; else set -")
     @PutMapping("/decline")
     @NeedLogin
     void decline(HttpServletRequest request,@RequestBody EmailDTO emailDTO) {
