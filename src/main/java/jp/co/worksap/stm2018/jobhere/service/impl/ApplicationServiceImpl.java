@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
 
-    //    private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final OfferRepository offerRepository;
     private final ResumeRepository resumeRepository;
@@ -70,7 +69,6 @@ public class ApplicationServiceImpl implements ApplicationService {
             Application application = new Application();
             application.setId(uuid);
             application.setResume(resume);
-            //application.setStep("no");
             Timestamp t = new Timestamp(System.currentTimeMillis());
             application.setUpdateTime(t);
             User user = userRepository.findById(userId).get();
@@ -92,27 +90,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         } else {
             throw new ValidationException("Job id does not exist!");
         }
-
-        /*return JobDTO.builder().id(uuid).name(jobDTO.getName())
-                .detail(jobDTO.getDetail())
-                .count(jobDTO.getCount())
-                .department(jobDTO.getDepartment())
-                .remark(jobDTO.getRemark())
-                .createTime(timestamp)
-                .updateTime(timestamp).company(c).build();*/
-
     }
 
     @Override
     public ApplicationDTO find(String applicationId) {
-//        private String id;
-//        private Resume resume;
-//        private Job job;
-//        private String step;
-//        private User user;
-//        private Timestamp createTime;
-//        private Timestamp updateTime;
-
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
@@ -136,7 +117,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             for (Application application : job.getApplications()) {
-                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replaceAll("-",""))-Double.parseDouble(step.replaceAll("-","")))<0.01) {
+                //if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replaceAll("-",""))-Double.parseDouble(step.replaceAll("-","")))<0.01) {
+                if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", ""))-Double.parseDouble(step.replace("+", "").replace("-", "")))<0.01) {
                     applicationDTOList.add(ApplicationDTO.builder()
                             .id(application.getId())
                             .resume(application.getResume())
@@ -170,30 +152,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    @Override
-    public void hrUpdate(String applicationId) {
-        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
-        if (applicationOptional.isPresent()) {
-            Application application = applicationOptional.get();
-            Job job = application.getJob();
-            List<Step> stepList = stepRepository.findByJobId(job.getId());
-            if (stepList == null || stepList.size() == 0)
-                stepList = stepRepository.findByJobId("-1");
 
-            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-
-            if (Double.valueOf(application.getStep()) - stepList.get(0).getIndex() == 0 || application.getStep().charAt(0) == '+') {
-                Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
-                if (stepOptional.isPresent()) {
-                    application.setStep(stepOptional.get().getIndex() + "");
-                }
-            } else {
-                throw new ValidationException("The application has been turn down");
-            }
-        } else {
-            throw new NotFoundException("Application no found");
-        }
-    }
 
     @Transactional
     @Override
@@ -208,7 +167,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
             //May should use the following if
-            //if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(stepList.size()-2).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
+            //if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(stepList.size()-2).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
             if (application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
@@ -221,7 +180,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     offer.setOfferTime( new Timestamp(System.currentTimeMillis()));
                     offer.setSendStatus("0");
                     offerRepository.save(offer);
-                    //return stepOptional.get().getIndex() + "";
                 }
                 else {
                     throw new ValidationException("Step in system has errors.");
@@ -249,13 +207,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             if(step.charAt(0) == '-'){
                 application.setStep("-"+step);
                 applicationRepository.save(application);
-                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
                 Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
             }
-            else if(Math.abs(Double.valueOf(step) - stepList.get(0).getIndex())<0.01){
+            //maybe the following two replace is unnecessary
+            else if(Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01){
                 application.setStep("--"+step);
                 applicationRepository.save(application);
-                //Mail.send("chorespore@163.com", application.getResume().getEmail(), emailDTO.getSubject(),emailDTO.getContent());
                 Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
             }
             else{

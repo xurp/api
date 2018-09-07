@@ -43,7 +43,9 @@ public class OfferController {
 
     @PutMapping("")
     @NeedLogin
-    void update(HttpServletRequest request, EmailDTO emailDTO) {
+    void update(HttpServletRequest request,@RequestBody EmailDTO emailDTO) {
+        System.out.println(emailDTO.getOfferId());
+        System.out.println(emailDTO.getSubject());
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             offerService.update(emailDTO);
