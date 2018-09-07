@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Service
 public class AssessmentServiceImpl implements AssessmentService {
 
-    //    private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final StepRepository stepRepository;
     private final UserRepository userRepository;
@@ -47,8 +46,6 @@ public class AssessmentServiceImpl implements AssessmentService {
         Assessment assessment = new Assessment();
         assessment.setId(assessId);
         assessment.setApplicationId(applicationId);
-        //List<Cooperator> cooperators =cooperatorRepository.findAllById(Arrays.asList(cooperatorArr));
-        //assessment.setCooperators(cooperators);
         Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
         assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         Application application = applicationRepository.findById(applicationId).get();
@@ -62,8 +59,6 @@ public class AssessmentServiceImpl implements AssessmentService {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         assessment.setAssessmentTime(timestamp);
         assessmentRepository.save(assessment);
-        //step of application '+1'
-        //application.setStep((Integer.parseInt(step) + 1) + "");
         application.setStep(newstep);
         applicationRepository.save(application);
         Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
@@ -137,7 +132,6 @@ public class AssessmentServiceImpl implements AssessmentService {
                                 .stepList(stepList)
                         .build();
             } else {
-                //return null;
                 throw new ValidationException("You've done it, thank you.");
             }
         } else {
@@ -171,11 +165,10 @@ public class AssessmentServiceImpl implements AssessmentService {
                 stepList = stepRepository.findByJobId("-1");
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-
-            if (Math.abs(Double.valueOf(application.getStep()) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
+            //  || or && ?
+            if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
-                    //application.setStep(stepOptional.get().getIndex() + "");
                     return stepOptional.get().getIndex() + "";
                 }
                 else {
