@@ -167,8 +167,8 @@ public class AssessmentServiceImpl implements AssessmentService {
                 stepList = stepRepository.findByJobId("-1");
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-            //  || or && ?
-            if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01 && application.getStep().charAt(0) == '+') {
+            //  || , former is step 0!
+            if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     return stepOptional.get().getIndex() + "";
