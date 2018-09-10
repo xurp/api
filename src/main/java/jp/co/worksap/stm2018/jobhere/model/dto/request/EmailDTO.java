@@ -20,4 +20,6 @@ public class EmailDTO {
     private String content;
     private String assessId;
     private String receiver;
+    private String operationId;
+    private String link;
 }

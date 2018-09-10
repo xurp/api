@@ -4,6 +4,7 @@ import jp.co.worksap.stm2018.jobhere.dao.*;
 import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class AssessmentServiceImpl implements AssessmentService {
 
-    private final JobRepository jobRepository;
+    private final OutboxRepository outboxRepository;
     private final StepRepository stepRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
@@ -30,15 +31,30 @@ public class AssessmentServiceImpl implements AssessmentService {
 
 
     @Autowired
-    AssessmentServiceImpl(JobRepository jobRepository, StepRepository stepRepository, UserRepository userRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(OutboxRepository outboxRepository, StepRepository stepRepository, UserRepository userRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
         this.stepRepository = stepRepository;
-        this.jobRepository = jobRepository;
+        this.outboxRepository = outboxRepository;
         this.assessmentRepository = assessmentRepository;
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
         this.cooperatorRepository = cooperatorRepository;
     }
+    @Transactional
+    @Override
+    public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
+        //to do:let interview choose date and time
+        //now, outbox will be saved. but assessment should be created after the interviewer and the candidate choose date and time
+        //step of the application should be updated at that time as well
+        Outbox outbox=new Outbox();
+        outbox.setOperationId(emailDto.getOperationId());
+        outbox.setApplicationId(emailDto.getApplicationId());
+        outbox.setContent(emailDto.getContent());
+        outbox.setLink(emailDto.getLink());
+        outbox.setSubject(emailDto.getSubject());
+        outboxRepository.save(outbox);
+        //Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
 
+    }
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
@@ -62,7 +78,41 @@ public class AssessmentServiceImpl implements AssessmentService {
         application.setStep(newstep);
         applicationRepository.save(application);
         Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
+        return AssessmentDTO.builder()
+                .id(assessment.getId())
+                .cooperator(assessment.getCooperator())
+                .applicationId(assessment.getApplicationId())
+                .assessmentTime(assessment.getAssessmentTime())
+                .comment(assessment.getComment())
+                .step(assessment.getStep())
+                .pass(assessment.getPass())
+                .assessmentTime(timestamp).build();
+    }
 
+    /*@Transactional
+    @Override
+    public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
+        //this function is before 'choose date' module
+        String newstep=hrUpdate(applicationId);
+        Assessment assessment = new Assessment();
+        assessment.setId(assessId);
+        assessment.setApplicationId(applicationId);
+        Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
+        assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
+        Application application = applicationRepository.findById(applicationId).get();
+        String step = application.getStep();
+        if (step.charAt(0) == '+' || step.charAt(0) == '-')
+            step = step.substring(1);
+        assessment.setStep(step);
+        assessment.setStep(newstep);
+        assessment.setComment(" ");
+        assessment.setPass("assessing");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        assessment.setAssessmentTime(timestamp);
+        assessmentRepository.save(assessment);
+        application.setStep(newstep);
+        applicationRepository.save(application);
+        Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
         return AssessmentDTO.builder()
                 .id(assessment.getId())
                 .cooperator(assessment.getCooperator())
@@ -72,7 +122,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .step(assessment.getStep())
                 .pass(assessment.getPass())
         .assessmentTime(timestamp).build();
-    }
+    }*/
 
     public List<AssessmentDTO> list(String applicationId) {
         List<AssessmentDTO> assessmentDTOList = new ArrayList<>();

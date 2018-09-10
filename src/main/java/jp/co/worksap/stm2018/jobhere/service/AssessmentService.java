@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.service;
 
+import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 
@@ -15,6 +16,6 @@ public interface AssessmentService {
 
     void update(AssessmentDTO assessmentDTO);
 
-
+    void saveOutboxAndMakeAppointment(EmailDTO emailDto);
 
 }
