@@ -1,8 +1,11 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.NotLoginException;
+import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ResumeDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.CooperatorDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.UserDTO;
 import jp.co.worksap.stm2018.jobhere.service.AuthService;
 import jp.co.worksap.stm2018.jobhere.service.ReviewService;
@@ -33,6 +36,18 @@ public class ReviewController {
             throw new NotLoginException();
         User user = authService.getUserByToken(token);
         return reviewService.list(user);
+    }
+
+    @GetMapping("/cooperator")
+    @NeedLogin
+    List<CooperatorDTO> listCooperator(HttpServletRequest request) {
+
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            return reviewService.listCooperator();
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
     }
 
     @PostMapping("/{id}")

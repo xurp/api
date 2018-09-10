@@ -1,11 +1,14 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
+import jp.co.worksap.stm2018.jobhere.dao.CooperatorRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
 import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.Cooperator;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.CooperatorDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.UserDTO;
 import jp.co.worksap.stm2018.jobhere.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +23,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final CooperatorRepository cooperatorRepository;
 
     @Autowired
-    ReviewServiceImpl(UserRepository userRepository, CompanyRepository companyRepository) {
+    ReviewServiceImpl(UserRepository userRepository, CompanyRepository companyRepository, CooperatorRepository cooperatorRepository) {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
+        this.cooperatorRepository = cooperatorRepository;
     }
 
     @Override
@@ -65,6 +70,22 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return userDTOList;
+    }
+
+    @Override
+    public List<CooperatorDTO> listCooperator() {
+        List<Cooperator> cooperatorList = cooperatorRepository.findAll();
+        List<CooperatorDTO> cooperatorDTOList = new ArrayList<>();
+        for (Cooperator cooperator : cooperatorList) {
+            cooperatorDTOList.add(CooperatorDTO.builder()
+                    .id(cooperator.getId())
+                    .name(cooperator.getName())
+                    .companyId(cooperator.getCompanyId())
+                    .department(cooperator.getDepartment())
+                    .email(cooperator.getEmail())
+                    .phone(cooperator.getPhone()).build());
+        }
+        return cooperatorDTOList;
     }
 
     @Override
