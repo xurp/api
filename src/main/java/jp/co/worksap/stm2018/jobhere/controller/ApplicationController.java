@@ -93,10 +93,11 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-    @ApiOperation(value="decline the application and send email to the candidate ", notes="if step is resume filter, set --; else set -")
+    @ApiOperation(value="decline the application and send email to the candidate ", notes="when step is resume or -; if step is resume filter, set --; else set -")
     @PutMapping("/decline")
     @NeedLogin
     void decline(HttpServletRequest request,@RequestBody EmailDTO emailDTO) {
+        //if batch operation, call this function N times
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             applicationService.decline(emailDTO);

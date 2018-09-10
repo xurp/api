@@ -137,6 +137,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void update(AssessmentDTO assessmentDTO) {
+        //when interviewer return pass or fail
         Optional<Application> applicationOptional = applicationRepository.findById(assessmentDTO.getApplicationId());
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
@@ -203,8 +204,10 @@ public class ApplicationServiceImpl implements ApplicationService {
             if (stepList == null || stepList.size() == 0)
                 stepList = stepRepository.findByJobId("-1");
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-
-            if(step.charAt(0) == '-'){
+            if(step.charAt(0) == '-'&&step.charAt(1)== '-'){
+                throw new ValidationException("The rejection email has been sent.");
+            }
+            else if(step.charAt(0) == '-'){
                 application.setStep("-"+step);
                 applicationRepository.save(application);
                 Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());

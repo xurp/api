@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.controller;
 
+import io.swagger.annotations.ApiOperation;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
@@ -36,15 +37,19 @@ public class AssessmentController {
         this.jobService = jobService;
         this.assessmentService = assessmentService;
     }
-
+    //@ApiOperation(value="create new assessment, send email and update step of application", notes="when step is +")
+    @ApiOperation(value="save outbox and send email of selecting time", notes="when step is +")
     @PostMapping("")
     @NeedLogin
     void save(HttpServletRequest request,@RequestBody EmailDTO emailDTO ) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             //hr views application detail then click 'send email'
-            //create assessment and send email
-            assessmentService.save(emailDTO.getApplicationId(), emailDTO.getCooperatorId(),emailDTO.getSubject(),emailDTO.getContent(),emailDTO.getAssessId());
+            //create new assessment, send email and update step of application
+            //assessmentService.save(emailDTO.getApplicationId(), emailDTO.getCooperatorId(),emailDTO.getSubject(),emailDTO.getContent(),emailDTO.getAssessId());
+
+            //after choose date and time module
+            assessmentService.saveOutboxAndMakeAppointment(emailDTO);
         } else {
             log.warn("Permission Denied!");
             throw new ValidationException("Permission Denied!");
