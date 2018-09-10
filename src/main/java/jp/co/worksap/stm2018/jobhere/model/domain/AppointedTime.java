@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "appoint_time")
+@Table(name = "appointed_time")
 public class AppointedTime {
     @Id
     private String id;
