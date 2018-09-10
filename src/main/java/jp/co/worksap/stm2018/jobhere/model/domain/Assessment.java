@@ -23,8 +23,8 @@ import java.util.List;
 public class Assessment {
     @Id
     private String id;
-
-    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.EAGER,optional=true)
+    //before interviewer chooses date, it is null
+    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.EAGER,optional=false)
     @JoinColumn(name = "cooperator_id")
     @JsonIgnore
     private Cooperator cooperator;

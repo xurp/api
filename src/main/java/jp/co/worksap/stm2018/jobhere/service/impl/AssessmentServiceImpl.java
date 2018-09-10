@@ -43,8 +43,6 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
         //to do:let interview choose date and time
-        //now, outbox will be saved. but assessment should be created after the interviewer and the candidate choose date and time
-        //step of the application should be updated at that time as well
         Outbox outbox=new Outbox();
         outbox.setOperationId(emailDto.getOperationId());
         outbox.setApplicationId(emailDto.getApplicationId());
@@ -53,6 +51,29 @@ public class AssessmentServiceImpl implements AssessmentService {
         outbox.setSubject(emailDto.getSubject());
         outboxRepository.save(outbox);
         //Mail.send("chorespore@163.com",  , emailDto.getSubject(),emailDto.getContent());
+
+        //now, creating assessment and updating step of applications will be done immediately
+        String newstep=hrUpdate(emailDto.getApplicationId());
+        Assessment assessment = new Assessment();
+        assessment.setId(emailDto.getAssessId());
+        assessment.setApplicationId(emailDto.getApplicationId());
+        //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
+        //now, cooperator should be updated after choosing date
+        //Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
+        //assessment.setCooperator(cooperator);
+        Application application = applicationRepository.findById(emailDto.getApplicationId()).get();
+        String step = application.getStep();
+        if (step.charAt(0) == '+' || step.charAt(0) == '-')
+            step = step.substring(1);
+        assessment.setStep(step);
+        assessment.setStep(newstep);
+        assessment.setComment(" ");
+        assessment.setPass("assessing");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        assessment.setAssessmentTime(timestamp);
+        assessmentRepository.save(assessment);
+        application.setStep(newstep);
+        applicationRepository.save(application);
 
     }
     @Transactional
