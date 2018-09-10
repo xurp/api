@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Created by xu_xi-pc on 2018/9/5.
  */
@@ -22,4 +24,8 @@ public class EmailDTO {
     private String receiver;
     private String operationId;
     private String link;
+
+    private String startDate;
+    private String endDate;
+    private List<String> cooperatorIds;
 }
