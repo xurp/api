@@ -58,6 +58,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
+        //after all the candidates have selected time, save assessment and update step of application, send ASSESSMENT email to the interview
         String newstep=hrUpdate(applicationId);
         Assessment assessment = new Assessment();
         assessment.setId(assessId);
