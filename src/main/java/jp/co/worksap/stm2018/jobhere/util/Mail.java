@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+//@Service
+//@EnableAsync
 public class Mail {
 
     public static void send(String from, String to, String subject, String text) {
@@ -17,7 +19,8 @@ public class Mail {
             mail(from, to, subject, text);
         }).start();
     }
-
+    //@Async
+    //if use @Async, static should be deleted
     public static void mail(String from, String to, String subject, String text) {
         Properties properties = System.getProperties();
 

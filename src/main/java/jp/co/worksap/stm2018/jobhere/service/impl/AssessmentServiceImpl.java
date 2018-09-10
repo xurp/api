@@ -24,18 +24,18 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     private final OutboxRepository outboxRepository;
     private final StepRepository stepRepository;
-    private final UserRepository userRepository;
+    private final AppointedTimeRepository appointedTimeRepository;
     private final ApplicationRepository applicationRepository;
     private final CooperatorRepository cooperatorRepository;
     private final AssessmentRepository assessmentRepository;
 
 
     @Autowired
-    AssessmentServiceImpl(OutboxRepository outboxRepository, StepRepository stepRepository, UserRepository userRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
         this.stepRepository = stepRepository;
         this.outboxRepository = outboxRepository;
         this.assessmentRepository = assessmentRepository;
-        this.userRepository = userRepository;
+        this.appointedTimeRepository = appointedTimeRepository;
         this.applicationRepository = applicationRepository;
         this.cooperatorRepository = cooperatorRepository;
     }
@@ -43,29 +43,46 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
         //to do:let interview choose date and time
+        //Outbox:send to candidates to select dates
         Outbox outbox=new Outbox();
+        outbox.setId(UUID.randomUUID().toString().replace("-", ""));
         outbox.setOperationId(emailDto.getOperationId());
         outbox.setApplicationId(emailDto.getApplicationId());
-        outbox.setContent(emailDto.getContent());
-        outbox.setLink(emailDto.getLink());
-        outbox.setSubject(emailDto.getSubject());
+        //outbox.setContent(emailDto.getContent());
+        //outbox.setLink(emailDto.getLink());
+        //outbox.setSubject(emailDto.getSubject());
         outboxRepository.save(outbox);
+        for(String cooperatorId:emailDto.getCooperatorIds()) {
+            AppointedTime appointedTime = new AppointedTime();
+            appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
+            appointedTime.setApplicationId(emailDto.getApplicationId());
+            appointedTime.setCooperatorId(cooperatorId);
+            String startdate = emailDto.getStartDate();
+            String enddate = emailDto.getEndDate();
+            try {
+                Timestamp t1 = Timestamp.valueOf(startdate);
+                Timestamp t2 = Timestamp.valueOf(enddate);
+                appointedTime.setStartDate(t1);
+                appointedTime.setEndDate(t2);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            appointedTime.setOperationId(emailDto.getOperationId());
+            appointedTimeRepository.save(appointedTime);
+        }
         //Mail.send("chorespore@163.com",  , emailDto.getSubject(),emailDto.getContent());
 
         //now, creating assessment and updating step of applications will be done immediately
         String newstep=hrUpdate(emailDto.getApplicationId());
         Assessment assessment = new Assessment();
-        assessment.setId(emailDto.getAssessId());
+        assessment.setId(UUID.randomUUID().toString().replace("-", ""));
+        //assessment.setId(emailDto.getAssessId());
         assessment.setApplicationId(emailDto.getApplicationId());
         //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         //now, cooperator should be updated after choosing date
         //Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
         //assessment.setCooperator(cooperator);
         Application application = applicationRepository.findById(emailDto.getApplicationId()).get();
-        String step = application.getStep();
-        if (step.charAt(0) == '+' || step.charAt(0) == '-')
-            step = step.substring(1);
-        assessment.setStep(step);
         assessment.setStep(newstep);
         assessment.setComment(" ");
         assessment.setPass("assessing");
@@ -87,10 +104,6 @@ public class AssessmentServiceImpl implements AssessmentService {
         Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
         assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         Application application = applicationRepository.findById(applicationId).get();
-        String step = application.getStep();
-        if (step.charAt(0) == '+' || step.charAt(0) == '-')
-            step = step.substring(1);
-        assessment.setStep(step);
         assessment.setStep(newstep);
         assessment.setComment(" ");
         assessment.setPass("assessing");
