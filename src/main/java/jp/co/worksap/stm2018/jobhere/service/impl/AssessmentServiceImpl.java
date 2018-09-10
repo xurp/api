@@ -52,7 +52,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         outbox.setLink(emailDto.getLink());
         outbox.setSubject(emailDto.getSubject());
         outboxRepository.save(outbox);
-        //Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
+        //Mail.send("chorespore@163.com",  , emailDto.getSubject(),emailDto.getContent());
 
     }
     @Transactional
