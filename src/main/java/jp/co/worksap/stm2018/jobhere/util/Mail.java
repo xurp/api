@@ -7,9 +7,18 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class Mail {
+
     public static void send(String from, String to, String subject, String text) {
+        new Thread(() -> {
+            mail(from, to, subject, text);
+        }).start();
+    }
+
+    public static void mail(String from, String to, String subject, String text) {
         Properties properties = System.getProperties();
 
         properties.put("mail.smtp.auth", "true");
@@ -20,7 +29,6 @@ public class Mail {
 
         try {
             MimeMessage message = new MimeMessage(session);
-
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject(subject);
