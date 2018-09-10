@@ -1,10 +1,9 @@
-create table "job" (
+create table "appointed_time" (
   "id" varchar(255) not null primary key,
-  "create_time" timestamp not null,
-  "update_time" timestamp not null,
-  "count" int not null,
-  "department" varchar(255) not null,
-  "detail" text not null,
-  "name" varchar(255) not null,
-  "remark" varchar(255) not null
+  "start_date" timestamp null,
+  "end_date" timestamp null,
+  "start_time" timestamp null,
+  "operation_id" varchar(255) null,
+  "cooperator_id" varchar(255) null,
+  "application_id" varchar(255) null
 );

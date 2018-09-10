@@ -43,6 +43,10 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
         //to do:let interview choose date and time
+        List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperatorId(emailDto.getOperationId());
+        int index=0;
+        if(appointedTimeList!=null&&appointedTimeList.size()>0)
+            index=appointedTimeList.size();
         //Outbox:send to candidates to select dates
         Outbox outbox=new Outbox();
         outbox.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -52,11 +56,13 @@ public class AssessmentServiceImpl implements AssessmentService {
         //outbox.setLink(emailDto.getLink());
         //outbox.setSubject(emailDto.getSubject());
         outboxRepository.save(outbox);
-        for(String cooperatorId:emailDto.getCooperatorIds()) {
+        //for(String cooperatorId:emailDto.getCooperatorIds()) {
             AppointedTime appointedTime = new AppointedTime();
             appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
             appointedTime.setApplicationId(emailDto.getApplicationId());
-            appointedTime.setCooperatorId(cooperatorId);
+            //this method is call N times, but cooperatorList should be saved
+            //when N times, all the cooperator are saved, may occurs more than 1 but ok
+            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(index));
             String startdate = emailDto.getStartDate();
             String enddate = emailDto.getEndDate();
             try {
@@ -69,8 +75,10 @@ public class AssessmentServiceImpl implements AssessmentService {
             }
             appointedTime.setOperationId(emailDto.getOperationId());
             appointedTimeRepository.save(appointedTime);
-        }
-        //Mail.send("chorespore@163.com",  , emailDto.getSubject(),emailDto.getContent());
+       // }
+
+        //subject and content are in the dto
+        Mail.send("chorespore@163.com",cooperatorRepository.findById(emailDto.getCooperatorIds().get(index)).get().getEmail() , emailDto.getSubject(),emailDto.getContent());
 
         //now, creating assessment and updating step of applications will be done immediately
         String newstep=hrUpdate(emailDto.getApplicationId());
