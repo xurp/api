@@ -24,6 +24,7 @@ public class Assessment {
     @Id
     private String id;
     //before interviewer chooses date, it is null
+    //spring.jackson.serialization.fail-on-empty-beans=false than...LAZY!!!
     @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=false)
     @JoinColumn(name = "cooperator_id")
     @JsonIgnore
