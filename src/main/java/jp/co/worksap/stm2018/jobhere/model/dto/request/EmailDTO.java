@@ -28,4 +28,5 @@ public class EmailDTO {
     private String startDate;
     private String endDate;
     private List<String> cooperatorIds;
+    private List<String> applications;
 }

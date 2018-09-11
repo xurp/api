@@ -19,20 +19,20 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "application")
+@Table(name = "appointed_time")
 public class AppointedTime {
     @Id
     private String id;
     @Column(nullable = true)
     private String operationId;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Timestamp startDate;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Timestamp endDate;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Timestamp startTime;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String cooperatorId;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String applicationId;
 }

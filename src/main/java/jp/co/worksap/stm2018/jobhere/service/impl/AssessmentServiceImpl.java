@@ -39,24 +39,41 @@ public class AssessmentServiceImpl implements AssessmentService {
         this.applicationRepository = applicationRepository;
         this.cooperatorRepository = cooperatorRepository;
     }
+
     @Transactional
     @Override
     public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
+        //now this method only be called ONCE!!
+        //NOTICE!!!!!!!application num should >= cooperator num!
         //to do:let interview choose date and time
-        //Outbox:send to candidates to select dates
-        Outbox outbox=new Outbox();
-        outbox.setId(UUID.randomUUID().toString().replace("-", ""));
-        outbox.setOperationId(emailDto.getOperationId());
-        outbox.setApplicationId(emailDto.getApplicationId());
-        //outbox.setContent(emailDto.getContent());
-        //outbox.setLink(emailDto.getLink());
-        //outbox.setSubject(emailDto.getSubject());
-        outboxRepository.save(outbox);
-        for(String cooperatorId:emailDto.getCooperatorIds()) {
+        int cooperatorNum=emailDto.getCooperatorIds().size();
+        if(cooperatorNum==0)
+            return;
+        int applicationNum=emailDto.getApplications().size();
+        if(applicationNum==0)
+            return;
+        int batchindex=0;
+        for(String applicationId:emailDto.getApplications()) {
+            //the following does not work. use batchindex
+            /*List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationId(emailDto.getOperationId());
+            int index=0;
+            if(appointedTimeList!=null&&appointedTimeList.size()>0)
+                index=appointedTimeList.size();*/
+            //Outbox:send to candidates to select dates
+            Outbox outbox = new Outbox();
+            outbox.setId(UUID.randomUUID().toString().replace("-", ""));
+            outbox.setOperationId(emailDto.getOperationId());
+            outbox.setApplicationId(applicationId);
+            outbox.setContent("");
+            outbox.setLink("");
+            outbox.setSubject("");
+            outboxRepository.save(outbox);
+            //for(String cooperatorId:emailDto.getCooperatorIds()) {
             AppointedTime appointedTime = new AppointedTime();
             appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
-            appointedTime.setApplicationId(emailDto.getApplicationId());
-            appointedTime.setCooperatorId(cooperatorId);
+            appointedTime.setApplicationId(applicationId);
+            //all the cooperator are saved, may occurs more than 1 but ok
+            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
             String startdate = emailDto.getStartDate();
             String enddate = emailDto.getEndDate();
             try {
@@ -69,29 +86,32 @@ public class AssessmentServiceImpl implements AssessmentService {
             }
             appointedTime.setOperationId(emailDto.getOperationId());
             appointedTimeRepository.save(appointedTime);
+            // }
+
+            //subject and content are in the dto
+            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(), emailDto.getContent());
+
+            //now, creating assessment and updating step of applications will be done immediately
+            String newstep = hrUpdate(applicationId);
+            Assessment assessment = new Assessment();
+            assessment.setId(UUID.randomUUID().toString().replace("-", ""));
+            //assessment.setId(emailDto.getAssessId());
+            assessment.setApplicationId(applicationId);
+            //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
+            //now, cooperator should be updated after choosing date
+            //Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
+            //assessment.setCooperator(cooperator);
+            Application application = applicationRepository.findById(applicationId).get();
+            assessment.setStep(newstep);
+            assessment.setComment(" ");
+            assessment.setPass("assessing");
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            assessment.setAssessmentTime(timestamp);
+            assessmentRepository.save(assessment);
+            application.setStep(newstep);
+            applicationRepository.save(application);
+            batchindex++;
         }
-        //Mail.send("chorespore@163.com",  , emailDto.getSubject(),emailDto.getContent());
-
-        //now, creating assessment and updating step of applications will be done immediately
-        String newstep=hrUpdate(emailDto.getApplicationId());
-        Assessment assessment = new Assessment();
-        assessment.setId(UUID.randomUUID().toString().replace("-", ""));
-        //assessment.setId(emailDto.getAssessId());
-        assessment.setApplicationId(emailDto.getApplicationId());
-        //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
-        //now, cooperator should be updated after choosing date
-        //Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
-        //assessment.setCooperator(cooperator);
-        Application application = applicationRepository.findById(emailDto.getApplicationId()).get();
-        assessment.setStep(newstep);
-        assessment.setComment(" ");
-        assessment.setPass("assessing");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        assessment.setAssessmentTime(timestamp);
-        assessmentRepository.save(assessment);
-        application.setStep(newstep);
-        applicationRepository.save(application);
-
     }
     @Transactional
     @Override
