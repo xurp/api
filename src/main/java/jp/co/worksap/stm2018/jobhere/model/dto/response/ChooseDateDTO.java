@@ -20,4 +20,5 @@ public class ChooseDateDTO {
     private int number;//1(batch) or 3(single)
     private String operationId;
     private String cooperatorId;
+    private Timestamp startTime;
 }

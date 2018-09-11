@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by xu_xi-pc on 2018/9/11.
@@ -45,8 +46,14 @@ public class AppointedTimeController {
         return chooseDateDTO;
     }
 
+    @GetMapping("/schedule")
+    Set<ChooseDateDTO> getCandidate(HttpServletRequest request) {
+        String operationId = request.getParameter("operationId");
+        return appointedTimeService.getCandidateDate(operationId);
+    }
+
     @PutMapping("")
-    void update(@RequestBody AppointedTimeDTO appointedTimeDTO) {
-        appointedTimeService.update(appointedTimeDTO);
+    void update(HttpServletRequest request,@RequestBody AppointedTimeDTO appointedTimeDTO) {
+        appointedTimeService.update(appointedTimeDTO,request.getServletContext().getRealPath(""));
     }
 }
