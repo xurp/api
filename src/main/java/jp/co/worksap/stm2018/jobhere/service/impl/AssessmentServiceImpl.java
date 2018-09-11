@@ -113,9 +113,11 @@ public class AssessmentServiceImpl implements AssessmentService {
             //assessment.setId(emailDto.getAssessId());
             assessment.setApplicationId(applicationId);
             //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
-            //now, cooperator should be updated after choosing date
-            //Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
-            //assessment.setCooperator(cooperator);
+            //now, cooperator should be updated after choosing date(but shezhao has only one cooperator so save it)
+            if(applicationNum==1) {
+                Cooperator cooperator=cooperatorRepository.findById(emailDto.getCooperatorIds().get(0)).get();
+                assessment.setCooperator(cooperator);
+            }
             Application application = applicationRepository.findById(applicationId).get();
             assessment.setStep(newstep);
             assessment.setComment(" ");
