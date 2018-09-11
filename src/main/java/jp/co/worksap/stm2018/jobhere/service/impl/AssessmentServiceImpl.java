@@ -39,10 +39,12 @@ public class AssessmentServiceImpl implements AssessmentService {
         this.applicationRepository = applicationRepository;
         this.cooperatorRepository = cooperatorRepository;
     }
+
     @Transactional
     @Override
     public void saveOutboxAndMakeAppointment(EmailDTO emailDto) {
-        //now this method only be called ONCE!!!
+        //now this method only be called ONCE!!
+        //NOTICE!!!!!!!application num should >= cooperator num!
         //to do:let interview choose date and time
         int cooperatorNum=emailDto.getCooperatorIds().size();
         if(cooperatorNum==0)
@@ -50,27 +52,28 @@ public class AssessmentServiceImpl implements AssessmentService {
         int applicationNum=emailDto.getApplications().size();
         if(applicationNum==0)
             return;
-
+        int batchindex=0;
         for(String applicationId:emailDto.getApplications()) {
-            List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationId(emailDto.getOperationId());
+            //the following does not work. use batchindex
+            /*List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationId(emailDto.getOperationId());
             int index=0;
             if(appointedTimeList!=null&&appointedTimeList.size()>0)
-                index=appointedTimeList.size();
+                index=appointedTimeList.size();*/
             //Outbox:send to candidates to select dates
             Outbox outbox = new Outbox();
             outbox.setId(UUID.randomUUID().toString().replace("-", ""));
             outbox.setOperationId(emailDto.getOperationId());
             outbox.setApplicationId(applicationId);
-            //outbox.setContent(emailDto.getContent());
-            //outbox.setLink(emailDto.getLink());
-            //outbox.setSubject(emailDto.getSubject());
+            outbox.setContent("");
+            outbox.setLink("");
+            outbox.setSubject("");
             outboxRepository.save(outbox);
             //for(String cooperatorId:emailDto.getCooperatorIds()) {
             AppointedTime appointedTime = new AppointedTime();
             appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
             appointedTime.setApplicationId(applicationId);
             //all the cooperator are saved, may occurs more than 1 but ok
-            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(index%cooperatorNum));
+            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
             String startdate = emailDto.getStartDate();
             String enddate = emailDto.getEndDate();
             try {
@@ -86,7 +89,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             // }
 
             //subject and content are in the dto
-            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(index%cooperatorNum)).get().getEmail(), emailDto.getSubject(), emailDto.getContent());
+            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(), emailDto.getContent());
 
             //now, creating assessment and updating step of applications will be done immediately
             String newstep = hrUpdate(applicationId);
@@ -107,6 +110,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessmentRepository.save(assessment);
             application.setStep(newstep);
             applicationRepository.save(application);
+            batchindex++;
         }
     }
     @Transactional
