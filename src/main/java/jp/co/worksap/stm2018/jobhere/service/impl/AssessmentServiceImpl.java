@@ -28,10 +28,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final ApplicationRepository applicationRepository;
     private final CooperatorRepository cooperatorRepository;
     private final AssessmentRepository assessmentRepository;
+    private final CompanyRepository companyRepository;
 
 
     @Autowired
-    AssessmentServiceImpl(OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(CompanyRepository companyRepository,OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+        this.companyRepository=companyRepository;
         this.stepRepository = stepRepository;
         this.outboxRepository = outboxRepository;
         this.assessmentRepository = assessmentRepository;
@@ -89,7 +91,12 @@ public class AssessmentServiceImpl implements AssessmentService {
             // }
 
             //subject and content are in the dto
-            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(), emailDto.getContent());
+            String content= emailDto.getContent();
+            content=content.replace("\\[assessor_name\\]",cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getName());
+            content=content.replace("\\[company_name\\]",companyRepository.findById(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getCompanyId()).get().getCompanyName());
+            content=content.replace("\\[operation_id\\]",emailDto.getOperationId());
+            content=content.replace("\\[cooperation_id\\]",emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
+            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(),content);
 
             //now, creating assessment and updating step of applications will be done immediately
             String newstep = hrUpdate(applicationId);
