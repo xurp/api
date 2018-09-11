@@ -2,6 +2,7 @@ package jp.co.worksap.stm2018.jobhere.controller;
 
 import io.swagger.annotations.ApiOperation;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
+import jp.co.worksap.stm2018.jobhere.http.ForbiddenException;
 import jp.co.worksap.stm2018.jobhere.model.domain.AppointedTime;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.AppointedTimeDTO;
@@ -31,6 +32,10 @@ public class AppointedTimeController {
         String operationId = request.getParameter("operationId");
         String cooperatorId = request.getParameter("cooperatorId");
         List<AppointedTime> appointedTimeList = appointedTimeService.getByOperationIdAndCooperatorId(operationId, cooperatorId);
+        if (appointedTimeList.get(0).getStartTime() != null) {
+            throw new ForbiddenException("You have already done the schedule arrange!");
+        }
+
         ChooseDateDTO chooseDateDTO = new ChooseDateDTO();
         chooseDateDTO.setStartDate(appointedTimeList.get(0).getStartDate());
         chooseDateDTO.setEndDate(appointedTimeList.get(0).getEndDate());
