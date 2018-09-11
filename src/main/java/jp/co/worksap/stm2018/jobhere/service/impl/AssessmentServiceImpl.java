@@ -71,7 +71,10 @@ public class AssessmentServiceImpl implements AssessmentService {
             outbox.setSubject("");
             outboxRepository.save(outbox);
             //for(String cooperatorId:emailDto.getCooperatorIds()) {
-            for(int i=0;i<3;i++) {
+            int onecooperatordates=1;
+            if(applicationNum==1)
+                onecooperatordates=3;
+            for(int i=0;i<onecooperatordates;i++) {
                 AppointedTime appointedTime = new AppointedTime();
                 appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
                 appointedTime.setApplicationId(applicationId);
@@ -210,9 +213,10 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public ApplicationAndAssessmentDTO getDetail(String id) {
         //id:assessmentId
-        Optional<Assessment> assessmentOptional = assessmentRepository.findById(id);
-        if (assessmentOptional.isPresent()) {
-            Assessment assessment = assessmentOptional.get();
+        //originally use findbyid, but assessment to cooperator is one-to-one and cooperator may be null and it is EAGER and findbyid use inner join
+        //so assessment exists, cooperator is null, the result is null. so set cooperator in assessment LAZY
+        Assessment assessment=assessmentRepository.getOne(id);
+        if (assessment!=null) {
             if (assessment.getPass().equals("assessing")) {
                 String applicationId = assessment.getApplicationId();
                 Application application = applicationRepository.findById(applicationId).get();

@@ -10,4 +10,5 @@ import java.util.List;
 @Transactional
 public interface AppointedTimeRepository extends JpaRepository<AppointedTime, String> {
     List<AppointedTime> getByOperationId(String id);
+    List<AppointedTime> getByOperationIdAndCooperatorId(String id1, String id2);
 }
