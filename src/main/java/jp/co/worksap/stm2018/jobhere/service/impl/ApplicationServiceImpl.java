@@ -192,6 +192,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new NotFoundException("Application no found");
         }
     }
+    
     @Transactional
     @Override
     public void decline(EmailDTO emailDTO) {
