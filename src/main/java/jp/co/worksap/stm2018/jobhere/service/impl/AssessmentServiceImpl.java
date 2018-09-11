@@ -28,10 +28,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final ApplicationRepository applicationRepository;
     private final CooperatorRepository cooperatorRepository;
     private final AssessmentRepository assessmentRepository;
+    private final CompanyRepository companyRepository;
 
 
     @Autowired
-    AssessmentServiceImpl(OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(CompanyRepository companyRepository,OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+        this.companyRepository=companyRepository;
         this.stepRepository = stepRepository;
         this.outboxRepository = outboxRepository;
         this.assessmentRepository = assessmentRepository;
@@ -54,7 +56,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             return;
         int batchindex=0;
         for(String applicationId:emailDto.getApplications()) {
-            //the following does not work. use batchindex
+            //the following does not work(may be transabctuibak). use batchindex
             /*List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationId(emailDto.getOperationId());
             int index=0;
             if(appointedTimeList!=null&&appointedTimeList.size()>0)
@@ -69,27 +71,37 @@ public class AssessmentServiceImpl implements AssessmentService {
             outbox.setSubject("");
             outboxRepository.save(outbox);
             //for(String cooperatorId:emailDto.getCooperatorIds()) {
-            AppointedTime appointedTime = new AppointedTime();
-            appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
-            appointedTime.setApplicationId(applicationId);
-            //all the cooperator are saved, may occurs more than 1 but ok
-            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
-            String startdate = emailDto.getStartDate();
-            String enddate = emailDto.getEndDate();
-            try {
-                Timestamp t1 = Timestamp.valueOf(startdate);
-                Timestamp t2 = Timestamp.valueOf(enddate);
-                appointedTime.setStartDate(t1);
-                appointedTime.setEndDate(t2);
-            } catch (Exception e) {
-                e.printStackTrace();
+            for(int i=0;i<3;i++) {
+                AppointedTime appointedTime = new AppointedTime();
+                appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
+                appointedTime.setApplicationId(applicationId);
+                //all the cooperator are saved, may occurs more than 1 but ok
+                appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex % cooperatorNum));
+                String startdate = emailDto.getStartDate();
+                String enddate = emailDto.getEndDate();
+                try {
+                    Timestamp t1 = Timestamp.valueOf(startdate);
+                    Timestamp t2 = Timestamp.valueOf(enddate);
+                    appointedTime.setStartDate(t1);
+                    appointedTime.setEndDate(t2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                appointedTime.setOperationId(emailDto.getOperationId());
+                appointedTimeRepository.save(appointedTime);
             }
-            appointedTime.setOperationId(emailDto.getOperationId());
-            appointedTimeRepository.save(appointedTime);
             // }
 
             //subject and content are in the dto
-            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(), emailDto.getContent());
+            String content= emailDto.getContent();
+            System.out.println(batchindex+" "+cooperatorNum);
+            System.out.println(emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
+            System.out.println(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getCompanyId());
+            content=content.replaceAll("\\[assessor_name\\]",cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getName());
+            content=content.replaceAll("\\[company_name\\]",companyRepository.findById(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getCompanyId()).get().getCompanyName());
+            content=content.replaceAll("\\[operation_id\\]",emailDto.getOperationId());
+            content=content.replaceAll("\\[cooperation_id\\]",emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
+            Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex%cooperatorNum)).get().getEmail(), emailDto.getSubject(),content);
 
             //now, creating assessment and updating step of applications will be done immediately
             String newstep = hrUpdate(applicationId);
