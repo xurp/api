@@ -71,23 +71,25 @@ public class AssessmentServiceImpl implements AssessmentService {
             outbox.setSubject("");
             outboxRepository.save(outbox);
             //for(String cooperatorId:emailDto.getCooperatorIds()) {
-            AppointedTime appointedTime = new AppointedTime();
-            appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
-            appointedTime.setApplicationId(applicationId);
-            //all the cooperator are saved, may occurs more than 1 but ok
-            appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex%cooperatorNum));
-            String startdate = emailDto.getStartDate();
-            String enddate = emailDto.getEndDate();
-            try {
-                Timestamp t1 = Timestamp.valueOf(startdate);
-                Timestamp t2 = Timestamp.valueOf(enddate);
-                appointedTime.setStartDate(t1);
-                appointedTime.setEndDate(t2);
-            } catch (Exception e) {
-                e.printStackTrace();
+            for(int i=0;i<3;i++) {
+                AppointedTime appointedTime = new AppointedTime();
+                appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
+                appointedTime.setApplicationId(applicationId);
+                //all the cooperator are saved, may occurs more than 1 but ok
+                appointedTime.setCooperatorId(emailDto.getCooperatorIds().get(batchindex % cooperatorNum));
+                String startdate = emailDto.getStartDate();
+                String enddate = emailDto.getEndDate();
+                try {
+                    Timestamp t1 = Timestamp.valueOf(startdate);
+                    Timestamp t2 = Timestamp.valueOf(enddate);
+                    appointedTime.setStartDate(t1);
+                    appointedTime.setEndDate(t2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                appointedTime.setOperationId(emailDto.getOperationId());
+                appointedTimeRepository.save(appointedTime);
             }
-            appointedTime.setOperationId(emailDto.getOperationId());
-            appointedTimeRepository.save(appointedTime);
             // }
 
             //subject and content are in the dto
