@@ -15,6 +15,7 @@ import jp.co.worksap.stm2018.jobhere.service.AppointedTimeService;
 import jp.co.worksap.stm2018.jobhere.util.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,18 +44,24 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
         }
         return appointedTimeList;
     }
-
+    @Transactional
     @Override
     public void update(AppointedTimeDTO appointedTimeDTO,String path) {
         List<AppointedTime> appointedTimeList = appointedTimeRepository
                 .getByOperationIdAndCooperatorId(appointedTimeDTO.getOperationId(), appointedTimeDTO.getCooperatorId());
         List<AppointedTime> appointedTimeRemainList = appointedTimeRepository
                 .getByOperationId(appointedTimeDTO.getOperationId());
+        int nullstarttime=0;
+        for(AppointedTime a:appointedTimeRemainList){
+            if(a.getStartTime()==null)
+                nullstarttime++;
+        }
         for (int i = 0; i < appointedTimeList.size(); i++) {
             appointedTimeList.get(i).setStartTime(appointedTimeDTO.getStartTimes().get(i));
             appointedTimeRepository.save(appointedTimeList.get(i));
         }
-        if(appointedTimeList.size()==appointedTimeRemainList.size()){
+        System.out.println(appointedTimeList.size()+" "+nullstarttime);
+        if(appointedTimeList.size()==nullstarttime){
             List<Outbox> outboxList=outboxRepository.findByOperationId(appointedTimeDTO.getOperationId());
             if(outboxList!=null&&outboxList.size()>0){
                 for(Outbox outbox:outboxList){
@@ -64,9 +71,10 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
                     //now assessId is needed, but appointedTime only has applicationId
                     //return the newest assessment in this application
                     List<Assessment> assessmentList=assessmentRepository.findByApplicationId(applicationId);
+                    path="https://sh-stm.paas.workslan/jobhere-api";
                     List<Assessment> sortedList= assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                     String content="Please click the link to choose your interview time:  "+path+"/#/schedule/candidate/"+appointedTimeDTO.getOperationId()+"/"+sortedList.get(sortedList.size()-1).getId();
-                    Mail.send("chorespore@163.com", email, "["+application.getJob().getCompany()+"] Please choose your interview time",content);
+                    Mail.send("chorespore@163.com", email, "["+application.getJob().getCompany().getCompanyName()+"] Please choose your interview time",content);
                 }
             }
 
