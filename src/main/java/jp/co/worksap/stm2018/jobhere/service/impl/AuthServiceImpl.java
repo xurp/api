@@ -50,7 +50,6 @@ public class AuthServiceImpl implements AuthService {
                 ApiToken apiToken = new ApiToken();
                 apiToken.setId(tokenId);
                 apiToken.setUser(user);
-                //apiToken.builder().id(tokenId).user(user);
                 apiTokenRepository.save(apiToken);
                 return ApiTokenDTO.builder()
                         .token(apiToken.getId())
