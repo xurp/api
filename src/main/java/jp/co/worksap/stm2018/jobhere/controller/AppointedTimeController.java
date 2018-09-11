@@ -33,7 +33,7 @@ public class AppointedTimeController {
         String cooperatorId = request.getParameter("cooperatorId");
         List<AppointedTime> appointedTimeList = appointedTimeService.getByOperationIdAndCooperatorId(operationId, cooperatorId);
         if (appointedTimeList.get(0).getStartTime() != null) {
-            throw new ForbiddenException("Start time has been set!");
+            throw new ForbiddenException("You have already done the schedule arrange!");
         }
 
         ChooseDateDTO chooseDateDTO = new ChooseDateDTO();
