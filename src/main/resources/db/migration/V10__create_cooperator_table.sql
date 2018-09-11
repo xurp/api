@@ -7,5 +7,3 @@ create table "cooperator" (
   "phone" varchar(255) null
 );
 
-insert into "cooperator" values ('1', 'b6999c2c3d924def92fea2e967010584', 'hr8 friend1 ','software', 'xu_xi@worksap.co.jp');
-insert into "cooperator" values ('2', 'b6999c2c3d924def92fea2e967010584', 'hr8 friend2','software', 'xu_xi@worksap.co.jp');
