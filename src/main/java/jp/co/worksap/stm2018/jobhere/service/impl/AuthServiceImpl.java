@@ -30,11 +30,12 @@ public class AuthServiceImpl implements AuthService {
     private final CompanyRepository companyRepository;
 
     @Autowired
-    AuthServiceImpl(UserRepository userRepository, ApiTokenRepository apiTokenRepository,CompanyRepository companyRepository) {
+    AuthServiceImpl(UserRepository userRepository, ApiTokenRepository apiTokenRepository, CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.apiTokenRepository = apiTokenRepository;
-        this.companyRepository=companyRepository;
+        this.companyRepository = companyRepository;
     }
+
     @Transactional
     @Override
     public ApiTokenDTO login(LoginDTO loginDto) {
@@ -62,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("Wrong password or username");
         }
     }
+
     @Transactional
     @Override
     public ApiTokenDTO register(RegisterDTO registerDTO) {
@@ -74,8 +76,12 @@ public class AuthServiceImpl implements AuthService {
             String tokenId = registerDTO.getUsername() + "stm" + registerDTO.getRole();
             ApiToken apiToken = new ApiToken();
             apiToken.setId(tokenId);
-            if(registerDTO.getRole().equals("candidate")) {
-                Resume resume = new Resume();
+            if (registerDTO.getRole().equals("candidate")) {
+
+                Resume resume = Resume.builder()
+                        .name(registerDTO.getUsername())
+                        .email(registerDTO.getEmail()).build();
+
                 User userToSave = User.builder()
                         .id(uuid)
                         .username(registerDTO.getUsername())
@@ -85,11 +91,10 @@ public class AuthServiceImpl implements AuthService {
                 userRepository.save(userToSave);
                 apiToken.setUser(userToSave);
                 apiTokenRepository.save(apiToken);
-            }
-            else{
+            } else {
                 //save one and many at one time(many not exists, else use many to save one)
-                Company c=companyRepository.findFirstByCompanyNameAndLegalPerson(registerDTO.getCompanyName(),registerDTO.getLegalPerson());
-                if(c==null||c.getStatus().equals("company-n")) {//this is a new company or the old company is company-n, insert new company
+                Company c = companyRepository.findFirstByCompanyNameAndLegalPerson(registerDTO.getCompanyName(), registerDTO.getLegalPerson());
+                if (c == null || c.getStatus().equals("company-n")) {//this is a new company or the old company is company-n, insert new company
                     Company company = new Company();
                     company.setId(UUID.randomUUID().toString().replace("-", ""));
                     company.setCompanyName(registerDTO.getCompanyName());
@@ -108,8 +113,7 @@ public class AuthServiceImpl implements AuthService {
                     userRepository.save(userToSave);
                     apiToken.setUser(userToSave);
                     apiTokenRepository.save(apiToken);
-                }
-                else{//there is a real company
+                } else {//there is a real company
                     User userToSave = User.builder()
                             .id(uuid)
                             .username(registerDTO.getUsername())
