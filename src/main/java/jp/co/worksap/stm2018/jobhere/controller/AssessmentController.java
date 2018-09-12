@@ -83,4 +83,12 @@ public class AssessmentController {
         applicationService.update(assessmentDTO);
     }
 
+    @DeleteMapping("/rearrange")
+    @NeedLogin
+    void resendEmail(@RequestBody EmailDTO emailDTO){
+        //if interviewer forget selecting date, resend
+        //if interviewer has selected date, should not resend
+        assessmentService.resendEmail(emailDTO);
+    }
+
 }

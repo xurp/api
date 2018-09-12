@@ -128,6 +128,12 @@ public class AssessmentServiceImpl implements AssessmentService {
             batchindex++;
         }
     }
+
+    @Override
+    public void resendEmail(EmailDTO emailDTO) {
+        Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+    }
+
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
