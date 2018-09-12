@@ -12,5 +12,5 @@ public interface ResumeService {
 
     ResumeDTO save(Resume resume);
 
-    List<ResumeDTO> list();
+    List<ResumeDTO> list(String keyword);
 }

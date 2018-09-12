@@ -35,8 +35,8 @@ public class ResumeController {
 
     @GetMapping("")
 //    @NeedLogin
-    List<ResumeDTO> list() {
-        return resumeService.list();
+    List<ResumeDTO> list(@RequestParam("keyword") String keyword) {
+        return resumeService.list(keyword);
     }
 
 }

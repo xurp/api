@@ -100,13 +100,14 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
-    public List<ResumeDTO> list() {
+    public List<ResumeDTO> list(String keyword) {
         List<User> userList = userRepository.getByRole("candidate");
 
         List<ResumeDTO> resumeDTOList = new ArrayList<>();
         for (User user : userList) {
             Resume resume = user.getResume();
-            if (resume.isOpen())
+            String info = resume.getSchool() + " " + resume.getMajor() + " " + resume.getDegree() + " " + resume.getIntro();
+            if (resume.isOpen() && (keyword.equals("") || info.contains(keyword)))
                 resumeDTOList.add(ResumeDTO.builder()
                         .id(resume.getId())
                         .name(resume.getName())
