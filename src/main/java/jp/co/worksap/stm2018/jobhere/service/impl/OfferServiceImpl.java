@@ -67,6 +67,30 @@ public class OfferServiceImpl implements OfferService {
         return offerDTOList;
     }
 
+    @Override
+    public OfferDTO find(String offerId) {
+        Offer offer = offerRepository.getOne(offerId);
+        Application application = applicationRepository.getOne(offer.getApplicationId());
+        ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                .id(application.getId())
+                .resume(application.getResume())
+                .job(application.getJob())
+                .step(application.getStep())
+                .user(application.getUser())
+                .createTime(application.getCreateTime())
+                .updateTime(application.getUpdateTime()).build();
+
+        return OfferDTO.builder()
+                .id(offer.getId())
+                .result(offer.getResult())
+                .sendStatus(offer.getSendStatus())
+                .remark(offer.getRemark())
+                .applicationDTO(applicationDTO)
+                .companyId(offer.getCompanyId())
+                .offerTime(offer.getOfferTime())
+                .respondTime(offer.getRespondTime()).build();
+    }
+
     @Transactional
     @Override
     public void update(EmailDTO emailDTO) {
