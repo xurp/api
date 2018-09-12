@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AssessmentService {
 
-    AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId);
+    AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content, String assessId);
 
     List<AssessmentDTO> list(String applicationId);
 
@@ -17,5 +17,7 @@ public interface AssessmentService {
     void update(AssessmentDTO assessmentDTO);
 
     void saveOutboxAndMakeAppointment(EmailDTO emailDto);
+
+    void schedule(AssessmentDTO assessmentDTO);
 
 }

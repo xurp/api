@@ -17,17 +17,12 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class AssessmentDTO {
     private String id;
-
     private Cooperator cooperator;
-
     private String applicationId;
-
     private Timestamp assessmentTime;
-
+    private Timestamp interviewTime;
     private String comment;
-
     private String step;
-
     private String pass;
 
 }
