@@ -31,17 +31,19 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
     private final StepRepository stepRepository;
+    private final Mail mail;
 
     @Autowired
     ApplicationServiceImpl(JobRepository jobRepository, OfferRepository offerRepository,
                            ResumeRepository resumeRepository, UserRepository userRepository,
-                           ApplicationRepository applicationRepository, StepRepository stepRepository) {
+                           ApplicationRepository applicationRepository, StepRepository stepRepository,Mail mail) {
         this.offerRepository = offerRepository;
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
         this.stepRepository = stepRepository;
+        this.mail=mail;
     }
 
 
@@ -212,13 +214,13 @@ public class ApplicationServiceImpl implements ApplicationService {
             else if(step.charAt(0) == '-'){
                 application.setStep("-"+step);
                 applicationRepository.save(application);
-                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
             }
             //maybe the following two replace is unnecessary
             else if(Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01){
                 application.setStep("--"+step);
                 applicationRepository.save(application);
-                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
             }
             else{
                 throw new ValidationException("The interviewer has not rejected the candidate.");

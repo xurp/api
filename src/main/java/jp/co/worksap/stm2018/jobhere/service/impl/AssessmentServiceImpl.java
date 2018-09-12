@@ -29,10 +29,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final CooperatorRepository cooperatorRepository;
     private final AssessmentRepository assessmentRepository;
     private final CompanyRepository companyRepository;
+    private final Mail mail;
 
 
     @Autowired
-    AssessmentServiceImpl(CompanyRepository companyRepository, OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+    AssessmentServiceImpl(Mail mail,CompanyRepository companyRepository, OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+        this.mail=mail;
         this.companyRepository = companyRepository;
         this.stepRepository = stepRepository;
         this.outboxRepository = outboxRepository;
@@ -102,7 +104,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                 content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getCompanyId()).get().getCompanyName());
                 content = content.replaceAll("\\[operation_id\\]", emailDto.getOperationId());
                 content = content.replaceAll("\\[cooperation_id\\]", emailDto.getCooperatorIds().get(batchindex % cooperatorNum));
-                Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getEmail(), emailDto.getSubject(), content);
+                mail.send("chorespore@163.com", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getEmail(), emailDto.getSubject(), content);
             }
             //now, creating assessment and updating step of applications will be done immediately
             String newstep = hrUpdate(applicationId);
@@ -192,7 +194,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                         content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
                         content = content.replaceAll("\\[operation_id\\]", emailDTO.getOperationId());
                         content = content.replaceAll("\\[cooperation_id\\]", emailDTO.getCooperatorId());
-                        Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
+                        mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
 
                     assessmentRepository.deleteById(assessment.getId());
                     String newstep = hrUpdate(applicationId);
@@ -219,7 +221,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         else{//case 2
 
         }
-        Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+        mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
     }
 
     @Override
@@ -232,7 +234,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessmentRepository.save(assessment);
             String content = emailDTO.getContent().replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
 
-            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),content);
+            mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),content);
 
         } else {
             throw new ValidationException("The link is wrong, please contact HR.");
@@ -259,7 +261,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessmentRepository.save(assessment);
         application.setStep(newstep);
         applicationRepository.save(application);
-        Mail.send("chorespore@163.com", cooperator.getEmail(), subject, content);
+        mail.send("chorespore@163.com", cooperator.getEmail(), subject, content);
         return AssessmentDTO.builder()
                 .id(assessment.getId())
                 .cooperator(assessment.getCooperator())

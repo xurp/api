@@ -31,6 +31,8 @@ public class OfferServiceImpl implements OfferService {
     private OfferRepository offerRepository;
     @Autowired
     private ApplicationRepository applicationRepository;
+    @Autowired
+    private Mail mail;
 
 
     @Override
@@ -73,7 +75,7 @@ public class OfferServiceImpl implements OfferService {
             Offer offer=offerOptional.get();
             offer.setSendStatus("1");
             offerRepository.save(offer);
-            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
+            mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
         }
         else{
             throw new ValidationException("Wrong offer ID.");
