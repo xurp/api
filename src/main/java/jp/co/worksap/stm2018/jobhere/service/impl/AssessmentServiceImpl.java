@@ -132,9 +132,13 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public void schedule(AssessmentDTO assessmentDTO) {
         Assessment assessment = assessmentRepository.getOne(assessmentDTO.getId());
-        assessment.setInterviewTime(assessmentDTO.getInterviewTime());
-        assessmentRepository.save(assessment);
         AppointedTime appointedTime = appointedTimeRepository.getFirstByStartTime(assessmentDTO.getInterviewTime());
+        Optional<Cooperator> cooperatorOptional = cooperatorRepository.findById(appointedTime.getCooperatorId());
+        if (cooperatorOptional.isPresent())
+            assessment.setCooperator(cooperatorOptional.get());
+        assessment.setInterviewTime(assessmentDTO.getInterviewTime());
+
+        assessmentRepository.save(assessment);
         appointedTimeRepository.delete(appointedTime);
     }
 
