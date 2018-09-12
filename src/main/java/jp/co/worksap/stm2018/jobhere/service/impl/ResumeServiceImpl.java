@@ -10,6 +10,7 @@ import jp.co.worksap.stm2018.jobhere.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,11 +24,11 @@ public class ResumeServiceImpl implements ResumeService {
 
 
     @Override
-    public void update(String id,ResumeDTO resumeDTO) {
-        Optional<User> userOptional=userRepository.findById(id);
-        if(userOptional.isPresent()){
-            User user=userOptional.get();
-            Resume resume=user.getResume();
+    public void update(String id, ResumeDTO resumeDTO) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            Resume resume = user.getResume();
             resume.setName(resumeDTO.getName());
             resume.setGender(resumeDTO.getGender());
             resume.setAge(resumeDTO.getAge());
@@ -39,17 +40,17 @@ public class ResumeServiceImpl implements ResumeService {
             resume.setIntro(resumeDTO.getIntro());
             resume.setOpen(resumeDTO.isOpen());
             userRepository.save(user);
-        }
-        else{
+        } else {
             throw new ValidationException("User id does not exist!");
         }
     }
+
     @Override
     public ResumeDTO find(String id) {
-        Optional<User> userOptional=userRepository.findById(id);
-        if(userOptional.isPresent()) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
             User user = userOptional.get();
-            Resume resume=user.getResume();
+            Resume resume = user.getResume();
             return ResumeDTO.builder()
                     .id(resume.getId())
                     .name(resume.getName())
@@ -63,8 +64,7 @@ public class ResumeServiceImpl implements ResumeService {
                     .intro(resume.getIntro())
                     .open(resume.isOpen())
                     .build();
-        }
-        else{
+        } else {
             throw new ValidationException("User id does not exist!");
         }
     }
@@ -101,6 +101,23 @@ public class ResumeServiceImpl implements ResumeService {
 
     @Override
     public List<ResumeDTO> list() {
-        return null;
+        List<Resume> resumeList = resumeRepository.getByOpen(true);
+        List<ResumeDTO> resumeDTOList = new ArrayList<>();
+        resumeList.stream().map(resume -> {
+            resumeDTOList.add(ResumeDTO.builder()
+                    .id(resume.getId())
+                    .name(resume.getName())
+                    .gender(resume.getGender())
+                    .age(resume.getAge())
+                    .email(resume.getEmail())
+                    .phone(resume.getPhone())
+                    .degree(resume.getDegree())
+                    .school(resume.getSchool())
+                    .major(resume.getMajor())
+                    .intro(resume.getIntro())
+                    .open(resume.isOpen()).build());
+            return resume;
+        });
+        return resumeDTOList;
     }
 }
