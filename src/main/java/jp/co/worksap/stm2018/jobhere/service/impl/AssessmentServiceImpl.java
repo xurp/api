@@ -159,6 +159,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             //List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
             //List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
             //Assessment assessment=sortedList.get(sortedList.size()-1);
+            System.out.println(emailDTO.getAssessId());
             Optional<Assessment> assessmentOptional = assessmentRepository.findById(emailDTO.getAssessId());
             if (!assessmentOptional.isPresent())
                 throw new ValidationException("The link is wrong, please contact HR.");
