@@ -237,6 +237,29 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
     }
+
+    @Override
+    public List<ApplicationDTO> candidateApplicationList(User user) {
+        String userId=user.getId();
+        List<Application> list=userRepository.findById(userId).get().getApplications();
+        List<ApplicationDTO> applicationDTOList=new ArrayList<>();
+        for(Application application:list){
+            List<Step> stepList=stepRepository.findByJobId(application.getJob().getId());
+            if(stepList==null||stepList.size()==0)
+                stepList=stepRepository.findByJobId("-1");
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
+            applicationDTOList.add(ApplicationDTO.builder()
+                    .id(application.getId())
+                    .resume(application.getResume())
+                    .job(application.getJob())
+                    .step(application.getStep())
+                    .user(application.getUser())
+                    .createTime(application.getCreateTime())
+                    .updateTime(application.getUpdateTime()).
+                            stepList(stepList).build());
+        }
+        return applicationDTOList;
+    }
     
     /*@Transactional
     @Override

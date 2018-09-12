@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.service;
 
+import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
@@ -22,5 +23,7 @@ public interface ApplicationService {
     public void updateApplicationStep(String applicationId);
 
     public void decline(EmailDTO emailDTO);
+
+    List<ApplicationDTO> candidateApplicationList(User user);
 
 }
