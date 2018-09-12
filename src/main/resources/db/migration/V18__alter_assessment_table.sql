@@ -1,0 +1,1 @@
+alter table "assessment"  add column "interview_time"timestamp null
