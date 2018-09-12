@@ -402,7 +402,10 @@ public class AssessmentServiceImpl implements AssessmentService {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             assessment.setAssessmentTime(timestamp);
             assessment.setPass(assessmentDTO.getPass());
-            assessment.setComment(assessmentDTO.getComment());
+            if(assessmentDTO.getComment()==null)
+                assessment.setComment(" ");
+            else
+                assessment.setComment(assessmentDTO.getComment());
             assessmentRepository.save(assessment);
         } else {
             throw new NotFoundException("Application not found");
