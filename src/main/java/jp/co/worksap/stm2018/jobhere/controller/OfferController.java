@@ -41,6 +41,8 @@ public class OfferController {
         }
     }
 
+
+
     @PutMapping("")
     @NeedLogin
     void update(HttpServletRequest request, @RequestBody EmailDTO emailDTO) {
@@ -55,6 +57,10 @@ public class OfferController {
         }
     }
 
+    @PutMapping("/{offerId}")
+    void offer(HttpServletRequest request, @PathVariable("offerId") String offerId, @RequestParam("result") String result) {
+        offerService.offer(offerId, result);
+    }
 
 }
 

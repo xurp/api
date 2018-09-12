@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,19 +66,27 @@ public class OfferServiceImpl implements OfferService {
         }
         return offerDTOList;
     }
+
     @Transactional
     @Override
     public void update(EmailDTO emailDTO) {
-        String offerId=emailDTO.getOfferId();
-        Optional<Offer> offerOptional=offerRepository.findById(offerId);
-        if(offerOptional.isPresent()) {
-            Offer offer=offerOptional.get();
+        String offerId = emailDTO.getOfferId();
+        Optional<Offer> offerOptional = offerRepository.findById(offerId);
+        if (offerOptional.isPresent()) {
+            Offer offer = offerOptional.get();
             offer.setSendStatus("1");
             offerRepository.save(offer);
             mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
-        }
-        else{
+        } else {
             throw new ValidationException("Wrong offer ID.");
         }
+    }
+
+    @Override
+    public void offer(String offerId, String result) {
+        Offer offer = offerRepository.getOne(offerId);
+        offer.setResult(result);
+        offer.setRespondTime(new Timestamp(System.currentTimeMillis()));
+        offerRepository.save(offer);
     }
 }

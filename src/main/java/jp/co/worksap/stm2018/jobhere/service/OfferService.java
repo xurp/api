@@ -14,4 +14,6 @@ public interface OfferService {
     List<OfferDTO> list(String companyId);
 
     void update(EmailDTO emailDTO);
+
+    void offer(String offerId, String result);
 }
