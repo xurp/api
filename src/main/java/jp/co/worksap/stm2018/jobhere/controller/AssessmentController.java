@@ -91,4 +91,11 @@ public class AssessmentController {
         assessmentService.resendEmail(emailDTO);
     }
 
+    @PutMapping("/reset")
+    @NeedLogin
+    void reassessment(@RequestBody EmailDTO emailDTO){
+        assessmentService.reassessment(emailDTO);
+    }
+
+
 }

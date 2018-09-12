@@ -134,6 +134,22 @@ public class AssessmentServiceImpl implements AssessmentService {
         Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
     }
 
+    @Override
+    public void reassessment(EmailDTO emailDTO) {
+        //id:assessmentId
+        Assessment assessment=assessmentRepository.getOne(emailDTO.getAssessId());
+        if (assessment!=null) {
+            assessment.setPass("assessing");
+            assessment.setComment("");
+            assessmentRepository.save(assessment);
+            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+
+        } else {
+            throw new ValidationException("The link is wrong, please contact HR.");
+        }
+
+    }
+
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
@@ -148,8 +164,8 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setStep(newstep);
         assessment.setComment(" ");
         assessment.setPass("assessing");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        assessment.setAssessmentTime(timestamp);
+        //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        //assessment.setAssessmentTime(timestamp);
         assessmentRepository.save(assessment);
         application.setStep(newstep);
         applicationRepository.save(application);
@@ -162,7 +178,8 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .comment(assessment.getComment())
                 .step(assessment.getStep())
                 .pass(assessment.getPass())
-                .assessmentTime(timestamp).build();
+                //.assessmentTime(timestamp)
+                .build();
     }
 
     /*@Transactional
