@@ -148,9 +148,16 @@ public class AssessmentServiceImpl implements AssessmentService {
         //now only consider case 3
         List<AppointedTime> appointedTimeList=appointedTimeRepository.getByApplicationId(applicationId);
         if(appointedTimeList==null||appointedTimeList.size()==0){
-            List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
-            List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
-            Assessment assessment=sortedList.get(sortedList.size()-1);
+            //List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
+            //List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
+            //Assessment assessment=sortedList.get(sortedList.size()-1);
+            Optional<Assessment> assessmentOptional=assessmentRepository.findById(emailDTO.getAssessId());
+            if(!assessmentOptional.isPresent())
+                throw new ValidationException("The link is wrong, please contact HR.");
+            Assessment assessment=assessmentOptional.get();
+            if(!assessment.getPass().equals("assessing")){
+                throw new ValidationException("Interviewer has assessed the candidate.");
+            }
             if(assessment.getCooperator()!=null){//case 3
                     Outbox outbox = new Outbox();
                     outbox.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -223,7 +230,9 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setPass("assessing");
             assessment.setComment("");
             assessmentRepository.save(assessment);
-            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+            String content = emailDTO.getContent().replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
+
+            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),content);
 
         } else {
             throw new ValidationException("The link is wrong, please contact HR.");
