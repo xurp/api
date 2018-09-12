@@ -34,7 +34,8 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
     private ApplicationRepository applicationRepository;
     @Autowired
     private AssessmentRepository assessmentRepository;
-
+    @Autowired
+    private Mail mail;
 
     @Override
     public List<AppointedTime> getByOperationIdAndCooperatorId(String id1, String id2) {
@@ -74,7 +75,7 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
                     path="https://sh-stm.paas.workslan/jobhere-api";
                     List<Assessment> sortedList= assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                     String content="Please click the link to choose your interview time:  "+path+"/#/schedule/candidate/"+appointedTimeDTO.getOperationId()+"/"+sortedList.get(sortedList.size()-1).getId();
-                    Mail.send("chorespore@163.com", email, "["+application.getJob().getCompany().getCompanyName()+"] Please choose your interview time",content);
+                    mail.send("chorespore@163.com", email, "["+application.getJob().getCompany().getCompanyName()+"] Please choose your interview time",content);
                 }
             }
 
