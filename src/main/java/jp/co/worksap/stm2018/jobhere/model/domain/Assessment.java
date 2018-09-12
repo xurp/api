@@ -41,6 +41,9 @@ public class Assessment {
     @Column(nullable = true)
     private Timestamp assessmentTime;
 
+    @Column(nullable = true)
+    private Timestamp interviewTime;
+
     @Column(nullable = true,columnDefinition = "text")
     private String comment;
     @Column(nullable = false)
