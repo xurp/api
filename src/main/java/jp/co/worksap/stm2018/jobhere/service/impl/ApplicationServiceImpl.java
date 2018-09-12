@@ -245,6 +245,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<ApplicationDTO> applicationDTOList=new ArrayList<>();
         for(Application application:list){
             List<Step> stepList=stepRepository.findByJobId(application.getJob().getId());
+            if(stepList==null||stepList.size()==0)
+                stepList=stepRepository.findByJobId("-1");
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
             applicationDTOList.add(ApplicationDTO.builder()
                     .id(application.getId())
