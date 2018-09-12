@@ -107,6 +107,8 @@ public class ResumeServiceImpl implements ResumeService {
         for (User user : userList) {
             Resume resume = user.getResume();
             String info = resume.getSchool() + " " + resume.getMajor() + " " + resume.getDegree() + " " + resume.getIntro();
+            info=info.toLowerCase();
+            keyword = keyword.toLowerCase();
             if (resume.isOpen() && (keyword.equals("") || info.contains(keyword)))
                 resumeDTOList.add(ResumeDTO.builder()
                         .id(resume.getId())
