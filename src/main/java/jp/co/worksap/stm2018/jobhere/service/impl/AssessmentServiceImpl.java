@@ -32,8 +32,8 @@ public class AssessmentServiceImpl implements AssessmentService {
 
 
     @Autowired
-    AssessmentServiceImpl(CompanyRepository companyRepository,OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
-        this.companyRepository=companyRepository;
+    AssessmentServiceImpl(CompanyRepository companyRepository, OutboxRepository outboxRepository, StepRepository stepRepository, AppointedTimeRepository appointedTimeRepository, ApplicationRepository applicationRepository, CooperatorRepository cooperatorRepository, AssessmentRepository assessmentRepository) {
+        this.companyRepository = companyRepository;
         this.stepRepository = stepRepository;
         this.outboxRepository = outboxRepository;
         this.assessmentRepository = assessmentRepository;
@@ -48,14 +48,14 @@ public class AssessmentServiceImpl implements AssessmentService {
         //now this method only be called ONCE!!
         //NOTICE!!!!!!!application num should >= cooperator num!
         //to do:let interview choose date and time
-        int cooperatorNum=emailDto.getCooperatorIds().size();
-        if(cooperatorNum==0)
+        int cooperatorNum = emailDto.getCooperatorIds().size();
+        if (cooperatorNum == 0)
             return;
-        int applicationNum=emailDto.getApplications().size();
-        if(applicationNum==0)
+        int applicationNum = emailDto.getApplications().size();
+        if (applicationNum == 0)
             return;
-        int batchindex=0;
-        for(String applicationId:emailDto.getApplications()) {
+        int batchindex = 0;
+        for (String applicationId : emailDto.getApplications()) {
             //the following does not work(may be transabctuibak). use batchindex
             /*List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationId(emailDto.getOperationId());
             int index=0;
@@ -71,10 +71,10 @@ public class AssessmentServiceImpl implements AssessmentService {
             outbox.setSubject("");
             outboxRepository.save(outbox);
             //for(String cooperatorId:emailDto.getCooperatorIds()) {
-            int onecooperatordates=1;
-            if(applicationNum==1)
-                onecooperatordates=3;
-            for(int i=0;i<onecooperatordates;i++) {
+            int onecooperatordates = 1;
+            if (applicationNum == 1)
+                onecooperatordates = 3;
+            for (int i = 0; i < onecooperatordates; i++) {
                 AppointedTime appointedTime = new AppointedTime();
                 appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
                 appointedTime.setApplicationId(applicationId);
@@ -96,7 +96,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             // }
 
             //subject and content are in the dto
-            if(batchindex<cooperatorNum) {//only need send cooperatorNum emails
+            if (batchindex < cooperatorNum) {//only need send cooperatorNum emails
                 String content = emailDto.getContent();
                 content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getName());
                 content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getCompanyId()).get().getCompanyName());
@@ -112,8 +112,8 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setApplicationId(applicationId);
             //originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
             //now, cooperator should be updated after choosing date(but shezhao has only one cooperator so save it)
-            if(applicationNum==1) {
-                Cooperator cooperator=cooperatorRepository.findById(emailDto.getCooperatorIds().get(0)).get();
+            if (applicationNum == 1) {
+                Cooperator cooperator = cooperatorRepository.findById(emailDto.getCooperatorIds().get(0)).get();
                 assessment.setCooperator(cooperator);
             }
             Application application = applicationRepository.findById(applicationId).get();
@@ -130,19 +130,31 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
+    public void schedule(AssessmentDTO assessmentDTO) {
+        Assessment assessment = assessmentRepository.getOne(assessmentDTO.getId());
+        AppointedTime appointedTime = appointedTimeRepository.getFirstByStartTime(assessmentDTO.getInterviewTime());
+        Optional<Cooperator> cooperatorOptional = cooperatorRepository.findById(appointedTime.getCooperatorId());
+        if (cooperatorOptional.isPresent())
+            assessment.setCooperator(cooperatorOptional.get());
+        assessment.setInterviewTime(assessmentDTO.getInterviewTime());
+
+        assessmentRepository.save(assessment);
+        appointedTimeRepository.delete(appointedTime);
+    }
+    
     public void resendEmail(EmailDTO emailDTO) {
         Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
     }
 
     @Transactional
     @Override
-    public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
+    public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content, String assessId) {
         //now. assessment and application will be updated immediately. This method may be used for other things.
-        String newstep=hrUpdate(applicationId);
+        String newstep = hrUpdate(applicationId);
         Assessment assessment = new Assessment();
         assessment.setId(assessId);
         assessment.setApplicationId(applicationId);
-        Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
+        Cooperator cooperator = cooperatorRepository.findById(cooperatorId).get();
         assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
         Application application = applicationRepository.findById(applicationId).get();
         assessment.setStep(newstep);
@@ -153,7 +165,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessmentRepository.save(assessment);
         application.setStep(newstep);
         applicationRepository.save(application);
-        Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
+        Mail.send("chorespore@163.com", cooperator.getEmail(), subject, content);
         return AssessmentDTO.builder()
                 .id(assessment.getId())
                 .cooperator(assessment.getCooperator())
@@ -221,15 +233,15 @@ public class AssessmentServiceImpl implements AssessmentService {
         //id:assessmentId
         //originally use findbyid, but assessment to cooperator is one-to-one and cooperator may be null and it is EAGER and findbyid use inner join
         //so assessment exists, cooperator is null, the result is null. so set cooperator in assessment LAZY
-        Assessment assessment=assessmentRepository.getOne(id);
-        if (assessment!=null) {
+        Assessment assessment = assessmentRepository.getOne(id);
+        if (assessment != null) {
             if (assessment.getPass().equals("assessing")) {
                 String applicationId = assessment.getApplicationId();
                 Application application = applicationRepository.findById(applicationId).get();
                 List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
-                List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
-                if(sortedList.size()>0)
-                sortedList.remove(sortedList.size()-1);
+                List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep()))).collect(Collectors.toList());
+                if (sortedList.size() > 0)
+                    sortedList.remove(sortedList.size() - 1);
                 List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
                 if (stepList == null || stepList.size() == 0)
                     stepList = stepRepository.findByJobId("-1");
@@ -258,7 +270,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                         .resume(application.getResume())
                         .step(application.getStep())
                         .assessments(assessmentDTOList)
-                                .stepList(stepList)
+                        .stepList(stepList)
                         .build();
             } else {
                 throw new ValidationException("You've done it, thank you.");
@@ -268,6 +280,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         }
 
     }
+
     @Transactional
     @Override
     public void update(AssessmentDTO assessmentDTO) {
@@ -295,12 +308,11 @@ public class AssessmentServiceImpl implements AssessmentService {
 
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
             //  || , former is step 0!
-            if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01 || application.getStep().charAt(0) == '+') {
+            if (Math.abs(Double.valueOf(application.getStep().replace("+", "").replace("-", "")) - stepList.get(0).getIndex()) < 0.01 || application.getStep().charAt(0) == '+') {
                 Optional<Step> stepOptional = stepList.stream().filter(tr -> tr.getIndex() > Double.valueOf(application.getStep().replace("+", ""))).findFirst();
                 if (stepOptional.isPresent()) {
                     return stepOptional.get().getIndex() + "";
-                }
-                else {
+                } else {
                     throw new ValidationException("Step in system has errors.");
                 }
             } else {
@@ -310,7 +322,6 @@ public class AssessmentServiceImpl implements AssessmentService {
             throw new NotFoundException("Application no found");
         }
     }
-
 
 
 }

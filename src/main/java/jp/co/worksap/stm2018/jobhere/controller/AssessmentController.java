@@ -37,11 +37,12 @@ public class AssessmentController {
         this.jobService = jobService;
         this.assessmentService = assessmentService;
     }
+
     //@ApiOperation(value="create new assessment, send email and update step of application", notes="when step is +")
-    @ApiOperation(value="save outbox and send email of selecting time", notes="when step is +")
+    @ApiOperation(value = "save outbox and send email of selecting time", notes = "when step is +")
     @PostMapping("")
     @NeedLogin
-    void save(HttpServletRequest request,@RequestBody EmailDTO emailDTO ) {
+    void save(HttpServletRequest request, @RequestBody EmailDTO emailDTO) {
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
             //hr views application detail then click 'send email'
@@ -81,6 +82,15 @@ public class AssessmentController {
         //interviewer can get detail without signing in. delete @NeedLogin
         assessmentService.update(assessmentDTO);
         applicationService.update(assessmentDTO);
+    }
+
+
+    @PutMapping("/{id}/schedule")
+    @NeedLogin
+    void schedule(@PathVariable("id") String id, @RequestBody AssessmentDTO assessmentDTO) {
+        //Set interview time chosen by the candidate
+        assessmentDTO.setId(id);
+        assessmentService.schedule(assessmentDTO);
     }
 
     @DeleteMapping("/rearrange")
