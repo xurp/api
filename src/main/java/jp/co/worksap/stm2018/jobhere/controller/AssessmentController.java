@@ -91,6 +91,7 @@ public class AssessmentController {
         //Set interview time chosen by the candidate
         assessmentDTO.setId(id);
         assessmentService.schedule(assessmentDTO);
+    }
 
     @DeleteMapping("/rearrange")
     @NeedLogin
