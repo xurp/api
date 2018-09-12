@@ -244,6 +244,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Application> list=userRepository.findById(userId).get().getApplications();
         List<ApplicationDTO> applicationDTOList=new ArrayList<>();
         for(Application application:list){
+            List<Step> stepList=stepRepository.findByJobId(application.getJob().getId());
+            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
             applicationDTOList.add(ApplicationDTO.builder()
                     .id(application.getId())
                     .resume(application.getResume())
@@ -251,7 +253,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .step(application.getStep())
                     .user(application.getUser())
                     .createTime(application.getCreateTime())
-                    .updateTime(application.getUpdateTime()).build());
+                    .updateTime(application.getUpdateTime()).
+                            stepList(stepList).build());
         }
         return applicationDTOList;
     }
