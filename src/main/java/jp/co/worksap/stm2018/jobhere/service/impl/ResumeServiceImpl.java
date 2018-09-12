@@ -10,6 +10,7 @@ import jp.co.worksap.stm2018.jobhere.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -96,5 +97,10 @@ public class ResumeServiceImpl implements ResumeService {
                 .intro(resume.getIntro())
                 .open(resume.isOpen())
                 .build();
+    }
+
+    @Override
+    public List<ResumeDTO> list() {
+        return null;
     }
 }
