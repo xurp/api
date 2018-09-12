@@ -83,4 +83,10 @@ public class AssessmentController {
         applicationService.update(assessmentDTO);
     }
 
+    @PutMapping("/reset")
+    @NeedLogin
+    void resendEmail(@RequestBody EmailDTO emailDTO){
+        assessmentService.resendEmail(emailDTO);
+    }
+
 }
