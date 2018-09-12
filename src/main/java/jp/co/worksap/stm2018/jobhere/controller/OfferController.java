@@ -56,15 +56,14 @@ public class OfferController {
     }
 
     @GetMapping("/{offerId}")
-    @NeedLogin
-    OfferDTO find(HttpServletRequest request, @PathVariable("offerId") String offerId) {
+    OfferDTO find(@PathVariable("offerId") String offerId) {
 
         return offerService.find(offerId);
     }
 
 
     @PutMapping("/{offerId}")
-    void offer(HttpServletRequest request, @PathVariable("offerId") String offerId, @RequestParam("result") String result) {
+    void offer(@PathVariable("offerId") String offerId, @RequestParam("result") String result) {
         offerService.offer(offerId, result);
     }
 
