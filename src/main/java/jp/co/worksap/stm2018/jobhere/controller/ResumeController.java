@@ -7,6 +7,8 @@ import jp.co.worksap.stm2018.jobhere.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/resume")
 public class ResumeController {
@@ -29,6 +31,12 @@ public class ResumeController {
     @NeedLogin
     ResumeDTO find(@PathVariable("id") String id) {
         return resumeService.find(id);
+    }
+
+    @GetMapping("")
+    @NeedLogin
+    List<ResumeDTO> list() {
+        return resumeService.list();
     }
 
 }
