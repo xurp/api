@@ -38,7 +38,8 @@ public class ApplicationController {
         this.resumeService = resumeService;
         this.jobService = jobService;
     }
-    @ApiOperation(value="save new application", notes="use Job to save Application(and consume)")
+
+    @ApiOperation(value = "save new application", notes = "use Job to save Application(and consume)")
     @PostMapping("")
     @NeedLogin
     ApplicationDTO save(HttpServletRequest request, @RequestBody String jobId) {
@@ -54,9 +55,21 @@ public class ApplicationController {
         } else {
             throw new ValidationException("You are not candidate!");
         }
-
     }
-    @ApiOperation(value="list applications of a step", notes="if step is ALL or the step of application equals to request, return it")
+
+
+    @ApiOperation(value = "hr make new applications", notes = "link resumes to jobs to create new applications")
+    @PostMapping("/resume")
+    @NeedLogin
+    ApplicationDTO link(HttpServletRequest request, @RequestParam("jobId") String jobId, @RequestParam("resumeId") String resumeId) {
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            return applicationService.link(jobId, resumeId);
+        } else
+            throw new ValidationException("Permission Denied!");
+    }
+
+    @ApiOperation(value = "list applications of a step", notes = "if step is ALL or the step of application equals to request, return it")
     @GetMapping("")
     @NeedLogin
     List<ApplicationDTO> list(HttpServletRequest request) {
@@ -70,7 +83,8 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-    @ApiOperation(value="get application detail", notes="get application detail")
+
+    @ApiOperation(value = "get application detail", notes = "get application detail")
     @GetMapping("/{id}")
     @NeedLogin
     ApplicationDTO find(HttpServletRequest request, @PathVariable("id") String id) {
@@ -81,7 +95,8 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-    @ApiOperation(value="update step of application and send offer", notes="update step of application and send offer")
+
+    @ApiOperation(value = "update step of application and send offer", notes = "update step of application and send offer")
     @PutMapping("/{id}/step")
     @NeedLogin
     void update(HttpServletRequest request, @PathVariable("id") String id) {
@@ -93,10 +108,11 @@ public class ApplicationController {
             throw new ValidationException("Permission Denied!");
         }
     }
-    @ApiOperation(value="decline the application and send email to the candidate ", notes="when step is resume or -; if step is resume filter, set --; else set -")
+
+    @ApiOperation(value = "decline the application and send email to the candidate ", notes = "when step is resume or -; if step is resume filter, set --; else set -")
     @PutMapping("/decline")
     @NeedLogin
-    void decline(HttpServletRequest request,@RequestBody EmailDTO emailDTO) {
+    void decline(HttpServletRequest request, @RequestBody EmailDTO emailDTO) {
         //if batch operation, call this function N times
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
