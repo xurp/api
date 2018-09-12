@@ -103,7 +103,7 @@ public class ResumeServiceImpl implements ResumeService {
     public List<ResumeDTO> list() {
         List<Resume> resumeList = resumeRepository.getByOpen(true);
         List<ResumeDTO> resumeDTOList = new ArrayList<>();
-        resumeList.stream().map(resume -> {
+        for (Resume resume : resumeList) {
             resumeDTOList.add(ResumeDTO.builder()
                     .id(resume.getId())
                     .name(resume.getName())
@@ -116,8 +116,7 @@ public class ResumeServiceImpl implements ResumeService {
                     .major(resume.getMajor())
                     .intro(resume.getIntro())
                     .open(resume.isOpen()).build());
-            return resume;
-        });
+        }
         return resumeDTOList;
     }
 }
