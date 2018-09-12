@@ -329,7 +329,9 @@ public class AssessmentServiceImpl implements AssessmentService {
                     .assessmentTime(assessment.getAssessmentTime())
                     .comment(assessment.getComment())
                     .step(assessment.getStep())
-                    .pass(assessment.getPass()).build());
+                    .pass(assessment.getPass()).
+                            interviewTime(assessment.getInterviewTime())
+                    .build());
         }
         return assessmentDTOList;
     }
