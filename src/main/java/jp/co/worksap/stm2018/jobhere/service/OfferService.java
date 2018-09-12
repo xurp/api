@@ -13,6 +13,8 @@ public interface OfferService {
     //ResumeDTO find(String id);
     List<OfferDTO> list(String companyId);
 
+    OfferDTO find(String offerId);
+
     void update(EmailDTO emailDTO);
 
     void offer(String offerId, String result);

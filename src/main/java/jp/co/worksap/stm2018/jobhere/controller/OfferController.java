@@ -41,8 +41,6 @@ public class OfferController {
         }
     }
 
-
-
     @PutMapping("")
     @NeedLogin
     void update(HttpServletRequest request, @RequestBody EmailDTO emailDTO) {
@@ -56,6 +54,14 @@ public class OfferController {
             throw new ValidationException("Permission Denied!");
         }
     }
+
+    @GetMapping("/{offerId}")
+    @NeedLogin
+    OfferDTO find(HttpServletRequest request, @PathVariable("offerId") String offerId) {
+
+        return offerService.find(offerId);
+    }
+
 
     @PutMapping("/{offerId}")
     void offer(HttpServletRequest request, @PathVariable("offerId") String offerId, @RequestParam("result") String result) {
