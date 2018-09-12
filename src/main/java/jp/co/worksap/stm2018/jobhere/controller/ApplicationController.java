@@ -122,5 +122,16 @@ public class ApplicationController {
         }
     }
 
+    @GetMapping("/candidate")
+    @NeedLogin
+    List<ApplicationDTO> candidateApplicationList(HttpServletRequest request){
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("candidate")) {
+            return applicationService.candidateApplicationList(user);
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
+    }
+
 
 }
