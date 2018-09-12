@@ -10,6 +10,8 @@ public interface ApplicationService {
 
     ApplicationDTO save(String jobId, String resumeId, String userId);
 
+    ApplicationDTO link(String jobId, String resumeId);
+
     ApplicationDTO find(String applicationId);
 
     List<ApplicationDTO> list(String jobId, String step);
