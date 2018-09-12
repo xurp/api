@@ -141,6 +141,10 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessmentRepository.save(assessment);
         appointedTimeRepository.delete(appointedTime);
     }
+    
+    public void resendEmail(EmailDTO emailDTO) {
+        Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+    }
 
     @Transactional
     @Override
