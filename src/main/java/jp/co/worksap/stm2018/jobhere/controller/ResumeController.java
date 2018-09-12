@@ -34,7 +34,7 @@ public class ResumeController {
     }
 
     @GetMapping("")
-    @NeedLogin
+//    @NeedLogin
     List<ResumeDTO> list() {
         return resumeService.list();
     }

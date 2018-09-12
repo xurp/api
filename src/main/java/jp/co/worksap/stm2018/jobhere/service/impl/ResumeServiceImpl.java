@@ -101,21 +101,24 @@ public class ResumeServiceImpl implements ResumeService {
 
     @Override
     public List<ResumeDTO> list() {
-        List<Resume> resumeList = resumeRepository.getByOpen(true);
+        List<User> userList = userRepository.getByRole("candidate");
+
         List<ResumeDTO> resumeDTOList = new ArrayList<>();
-        for (Resume resume : resumeList) {
-            resumeDTOList.add(ResumeDTO.builder()
-                    .id(resume.getId())
-                    .name(resume.getName())
-                    .gender(resume.getGender())
-                    .age(resume.getAge())
-                    .email(resume.getEmail())
-                    .phone(resume.getPhone())
-                    .degree(resume.getDegree())
-                    .school(resume.getSchool())
-                    .major(resume.getMajor())
-                    .intro(resume.getIntro())
-                    .open(resume.isOpen()).build());
+        for (User user : userList) {
+            Resume resume = user.getResume();
+            if (resume.isOpen())
+                resumeDTOList.add(ResumeDTO.builder()
+                        .id(resume.getId())
+                        .name(resume.getName())
+                        .gender(resume.getGender())
+                        .age(resume.getAge())
+                        .email(resume.getEmail())
+                        .phone(resume.getPhone())
+                        .degree(resume.getDegree())
+                        .school(resume.getSchool())
+                        .major(resume.getMajor())
+                        .intro(resume.getIntro())
+                        .open(resume.isOpen()).build());
         }
         return resumeDTOList;
     }
