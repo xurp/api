@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -22,4 +23,6 @@ public class ApplicationAndAssessmentDTO {
     private String step;
     private List<AssessmentDTO> assessments;
     private List<Step> stepList;
+    private Timestamp assessmentTime;
+    private Timestamp interviewTime;
 }

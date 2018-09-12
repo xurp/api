@@ -25,7 +25,10 @@ public class Assessment {
     private String id;
     //before interviewer chooses date, it is null
     //spring.jackson.serialization.fail-on-empty-beans=false than...LAZY!!!
-    @OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY,optional=false)
+    //can not be all, else cooperator will be deleted
+    //cascade = CascadeType.DETACH
+
+    @OneToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH},fetch=FetchType.LAZY,optional=false)
     @JoinColumn(name = "cooperator_id")
     @JsonIgnore
     private Cooperator cooperator;

@@ -34,7 +34,6 @@ public class OfferServiceImpl implements OfferService {
     @Autowired
     private Mail mail;
 
-
     @Override
     public List<OfferDTO> list(String companyId) {
 

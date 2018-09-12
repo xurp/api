@@ -93,7 +93,7 @@ public class AssessmentController {
         assessmentService.schedule(assessmentDTO);
     }
 
-    @DeleteMapping("/rearrange")
+    @PutMapping("/rearrange")
     @NeedLogin
     void resendEmail(@RequestBody EmailDTO emailDTO){
         //if interviewer forget selecting date, resend
