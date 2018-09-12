@@ -23,4 +23,6 @@ public interface AssessmentService {
 
     void resendEmail(EmailDTO emailDTO);
 
+    void reassessment(EmailDTO emailDTO);
+
 }

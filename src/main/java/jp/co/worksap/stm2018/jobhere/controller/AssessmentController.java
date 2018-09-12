@@ -97,8 +97,15 @@ public class AssessmentController {
     @NeedLogin
     void resendEmail(@RequestBody EmailDTO emailDTO){
         //if interviewer forget selecting date, resend
-        //if interviewer has selected date, should not resend
+        //if interviewer has selected date, should not resend?
         assessmentService.resendEmail(emailDTO);
     }
+
+    @PutMapping("/reset")
+    @NeedLogin
+    void reassessment(@RequestBody EmailDTO emailDTO){
+        assessmentService.reassessment(emailDTO);
+    }
+
 
 }

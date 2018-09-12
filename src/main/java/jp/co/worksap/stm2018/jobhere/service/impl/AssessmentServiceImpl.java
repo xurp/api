@@ -143,7 +143,92 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
     
     public void resendEmail(EmailDTO emailDTO) {
+        String applicationId=emailDTO.getApplicationId();
+        //1.interviewer has not selected date; 2.selected, but candidate not selected; 3.candidate selected so appointedtime's record is deleted and assessment has cooperator and interview time
+        //now only consider case 3
+        List<AppointedTime> appointedTimeList=appointedTimeRepository.getByApplicationId(applicationId);
+        if(appointedTimeList==null||appointedTimeList.size()==0){
+            List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
+            List<Assessment> sortedList = assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
+            Assessment assessment=sortedList.get(sortedList.size()-1);
+            if(assessment.getCooperator()!=null){//case 3
+                    Outbox outbox = new Outbox();
+                    outbox.setId(UUID.randomUUID().toString().replace("-", ""));
+                    outbox.setOperationId(emailDTO.getOperationId());
+                    outbox.setApplicationId(applicationId);
+                    outbox.setContent("");
+                    outbox.setLink("");
+                    outbox.setSubject("");
+                    outboxRepository.save(outbox);
+                    for(int i=0;i<3;i++) {
+                        AppointedTime appointedTime = new AppointedTime();
+                        appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
+                        appointedTime.setApplicationId(applicationId);
+                        appointedTime.setCooperatorId(emailDTO.getCooperatorId());
+                        String startdate = emailDTO.getStartDate();
+                        String enddate = emailDTO.getEndDate();
+                        try {
+                            Timestamp t1 = Timestamp.valueOf(startdate);
+                            Timestamp t2 = Timestamp.valueOf(enddate);
+                            appointedTime.setStartDate(t1);
+                            appointedTime.setEndDate(t2);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        appointedTime.setOperationId(emailDTO.getOperationId());
+                        appointedTimeRepository.save(appointedTime);
+                    }
+                    // }
+
+                        String content = emailDTO.getContent();
+                        content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getName());
+                        content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
+                        content = content.replaceAll("\\[operation_id\\]", emailDTO.getOperationId());
+                        content = content.replaceAll("\\[cooperation_id\\]", emailDTO.getCooperatorId());
+                        Mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
+
+                    assessmentRepository.deleteById(assessment.getId());
+                    String newstep = hrUpdate(applicationId);
+                    Assessment assessment1 = new Assessment();
+                    assessment1.setId(UUID.randomUUID().toString().replace("-", ""));
+                    assessment1.setApplicationId(applicationId);
+                    Cooperator cooperator=cooperatorRepository.findById(emailDTO.getCooperatorId()).get();
+                    assessment1.setCooperator(cooperator);
+
+                    Application application = applicationRepository.findById(applicationId).get();
+                    assessment1.setStep(application.getStep());
+                    assessment1.setComment(" ");
+                    assessment1.setPass("assessing");
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    assessment1.setAssessmentTime(timestamp);
+                    assessmentRepository.save(assessment1);
+
+
+            }
+            else{//case 1
+
+            }
+        }
+        else{//case 2
+
+        }
         Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+    }
+
+    @Override
+    public void reassessment(EmailDTO emailDTO) {
+        //id:assessmentId
+        Assessment assessment=assessmentRepository.getOne(emailDTO.getAssessId());
+        if (assessment!=null) {
+            assessment.setPass("assessing");
+            assessment.setComment("");
+            assessmentRepository.save(assessment);
+            Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
+
+        } else {
+            throw new ValidationException("The link is wrong, please contact HR.");
+        }
+
     }
 
     @Transactional
@@ -160,8 +245,8 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessment.setStep(newstep);
         assessment.setComment(" ");
         assessment.setPass("assessing");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        assessment.setAssessmentTime(timestamp);
+        //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        //assessment.setAssessmentTime(timestamp);
         assessmentRepository.save(assessment);
         application.setStep(newstep);
         applicationRepository.save(application);
@@ -174,7 +259,8 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .comment(assessment.getComment())
                 .step(assessment.getStep())
                 .pass(assessment.getPass())
-                .assessmentTime(timestamp).build();
+                //.assessmentTime(timestamp)
+                .build();
     }
 
     /*@Transactional
