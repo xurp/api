@@ -142,6 +142,10 @@ public class AssessmentServiceImpl implements AssessmentService {
 
         assessmentRepository.save(assessment);
         appointedTimeRepository.delete(appointedTime);
+        String content="Dear Evaluator:\n" +
+                "        Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
+                "                                https://sh-stm.paas.workslan/jobhere/#/assess/"+assessmentDTO.getId();
+        mail.send("chorespore@163.com", cooperatorOptional.get().getEmail(), "Assessment Invitation to "+cooperatorOptional.get().getName(), content);
     }
 
     public void resendEmail(EmailDTO emailDTO) {
@@ -200,7 +204,6 @@ public class AssessmentServiceImpl implements AssessmentService {
                     mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
 
                     assessmentRepository.deleteById(assessment.getId());
-                    String newstep = hrUpdate(applicationId);
                     Assessment assessment1 = new Assessment();
                     assessment1.setId(UUID.randomUUID().toString().replace("-", ""));
                     assessment1.setApplicationId(applicationId);
