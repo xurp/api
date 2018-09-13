@@ -33,4 +33,6 @@ public class JobDTO {
     private Company company;
 
     private boolean applied;//true:candidate can apply/false:candidate has applied
+
+    private String description;
 }

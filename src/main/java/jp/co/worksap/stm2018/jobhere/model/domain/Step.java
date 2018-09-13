@@ -32,6 +32,9 @@ public class Step {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = true)
+    private String description;
+
     public Step(){
         this.id=UUID.randomUUID().toString().replace("-", "");
     }
