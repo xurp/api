@@ -2,6 +2,7 @@ package jp.co.worksap.stm2018.jobhere.controller;
 
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.Step;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
@@ -62,4 +63,17 @@ public class JobController {
         }
         return jobDTOList;
     }
+    @GetMapping("/steps")
+    @NeedLogin
+    List<Step> stepList(HttpServletRequest request) {
+        String jobid=request.getParameter("jobId");
+        return jobService.getStepList(jobid);
+    }
+
+    @PutMapping("/steps")
+    @NeedLogin
+    void updateJobStep(HttpServletRequest request,@RequestBody JobStepDTO jobStepDTO) {
+        jobService.updateJobStep(jobStepDTO);
+    }
+
 }

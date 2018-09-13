@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
+import jp.co.worksap.stm2018.jobhere.dao.ApplicationRepository;
 import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.dao.JobRepository;
 import jp.co.worksap.stm2018.jobhere.dao.StepRepository;
@@ -13,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,12 +24,14 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final CompanyRepository companyRepository;
     private final StepRepository stepRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Autowired
-    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,StepRepository stepRepository) {
+    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,StepRepository stepRepository,ApplicationRepository applicationRepository) {
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
         this.stepRepository=stepRepository;
+        this.applicationRepository=applicationRepository;
     }
 
     @Override
@@ -170,6 +170,135 @@ public class JobServiceImpl implements JobService {
         } else {
             throw new ValidationException("Job id does not exist!");
         }
+    }
+
+    @Override
+    public List<Step> getStepList(String jobId) {
+        List<Step> stepList=stepRepository.findByJobId(jobId);
+        if(stepList==null||stepList.size()==0)
+            stepList=stepRepository.findByJobId("-1");
+        List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        return sortedList;
+    }
+
+    @Transactional
+    @Override
+    public void updateJobStep(JobStepDTO jobStepDTO) {
+        //judge by step name
+        String jobId=jobStepDTO.getId();
+        List<Step> newStepList=jobStepDTO.getStep();
+        List<Step> stepList=stepRepository.findByJobId(jobId);
+        boolean flag=false;
+        if(stepList==null||stepList.size()==0) {
+            stepList = stepRepository.findByJobId("-1");
+            flag=true;
+        }
+        for(Step s:stepList)
+            System.out.println(s.getName());
+        Optional<Job> jobOptional=jobRepository.findById(jobId);
+        if(!jobOptional.isPresent()){
+            throw new ValidationException("Job id is wrong");
+        }
+        List<Application> applicationList=jobOptional.get().getApplications();
+        System.out.println(applicationList.size());
+        Set<String> stepSet=new HashSet<>();//steps that has applications, not all steps
+        for(Application application:applicationList) {
+            for(Step step:stepList) {
+                 if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
+                        stepSet.add(step.getName());
+                 }
+        }
+        }
+        Set<String> newStepSet=new HashSet<>();
+        newStepList.forEach(a->newStepSet.add(a.getName()));
+        for(String s:stepSet){
+            if(!newStepSet.contains(s))
+                throw new ValidationException("You can't remove step which has applications now.");
+        }
+        if(flag){//the job uses default steps, create its new steps
+            List<Application> tosave=new ArrayList<>();
+            for (Step newStep : newStepList) {
+                newStep.setId(UUID.randomUUID().toString().replace("-", ""));
+                newStep.setJobId(jobId);
+                stepRepository.save(newStep);
+                for(Application application:applicationList){
+
+                    String stepName="";
+                    for(Step step:stepList) {
+                        System.out.println(step.getName()+" "+step.getIndex());
+                         System.out.println("application"+Double.parseDouble(application.getStep().replace("+", "").replace("-", "")));
+                        if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
+
+                            stepName=step.getName();
+                            break;
+                        }
+
+                    }
+                    System.out.println("######################");
+                    System.out.println(stepName);
+                    System.out.println(newStep.getName());
+                    System.out.println(stepName.equals(newStep.getName()));
+                    if(stepName.equals(newStep.getName())){
+                        //if save new application:ConcurrentModificationException null--for(Application application:applicationList)
+                        //I do not know why
+                        Application newApplication=applicationRepository.findById(application.getId()).get();
+                        String pre="";
+                        if(application.getStep().charAt(0)=='+'||application.getStep().charAt(0)=='-')
+                            pre+=application.getStep().charAt(0);
+                        if(application.getStep().charAt(1)=='-')
+                            pre+='-';
+                        newApplication.setStep(pre+newStep.getIndex()+"");
+                        tosave.add(newApplication);
+                        //applicationRepository.save(newApplication);
+
+                    }
+                }
+            }
+            for(int i=0;i<tosave.size();i++){
+                applicationRepository.save(tosave.get(i));
+            }
+        }
+        else {//the job has its own steps
+            List<Application> tosave=new ArrayList<>();
+            for (Step newStep : newStepList) {
+                newStep.setJobId(jobId);
+                for (Step step : stepList) {
+                    if (newStep.getName().equals(step.getName())) {
+                        newStep.setId(step.getId());
+                        break;
+                    }
+
+                }
+                for(Application application:applicationList){
+                    String stepName="";
+                    for(Step step:stepList) {
+                        if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
+                            stepName=step.getName();
+                            break;
+                        }
+
+                    }
+                    if(stepName.equals(newStep.getName())){
+                        Application newApplication=applicationRepository.findById(application.getId()).get();
+                        String pre="";
+                        if(application.getStep().charAt(0)=='+'||application.getStep().charAt(0)=='-')
+                            pre+=application.getStep().charAt(0);
+                        if(application.getStep().charAt(1)=='-')
+                            pre+='-';
+                        newApplication.setStep(pre+newStep.getIndex()+"");
+                        tosave.add(newApplication);
+
+                        //applicationRepository.save(application);
+                    }
+                }
+            }
+            for(int i=0;i<tosave.size();i++){
+                applicationRepository.save(tosave.get(i));
+            }
+            stepList.forEach(a->stepRepository.deleteById(a.getId()));
+            newStepList.forEach(a->stepRepository.save(a));
+        }
+
     }
 }
 
