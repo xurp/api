@@ -3,10 +3,7 @@ package jp.co.worksap.stm2018.jobhere.service.impl;
 import jp.co.worksap.stm2018.jobhere.dao.InvitationRepository;
 import jp.co.worksap.stm2018.jobhere.dao.ResumeRepository;
 import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
-import jp.co.worksap.stm2018.jobhere.model.domain.Invitation;
-import jp.co.worksap.stm2018.jobhere.model.domain.Job;
-import jp.co.worksap.stm2018.jobhere.model.domain.Resume;
-import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.InvitationDTO;
 import jp.co.worksap.stm2018.jobhere.service.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +48,10 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public List<InvitationDTO> list(User user) {
+        User curUser = userRepository.getOne(user.getId());
         List<InvitationDTO> invitationDTOList = new ArrayList<>();
-        if (user.getRole().equals("hr")) {
-            List<Job> jobList = user.getCompany().getJobs();
+        if (curUser.getRole().equals("hr")) {
+            List<Job> jobList = curUser.getCompany().getJobs();
             for (Job job : jobList) {
                 List<Invitation> invitationList = invitationRepository.getByJobId(job.getId());
                 for (Invitation invitation : invitationList) {
