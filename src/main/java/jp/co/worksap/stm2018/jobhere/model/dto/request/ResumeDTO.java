@@ -15,6 +15,8 @@ public class ResumeDTO {
 
     private String name;
 
+    private String userId;
+
     private String gender;
 
     private int age;
