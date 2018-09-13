@@ -54,7 +54,7 @@ public class DashBoardServiceImpl implements DashboardService {
             for (Application application : job.getApplications()) {
                 candidateCnt++;
                 String dept = job.getDepartment();
-                Double curStep = Double.valueOf(application.getStep());
+                Double curStep = Double.valueOf(application.getStep().replaceAll("-","").replaceAll("\\+",""));
 
                 if (!applicationMap.containsKey(dept)) {
                     applicationMap.put(dept, 0);
