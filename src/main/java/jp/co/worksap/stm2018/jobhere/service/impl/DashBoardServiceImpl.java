@@ -21,8 +21,7 @@ public class DashBoardServiceImpl implements DashboardService {
     private CompanyRepository companyRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private ResumeRepository resumeRepository;
+
     @Autowired
     private StepRepository stepRepository;
 
