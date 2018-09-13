@@ -114,6 +114,7 @@ public class ResumeServiceTests {
                 .when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
         ResumeDTO resumeDTO = ResumeDTO.builder()
+                .userId("uuu")
                 .name("person A")
                 .gender("male")
                 .age(10)
