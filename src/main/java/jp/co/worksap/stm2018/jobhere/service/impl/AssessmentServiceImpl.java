@@ -335,6 +335,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                             interviewTime(assessment.getInterviewTime())
                     .build());
         }
+        assessmentDTOList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
         return assessmentDTOList;
     }
 
