@@ -193,6 +193,8 @@ public class JobServiceImpl implements JobService {
             stepList = stepRepository.findByJobId("-1");
             flag=true;
         }
+        for(Step s:stepList)
+            System.out.println(s.getName());
         Optional<Job> jobOptional=jobRepository.findById(jobId);
         if(!jobOptional.isPresent()){
             throw new ValidationException("Job id is wrong");
@@ -223,14 +225,19 @@ public class JobServiceImpl implements JobService {
 
                     String stepName="";
                     for(Step step:stepList) {
-
+                        System.out.println(step.getName()+" "+step.getIndex());
+                         System.out.println("application"+Double.parseDouble(application.getStep().replace("+", "").replace("-", "")));
                         if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
 
                             stepName=step.getName();
+                            break;
                         }
-                        break;
-                    }
 
+                    }
+                    System.out.println("######################");
+                    System.out.println(stepName);
+                    System.out.println(newStep.getName());
+                    System.out.println(stepName.equals(newStep.getName()));
                     if(stepName.equals(newStep.getName())){
                         //if save new application:ConcurrentModificationException null--for(Application application:applicationList)
                         //I do not know why
@@ -258,16 +265,18 @@ public class JobServiceImpl implements JobService {
                 for (Step step : stepList) {
                     if (newStep.getName().equals(step.getName())) {
                         newStep.setId(step.getId());
+                        break;
                     }
-                    break;
+
                 }
                 for(Application application:applicationList){
                     String stepName="";
                     for(Step step:stepList) {
                         if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
                             stepName=step.getName();
+                            break;
                         }
-                        break;
+
                     }
                     if(stepName.equals(newStep.getName())){
                         Application newApplication=applicationRepository.findById(application.getId()).get();
@@ -278,7 +287,7 @@ public class JobServiceImpl implements JobService {
                             pre+='-';
                         newApplication.setStep(pre+newStep.getIndex()+"");
                         tosave.add(newApplication);
-                        
+
                         //applicationRepository.save(application);
                     }
                 }
