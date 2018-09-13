@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/invitation")
@@ -29,6 +30,12 @@ public class InvitationController {
         } else {
             throw new ValidationException("Permission Denied!");
         }
+    }
 
+    @GetMapping("")
+    @NeedLogin
+    List<InvitationDTO> list(HttpServletRequest request) {
+        User user = (User) request.getAttribute("getuser");
+        return invitationService.list(user);
     }
 }
