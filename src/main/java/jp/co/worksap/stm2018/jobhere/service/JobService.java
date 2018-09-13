@@ -1,6 +1,7 @@
 package jp.co.worksap.stm2018.jobhere.service;
 
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.Step;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.JobStepDTO;
 
@@ -17,5 +18,9 @@ public interface JobService {
     JobDTO save(Company company, JobDTO jobDTO);
 
     JobStepDTO getDetail(String id);
+
+    List<Step> getStepList(String jobId);
+
+    void updateJobStep(JobStepDTO jobStepDTO);
 
 }
