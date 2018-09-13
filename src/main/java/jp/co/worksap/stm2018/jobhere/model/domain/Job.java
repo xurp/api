@@ -49,6 +49,9 @@ public class Job {
     @Column(nullable = false)
     private String remark;
 
+    @Column(nullable = true)
+    private String description;
+
     @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH},optional=true)
     @JoinColumn(name="company_id")
     @JsonIgnore
