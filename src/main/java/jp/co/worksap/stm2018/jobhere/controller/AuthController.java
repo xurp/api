@@ -30,27 +30,34 @@ public class AuthController {
 
     @GetMapping("")
     @NeedLogin
-    UserDTO showStatus(HttpServletRequest request) throws Exception{
+    UserDTO showStatus(HttpServletRequest request) throws Exception {
         String token = String.valueOf(request.getHeader("Api-Token"));
         if (token == null)
             throw new NotLoginException();
-        User user=authService.getUserByToken(token);
-        if(user==null)
+        User user = authService.getUserByToken(token);
+        if (user == null)
             return null;
+        if (user.getRole().equals("hr"))
+            return UserDTO.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .role(user.getRole())
+                    .companyName(user.getCompany().getCompanyName())
+                    .legalPerson(user.getCompany().getLegalPerson()).build();
+
         return UserDTO.builder().id(user.getId()).username(user.getUsername()).role(user.getRole()).build();
     }
 
     @PostMapping("")
-    ApiTokenDTO login(HttpServletRequest request,@RequestBody LoginDTO loginDto) {
+    ApiTokenDTO login(HttpServletRequest request, @RequestBody LoginDTO loginDto) {
         return authService.login(loginDto);
     }
 
     @PostMapping("/register")
     ApiTokenDTO register(@RequestBody RegisterDTO registerDTO) {
 
-            return authService.register(registerDTO);
+        return authService.register(registerDTO);
     }
-
 
 
 }
