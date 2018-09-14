@@ -15,7 +15,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@EnableAsync
 public class Mail {
 
     /*public static void send(String from, String to, String subject, String text) {
