@@ -72,7 +72,7 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
                     //now assessId is needed, but appointedTime only has applicationId
                     //return the newest assessment in this application
                     List<Assessment> assessmentList=assessmentRepository.findByApplicationId(applicationId);
-                    path="https://sh-stm.paas.workslan/jobhere";
+                    //path="https://sh-stm.paas.workslan/jobhere";
                     List<Assessment> sortedList= assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                     String content="Please click the link to choose your interview time:  "+path+"/#/schedule/candidate/"+appointedTimeDTO.getOperationId()+"/"+sortedList.get(sortedList.size()-1).getId();
                     mail.send("chorespore@163.com", email, "["+application.getJob().getCompany().getCompanyName()+"] Please choose your interview time",content);

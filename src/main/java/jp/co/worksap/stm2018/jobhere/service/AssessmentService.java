@@ -19,7 +19,7 @@ public interface AssessmentService {
     void saveOutboxAndMakeAppointment(EmailDTO emailDto);
 
 
-    void schedule(AssessmentDTO assessmentDTO);
+    void schedule(AssessmentDTO assessmentDTO,String path);
 
     void resendEmail(EmailDTO emailDTO);
 
