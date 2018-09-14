@@ -134,14 +134,34 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public void schedule(AssessmentDTO assessmentDTO,String path) {
         Assessment assessment = assessmentRepository.getOne(assessmentDTO.getId());
-        AppointedTime appointedTime = appointedTimeRepository.getFirstByStartTime(assessmentDTO.getInterviewTime());
+        List<AppointedTime> appointedTimeList=appointedTimeRepository.getByOperationIdAndStartTime(assessmentDTO.getOperationId(),assessmentDTO.getInterviewTime());
+        List<AppointedTime> appointedTimeAllList=appointedTimeRepository.getByOperationId(assessmentDTO.getOperationId());
+        if(appointedTimeList==null||appointedTimeList.size()==0)
+            throw new ValidationException("Sorry, this time is selected just now");
+        //case1:appointedTimeList=1 and appointedTimeAllList=3 and the same cooperator; ->single
+        //case2:appointedTimeList=1 and appointedTimeAllList=3 and different cooperators selected the same time;
+        // case3:other
+        AppointedTime appointedTime = appointedTimeList.get(0);
         Optional<Cooperator> cooperatorOptional = cooperatorRepository.findById(appointedTime.getCooperatorId());
         if (cooperatorOptional.isPresent())
             assessment.setCooperator(cooperatorOptional.get());
         assessment.setInterviewTime(assessmentDTO.getInterviewTime());
 
         assessmentRepository.save(assessment);
-        appointedTimeRepository.delete(appointedTime);
+        boolean flag=true;
+        String cooperatorId=appointedTimeList.get(0).getCooperatorId();
+        for(AppointedTime a:appointedTimeAllList) {
+            if (!a.getCooperatorId().equals(cooperatorId))//string equals!
+                flag = false;
+        }
+        if(appointedTimeAllList.size()==3&&flag) {//case1
+            List<String> deleteList=new ArrayList<>();
+            appointedTimeAllList.forEach(a->deleteList.add(a.getId()));
+            deleteList.forEach(id->appointedTimeRepository.deleteById(id));
+        }
+        else {
+            appointedTimeRepository.deleteById(appointedTime.getId());
+        }
         String content="Dear Evaluator:\n" +
                 "        Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
                 "                                "+path+"#/assess/"+assessmentDTO.getId();

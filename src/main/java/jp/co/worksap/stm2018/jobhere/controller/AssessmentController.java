@@ -86,7 +86,6 @@ public class AssessmentController {
 
 
     @PutMapping("/{id}/schedule")
-    @NeedLogin
     void schedule(HttpServletRequest request,@PathVariable("id") String id, @RequestBody AssessmentDTO assessmentDTO) {
         //Set interview time chosen by the candidate
         assessmentDTO.setId(id);

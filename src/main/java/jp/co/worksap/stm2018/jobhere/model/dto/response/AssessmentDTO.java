@@ -24,5 +24,6 @@ public class AssessmentDTO {
     private String comment;
     private String step;
     private String pass;
+    private String operationId;
 
 }

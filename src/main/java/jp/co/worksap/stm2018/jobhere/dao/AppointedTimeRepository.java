@@ -14,6 +14,8 @@ public interface AppointedTimeRepository extends JpaRepository<AppointedTime, St
 
     List<AppointedTime> getByOperationId(String id);
 
+    List<AppointedTime> getByOperationIdAndStartTime(String id,Timestamp starttime);
+
     List<AppointedTime> getByOperationIdAndCooperatorId(String id1, String id2);
 
     AppointedTime getFirstByStartTime(Timestamp startTime);
