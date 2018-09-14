@@ -130,9 +130,9 @@ public class AssessmentServiceImpl implements AssessmentService {
             batchindex++;
         }
     }
-
+    @Transactional
     @Override
-    public void schedule(AssessmentDTO assessmentDTO) {
+    public void schedule(AssessmentDTO assessmentDTO,String path) {
         Assessment assessment = assessmentRepository.getOne(assessmentDTO.getId());
         AppointedTime appointedTime = appointedTimeRepository.getFirstByStartTime(assessmentDTO.getInterviewTime());
         Optional<Cooperator> cooperatorOptional = cooperatorRepository.findById(appointedTime.getCooperatorId());
@@ -144,7 +144,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         appointedTimeRepository.delete(appointedTime);
         String content="Dear Evaluator:\n" +
                 "        Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
-                "                                https://sh-stm.paas.workslan/jobhere/#/assess/"+assessmentDTO.getId();
+                "                                "+path+"#/assess/"+assessmentDTO.getId();
         mail.send("chorespore@163.com", cooperatorOptional.get().getEmail(), "Assessment Invitation to "+cooperatorOptional.get().getName(), content);
     }
 

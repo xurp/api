@@ -54,6 +54,6 @@ public class AppointedTimeController {
 
     @PutMapping("")
     void update(HttpServletRequest request,@RequestBody AppointedTimeDTO appointedTimeDTO) {
-        appointedTimeService.update(appointedTimeDTO,request.getServletContext().getRealPath(""));
+        appointedTimeService.update(appointedTimeDTO,request.getHeader("Referer"));
     }
 }

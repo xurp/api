@@ -87,10 +87,10 @@ public class AssessmentController {
 
     @PutMapping("/{id}/schedule")
     @NeedLogin
-    void schedule(@PathVariable("id") String id, @RequestBody AssessmentDTO assessmentDTO) {
+    void schedule(HttpServletRequest request,@PathVariable("id") String id, @RequestBody AssessmentDTO assessmentDTO) {
         //Set interview time chosen by the candidate
         assessmentDTO.setId(id);
-        assessmentService.schedule(assessmentDTO);
+        assessmentService.schedule(assessmentDTO,request.getHeader("Referer"));
     }
 
     @PutMapping("/rearrange")

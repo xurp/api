@@ -48,7 +48,8 @@ public class OfferController {
         System.out.println(emailDTO.getSubject());
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            emailDTO.setContent(emailDTO.getContent() + "\n\n https://sh-stm.paas.workslan/jobhere/#/o/" + emailDTO.getOfferId());
+            String path=request.getHeader("Referer");
+            emailDTO.setContent(emailDTO.getContent() + "\n\n"+path+"#/o/" + emailDTO.getOfferId());
             offerService.update(emailDTO);
         } else {
             throw new ValidationException("Permission Denied!");
