@@ -120,10 +120,8 @@ public class DashBoardServiceImpl implements DashboardService {
                 map.put("Pass", assessment.getPass());
                 map.put("Email", cooperator.getEmail());
                 map.put("Phone", cooperator.getPhone());
-                String interviewTime = assessment.getInterviewTime() == null ? "" : assessment.getInterviewTime().toString();
-                String assessmentTime = assessment.getAssessmentTime() == null ? "" : assessment.getAssessmentTime().toString();
-                map.put("Interview", interviewTime);
-                map.put("Assessment", assessmentTime);
+                map.put("Interview", assessment.getInterviewTime() == null ? "" : assessment.getInterviewTime().toString());
+                map.put("Assessment", assessment.getAssessmentTime() == null ? "" : assessment.getAssessmentTime().toString());
 
                 if (offerList.size() == 1)
                     map.put("Results", "offer");
