@@ -31,11 +31,25 @@ public class ExcelUtils {
             Map<String, String> map = mapList.get(i - 1);
             Row row = sheet.createRow(i);
             for (int j = 0; j < fields.length; j++) {
-                row.createCell(1).setCellValue(map.get(fields[j]));
+                row.createCell(j).setCellValue(map.get(fields[j]));
             }
         }
 
+//        //将生成excel文件保存到指定路径下
+//        try {
+//            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
+//            webBook.write(fout);
+//            fout.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("Excel文件生成成功...");
+
+
         writeExcel(response, webBook, "RecruitRecord");
+
+
     }
 
 
@@ -59,7 +73,10 @@ public class ExcelUtils {
         OutputStream out = null;
         try {
             out = response.getOutputStream();
-            response.setContentType("application/ms-excel;charset=UTF-8");
+
+            response.setContentType("application/octet-stream");
+//            response.setHeader("Content-Disposition", "attachment;filename=statics.xls");
+//            response.setContentType("application/ms-excel;charset=UTF-8");
             response.setHeader("Content-Disposition", "attachment;filename="
                     .concat(String.valueOf(URLEncoder.encode(fileName + ".xls", "UTF-8"))));
             work.write(out);
