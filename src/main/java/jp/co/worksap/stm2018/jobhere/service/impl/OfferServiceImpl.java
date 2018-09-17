@@ -33,6 +33,8 @@ public class OfferServiceImpl implements OfferService {
     @Autowired
     private ApplicationRepository applicationRepository;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private Mail mail;
 
     @Override
@@ -44,6 +46,41 @@ public class OfferServiceImpl implements OfferService {
             Optional<Application> applicationOptional = applicationRepository.findById(offer.getApplicationId());
             if (applicationOptional.isPresent()) {
                 Application application = applicationOptional.get();
+                ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                        .id(application.getId())
+                        .resume(application.getResume())
+                        .job(application.getJob())
+                        .step(application.getStep())
+                        .user(application.getUser())
+                        .createTime(application.getCreateTime())
+                        .updateTime(application.getUpdateTime()).build();
+
+                offerDTOList.add(OfferDTO.builder()
+                        .id(offer.getId())
+                        .result(offer.getResult())
+                        .sendStatus(offer.getSendStatus())
+                        .remark(offer.getRemark())
+                        .applicationDTO(applicationDTO)
+                        .companyId(offer.getCompanyId())
+                        .offerTime(offer.getOfferTime())
+                        .respondTime(offer.getRespondTime()).build());
+            }
+        }
+        return offerDTOList;
+    }
+
+    @Override
+    public List<OfferDTO> offersOfCandidate(String userId) {
+        List<OfferDTO> offerDTOList = new ArrayList<>();
+
+        User user = userRepository.getOne(userId);
+        List<Application> applicationList = user.getApplications();
+
+        for (Application application : applicationList) {
+            List<Offer> offerList = offerRepository.findByApplicationId(application.getId());
+            if (offerList.size() == 1) {
+                Offer offer = offerList.get(0);
+
                 ApplicationDTO applicationDTO = ApplicationDTO.builder()
                         .id(application.getId())
                         .resume(application.getResume())
@@ -113,4 +150,6 @@ public class OfferServiceImpl implements OfferService {
         offer.setRespondTime(new Timestamp(System.currentTimeMillis()));
         offerRepository.save(offer);
     }
+
+
 }

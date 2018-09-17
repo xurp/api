@@ -18,4 +18,6 @@ public interface OfferService {
     void update(EmailDTO emailDTO);
 
     void offer(String offerId, String result);
+
+    List<OfferDTO> offersOfCandidate(String userId);
 }
