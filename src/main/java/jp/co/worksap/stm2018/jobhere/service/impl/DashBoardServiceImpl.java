@@ -1,9 +1,11 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jp.co.worksap.stm2018.jobhere.dao.*;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.DashboardDTO;
 import jp.co.worksap.stm2018.jobhere.service.DashboardService;
+import org.apache.el.parser.AstSemicolon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +23,14 @@ public class DashBoardServiceImpl implements DashboardService {
     private CompanyRepository companyRepository;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private StepRepository stepRepository;
+    @Autowired
+    private AssessmentRepository assessmentRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
+    @Autowired
+    private OfferRepository offerRepository;
 
     @Override
     public DashboardDTO find(String hrId) {
@@ -53,7 +60,7 @@ public class DashBoardServiceImpl implements DashboardService {
             for (Application application : job.getApplications()) {
                 candidateCnt++;
                 String dept = job.getDepartment();
-                Double curStep = Double.valueOf(application.getStep().replaceAll("-","").replaceAll("\\+",""));
+                Double curStep = Double.valueOf(application.getStep().replaceAll("-", "").replaceAll("\\+", ""));
 
                 if (!applicationMap.containsKey(dept)) {
                     applicationMap.put(dept, 0);
@@ -84,5 +91,44 @@ public class DashBoardServiceImpl implements DashboardService {
                 .candidateCnt(candidateCnt)
                 .hrCnt(hrCnt)
                 .deptList(deptList).build();
+    }
+
+    @Override
+    public List<Map<String, String>> export(String hrId) {
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        User hr = userRepository.getOne(hrId);
+        List<Assessment> assessmentList = assessmentRepository.findAll();
+        Company company = hr.getCompany();
+
+        for (Assessment assessment : assessmentList) {
+            Cooperator cooperator = assessment.getCooperator();
+            if (cooperator.getCompanyId().equals(company.getId())) {
+                Application application = applicationRepository.getOne(assessment.getApplicationId());
+                List<Offer> offerList = offerRepository.findByApplicationId(application.getId());
+
+                Map<String, String> map = new HashMap<>();
+
+                map.put("Cooperator", cooperator.getName());
+                map.put("Candidate", application.getResume().getName());
+                map.put("Department", cooperator.getDepartment());
+                map.put("Step", assessment.getStep());
+                map.put("Comment", assessment.getComment());
+                map.put("Pass", assessment.getPass());
+                map.put("Email", cooperator.getEmail());
+                map.put("Phone", cooperator.getPhone());
+                map.put("Interview Time", assessment.getInterviewTime().toString());
+                map.put("Assessment Time", assessment.getAssessmentTime().toString());
+
+                if (offerList.size() == 1)
+                    map.put("Results", "offer");
+                else
+                    map.put("Results", "");
+
+                mapList.add(map);
+            }
+        }
+
+        return mapList;
     }
 }

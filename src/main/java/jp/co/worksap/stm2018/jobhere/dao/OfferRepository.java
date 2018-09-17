@@ -10,4 +10,6 @@ import java.util.List;
 @Transactional
 public interface OfferRepository extends JpaRepository<Offer, String> {
     List<Offer> findByCompanyId(String companyId);
+
+    List<Offer> findByApplicationId(String applicationId);
 }
