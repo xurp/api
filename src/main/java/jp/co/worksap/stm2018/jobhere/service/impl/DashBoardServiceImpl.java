@@ -8,6 +8,7 @@ import jp.co.worksap.stm2018.jobhere.service.DashboardService;
 import org.apache.el.parser.AstSemicolon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,6 +95,7 @@ public class DashBoardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Transactional
     public List<Map<String, String>> export(String hrId) {
         List<Map<String, String>> mapList = new ArrayList<>();
 
@@ -103,7 +105,8 @@ public class DashBoardServiceImpl implements DashboardService {
 
         for (Assessment assessment : assessmentList) {
             Cooperator cooperator = assessment.getCooperator();
-            if (cooperator.getCompanyId().equals(company.getId())) {
+//            System.out.println(mapList.size() + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            if (cooperator != null && cooperator.getCompanyId().equals(company.getId())) {
                 Application application = applicationRepository.getOne(assessment.getApplicationId());
                 List<Offer> offerList = offerRepository.findByApplicationId(application.getId());
 
@@ -117,8 +120,8 @@ public class DashBoardServiceImpl implements DashboardService {
                 map.put("Pass", assessment.getPass());
                 map.put("Email", cooperator.getEmail());
                 map.put("Phone", cooperator.getPhone());
-                map.put("Interview Time", assessment.getInterviewTime().toString());
-                map.put("Assessment Time", assessment.getAssessmentTime().toString());
+//                map.put("Interview", assessment.getInterviewTime().toString());
+//                map.put("Assessment", assessment.getAssessmentTime().toString());
 
                 if (offerList.size() == 1)
                     map.put("Results", "offer");

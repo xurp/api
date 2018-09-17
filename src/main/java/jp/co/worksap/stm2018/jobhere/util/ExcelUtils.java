@@ -3,44 +3,39 @@ package jp.co.worksap.stm2018.jobhere.util;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.util.ResourceUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by bwju on 2016/12/06.
  */
 public class ExcelUtils {
-    private static final String INSPECTIONRECORD_SURFACE_TEMPLET_PATH = "/asserts/templete/InspectionRecordSurface.xls";
     private static HSSFCellStyle cellstyle = null;
 
-    public static void exportInspectionRecordSurface(HttpServletRequest request, HttpServletResponse response, Map map) throws IOException {
-        //实现上文里有，改个函数名，写你的操作模板函数吧！
-    }
-
-    public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, Map map) throws IOException {
-        //模板的路径，这个在自己的项目中很容易弄错，相对位置一定要写对啊
-        String psth = request.getRealPath("/") + INSPECTIONRECORD_SURFACE_TEMPLET_PATH;
+    public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
+        String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
+//        System.out.println(psth);
         Workbook webBook = readExcel(psth);
         createCellStyle(webBook);
         Sheet sheet = webBook.getSheetAt(0);
-        //开始操作模板，找到某行某列（某个cell），需要注意的是这里有个坑，行和列的计数都是从0开始的
-        //一次数据插入的位置不对，别灰心，多试几次就好啦，你要是能看懂我下面的代码，数据插在了什么位置，你就明白了
-        int rows = 1;
-        Row row = sheet.getRow(rows);
-        row.createCell(1).setCellValue((String) map.get("sequence"));
-        row.createCell(3).setCellValue((String) map.get("date"));
-        row.createCell(9).setCellValue((String) map.get("chetaihao"));
-        rows = 2;
-        row = sheet.getRow(rows);
-        row.createCell(1).setCellValue((String) map.get("productName"));
-        row.createCell(3).setCellValue((String) map.get("specification"));
-        row.createCell(9).setCellValue((String) map.get("memo"));
-        //检验记录的插入业务相关，不展示，其实就是for循环在合适的行合适的列插入一个个对象的属性即可，你这么聪明，没问题的
-        writeExcel(response, webBook, "表面质量检验记录");
+
+        String[] fields = {"Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Results"};
+
+        for (int i = 1, size = mapList.size(); i < size; i++) {
+            Map<String, String> map = mapList.get(i - 1);
+            Row row = sheet.createRow(i);
+            for (int j = 0; j < fields.length; j++) {
+                row.createCell(1).setCellValue(map.get(fields[j]));
+            }
+        }
+
+        writeExcel(response, webBook, "RecruitRecord");
     }
 
 
