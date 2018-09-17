@@ -124,8 +124,8 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setStep(newstep);
             assessment.setComment(" ");
             assessment.setPass("assessing");
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            assessment.setAssessmentTime(timestamp);
+            //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            //assessment.setAssessmentTime(timestamp);
             assessmentRepository.save(assessment);
             application.setStep(newstep);
             applicationRepository.save(application);
