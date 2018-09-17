@@ -47,16 +47,16 @@ public class DashboardController {
      * @throws Exception
      */
     @RequestMapping(value = "/export", method = RequestMethod.GET)
-//    @NeedLogin
+    @NeedLogin
     public void exportSurface(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ExcelUtils.exportRecruitRecord(request, response, dashboardService.export("e98a28756cae4e648d70b02e42aa5ae0"));
+//        ExcelUtils.exportRecruitRecord(request, response, dashboardService.export("e98a28756cae4e648d70b02e42aa5ae0"));
 
-//        User user = (User) request.getAttribute("getuser");
-//        if (user.getRole().equals("hr")) {
-//            ExcelUtils.exportRecruitRecord(request, response, dashboardService.export(user.getId()));
-//        } else {
-//            throw new ValidationException("Permission Denied!");
-//        }
+        User user = (User) request.getAttribute("getuser");
+        if (user.getRole().equals("hr")) {
+            ExcelUtils.exportRecruitRecord(request, response, dashboardService.export(user.getId()));
+        } else {
+            throw new ValidationException("Permission Denied!");
+        }
     }
 
 }

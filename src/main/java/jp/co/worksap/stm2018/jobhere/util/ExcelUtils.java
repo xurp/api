@@ -35,17 +35,16 @@ public class ExcelUtils {
             }
         }
 
-        //将生成excel文件保存到指定路径下
-        try {
-            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
-            webBook.write(fout);
-            fout.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Excel文件生成成功...");
-
+//        //将生成excel文件保存到指定路径下
+//        try {
+//            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
+//            webBook.write(fout);
+//            fout.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("Excel文件生成成功...");
 
         writeExcel(response, webBook, "RecruitRecord");
 
