@@ -105,7 +105,6 @@ public class DashBoardServiceImpl implements DashboardService {
 
         for (Assessment assessment : assessmentList) {
             Cooperator cooperator = assessment.getCooperator();
-//            System.out.println(mapList.size() + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             if (cooperator != null && cooperator.getCompanyId().equals(company.getId())) {
                 Application application = applicationRepository.getOne(assessment.getApplicationId());
                 List<Offer> offerList = offerRepository.findByApplicationId(application.getId());
