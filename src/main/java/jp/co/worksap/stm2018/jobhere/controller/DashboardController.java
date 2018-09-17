@@ -41,7 +41,7 @@ public class DashboardController {
 
 
     /***
-     * 批量导出表面质量检验记录
+     * 批量导出表记录
      *
      * @return
      * @throws Exception
