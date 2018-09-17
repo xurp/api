@@ -4,6 +4,7 @@ import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.EmailTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,54 +23,81 @@ import java.util.List;
 public class EmailController {
     @GetMapping("/interviewerDate")
     @NeedLogin
-    List<String> list(HttpServletRequest request) {
-        List<String> emailList=new ArrayList<>();
-        emailList.add("        Please select the time during which you will be available for the interview. Attention please, once selected, the time table can not be changed! The time selection link is below:\n");
-        emailList.add("        Thank you for your support for the recruitment! Please select the time during which you will be available for the interview. The time selection link is below:\n");
+    List<EmailTemplate> list(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Dear [assessor_name]\n" +
+                "\tPlease select the time during which you will be available for the interview. Attention please, once selected, the time table can not be changed! The time selection link is below: \n" +
+                "\t\t"+request.getHeader("Referer")+"/#/schedule/interview/[operation_id]/[cooperation_id]\n" +
+                "\tBest Regards\n" +
+                "[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [assessor_name]\n" +
+                "\tThank you for your support for the recruitment! Please select the time during which you will be available for the interview. The time selection link is below: \n" +
+                "\t\t"+request.getHeader("Referer")+"/#/schedule/interview/[operation_id]/[cooperation_id]\n" +
+                "\tBest Regards\n" +
+                "[company_name]"));
+
 
         return emailList;
     }
 
     @GetMapping("/decline")
     @NeedLogin
-    List<String> list1(HttpServletRequest request) {
-        List<String> emailList=new ArrayList<>();
-        emailList.add("Thank you for your application for the position. As you can imagine, we received a large number of applications. I am sorry to inform you that you have not passed this position.\n" +
+    List<EmailTemplate> list1(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Dear [candidate_name]:\n" +
+                "\tThank you for your application for the position. As you can imagine, we received a large number of applications. I am sorry to inform you that you have not passed this position.\n" +
                 "\n" +
                 "\tWe thanks you for the time you invested in applying for the shipping coordinator position. We encourage you to apply for future openings for which you qualify.\n" +
                 "\n" +
-                "Best wishes for a successful job search. Thank you, again, for your interest in our company.");
-        emailList.add("Thank you for your application for the position. I am sorry to inform you that you have not passed this position.\n" +
+                "Best wishes for a successful job search. Thank you, again, for your interest in our company."));
+        emailList.add(new EmailTemplate("template2","Dear [candidate_name]:\n\tThank you for your application for the position. I am sorry to inform you that you have not passed this position.\n" +
                 "\n" +
-                "Best wishes for a successful job search. Thank you, again, for your interest in our company.");
+                "Best wishes for a successful job search. Thank you, again, for your interest in our company."));
         return emailList;
     }
 
     @GetMapping("/offer")
     @NeedLogin
-    List<String> list2(HttpServletRequest request) {
-        List<String> emailList=new ArrayList<>();
-        emailList.add("Congratulations");
-        emailList.add("Congratulations! You passed all the assessment. Welcome to our company! Please click the link to choose whether to accept the offer or not.");
+    List<EmailTemplate> list2(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Congratulations"));
+        emailList.add(new EmailTemplate("template2","Congratulations! You passed all the assessment. Welcome to our company! Please click the link to choose whether to accept the offer or not."));
         return emailList;
 
-    }
-
-    @GetMapping("/resend")
-    @NeedLogin
-    List<String> list3(HttpServletRequest request) {
-        List<String> emailList=new ArrayList<>();
-        emailList.add("This is your re-picking time url:");
-        emailList.add("First of all, thank you for your support for our work. This is your re-picking time url. Please select the time again:");
-        return emailList;
     }
 
     @GetMapping("/rearrange")
     @NeedLogin
-    List<String> list4(HttpServletRequest request) {
-        List<String> emailList=new ArrayList<>();
-        emailList.add("This is your re-assessing url:");
-        emailList.add("First of all, thank you for your support for our work. This is your re-assessing url. Please assess the candidate again:");
+    List<EmailTemplate> list3(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Dear [assessor_name]\n" +
+                "\tThis is your re-picking time url:\n" +
+                "\t\t"+request.getHeader("Referer")+"/#/schedule/interview/[operation_id]/[cooperation_id]\n" +
+                "\tBest Regards,\n" +
+                "[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [assessor_name]\n" +
+                "\tFirst of all, thank you for your support for our work. This is your re-picking time url. Please select the time again:\n" +
+                "\t\t"+request.getHeader("Referer")+"/#/schedule/interview/[operation_id]/[cooperation_id]\n" +
+                "\tBest Regards,\n" +
+                "[company_name]"));
+        return emailList;
+    }
+
+    @GetMapping("/resend")
+    @NeedLogin
+    List<EmailTemplate> list4(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Dear [assessor_name]\n" +
+                "\tThis is your re-assessing time url:\n" +
+                "\t\t"+request.getHeader("Referer")+"/#/assess/[assess_id]\n" +
+                "\tBest Regards,\n" +
+                "[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [assessor_name]\n" +
+                "\tFirst of all, thank you for your support for our work. This is your re-assessing url. Please assess the candidate again:\n" +
+                "\t\t"+request.getHeader("Referer")+"/#/assess/[assess_id]\n" +
+                "\tBest Regards,\n" +
+                "[company_name]"));
+
         return emailList;
 
     }
