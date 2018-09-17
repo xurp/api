@@ -98,7 +98,9 @@ public class AssessmentServiceImpl implements AssessmentService {
             // }
 
             //subject and content are in the dto
+            System.out.println(batchindex+" "+cooperatorNum);
             if (batchindex < cooperatorNum) {//only need send cooperatorNum emails
+                System.out.println("begin to send email");
                 String content = emailDto.getContent();
                 content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getName());
                 content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDto.getCooperatorIds().get(batchindex % cooperatorNum)).get().getCompanyId()).get().getCompanyName());
@@ -170,7 +172,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     public void resendEmail(EmailDTO emailDTO) {
         String applicationId = emailDTO.getApplicationId();
-        //1.interviewer has not selected date; 2.selected, but candidate not selected; 3.candidate selected so appointedtime's record is deleted and assessment has cooperator and interview time
+        //1.interviewer has not selected date; 2.selected, but candidate not selected; 3.candidate selected so appointedtime's record is deleted and assessment has cooperator and interview time and the status is assessing
         //now only consider case 3
 
         List<AppointedTime> appointedTimeList = appointedTimeRepository.getByApplicationId(applicationId);
@@ -211,11 +213,11 @@ public class AssessmentServiceImpl implements AssessmentService {
                         appointedTime.setEndDate(t2);
                     } catch (Exception e) {
                         e.printStackTrace();
-
+                    }
                         appointedTime.setOperationId(emailDTO.getOperationId());
                         appointedTimeRepository.save(appointedTime);
-                    }
-                    // }
+
+                }
 
 
                     String content = emailDTO.getContent();
@@ -235,11 +237,11 @@ public class AssessmentServiceImpl implements AssessmentService {
                     Application application = applicationRepository.findById(applicationId).get();
                     assessment1.setStep(application.getStep());
                     assessment1.setComment(" ");
-                    assessment1.setPass("assessing");
+                    assessment1.setPass("assessing");//if not assessing, exception has been thrown
                     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                     assessment1.setAssessmentTime(timestamp);
                     assessmentRepository.save(assessment1);
-                }
+
 
             } else {//case 1
 
