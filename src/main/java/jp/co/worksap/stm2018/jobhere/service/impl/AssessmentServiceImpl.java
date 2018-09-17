@@ -261,8 +261,10 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setPass("assessing");
             assessment.setComment("");
             assessmentRepository.save(assessment);
-
-            String content = emailDTO.getContent().replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
+            String content = emailDTO.getContent();
+            content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getName());
+            content = content.replaceAll("\\[assess_id\\]", emailDTO.getAssessId());
+            content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
 
 
             mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
