@@ -25,7 +25,7 @@ public class ExcelUtils {
         createCellStyle(webBook);
         Sheet sheet = webBook.getSheetAt(0);
 
-        String[] fields = {"Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Results"};
+        String[] fields = {"Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Interview", "Assessment", "Results"};
 
         for (int i = 1, size = mapList.size(); i < size; i++) {
             Map<String, String> map = mapList.get(i - 1);
@@ -35,16 +35,16 @@ public class ExcelUtils {
             }
         }
 
-//        //将生成excel文件保存到指定路径下
-//        try {
-//            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
-//            webBook.write(fout);
-//            fout.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.println("Excel文件生成成功...");
+        //将生成excel文件保存到指定路径下
+        try {
+            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
+            webBook.write(fout);
+            fout.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Excel文件生成成功...");
 
 
         writeExcel(response, webBook, "RecruitRecord");
