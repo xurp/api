@@ -415,7 +415,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                     .comment(assessment.getComment())
                     .step(assessment.getStep())
                     .pass(assessment.getPass())
-                    .interviewTime(assessment.getInterviewTime()).build());
+                    .interviewTime(assessment.getInterviewTime()).score(assessment.getScore()).build());
         }
         assessmentDTOList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
         return assessmentDTOList;
@@ -452,7 +452,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                             .interviewTime(assessment.getInterviewTime())
                             .comment(a.getComment())
                             .step(a.getStep())
-                            .pass(a.getPass()).build());
+                            .pass(a.getPass()).score(a.getScore()).build());
                 }
                 /*List<Assessment> assessmentListIncludingCooperator=new ArrayList<>();
                 Assessment assessment1=new Assessment();

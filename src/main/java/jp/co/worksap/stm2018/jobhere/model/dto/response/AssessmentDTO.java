@@ -25,5 +25,6 @@ public class AssessmentDTO {
     private String step;
     private String pass;
     private String operationId;
+    private String score;
 
 }
