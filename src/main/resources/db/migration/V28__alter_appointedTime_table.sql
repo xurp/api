@@ -1,0 +1,1 @@
+alter table "appointed_time" add column "end_time" timestamp null;

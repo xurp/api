@@ -40,6 +40,7 @@ public class AppointedTimeController {
         ChooseDateDTO chooseDateDTO = new ChooseDateDTO();
         chooseDateDTO.setStartDate(appointedTimeList.get(0).getStartDate());
         chooseDateDTO.setEndDate(appointedTimeList.get(0).getEndDate());
+        chooseDateDTO.setPeriods(appointedTimeList.get(0).getPeriods());
         chooseDateDTO.setCooperatorId(cooperatorId);
         chooseDateDTO.setOperationId(operationId);
         chooseDateDTO.setNumber(appointedTimeList.size());

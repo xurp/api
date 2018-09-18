@@ -17,8 +17,10 @@ import java.sql.Timestamp;
 public class ChooseDateDTO {
     private Timestamp startDate;
     private Timestamp endDate;
+    private String periods;
     private int number;//1(batch) or 3(single)
     private String operationId;
     private String cooperatorId;
     private Timestamp startTime;
+    private Timestamp endTime;
 }

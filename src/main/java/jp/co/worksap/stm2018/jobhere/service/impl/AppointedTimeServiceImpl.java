@@ -59,6 +59,7 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
         }
         for (int i = 0; i < appointedTimeList.size(); i++) {
             appointedTimeList.get(i).setStartTime(appointedTimeDTO.getStartTimes().get(i));
+            appointedTimeList.get(i).setEndTime(appointedTimeDTO.getEndTimes().get(i));
             appointedTimeRepository.save(appointedTimeList.get(i));
         }
         System.out.println(appointedTimeList.size()+" "+nullstarttime);
@@ -89,7 +90,9 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
         Set<ChooseDateDTO> chooseDateDTOList=new HashSet<>();
         for(AppointedTime appointedTime:appointedTimeList){
             //starttime is different
-            chooseDateDTOList.add(ChooseDateDTO.builder().startTime(appointedTime.getStartTime()).build());
+            chooseDateDTOList.add(ChooseDateDTO.builder()
+                    .startTime(appointedTime.getStartTime())
+                    .endTime(appointedTime.getEndTime()).build());
         }
         if(chooseDateDTOList.size()==0){
             throw new ValidationException("Sorry, there is no available time now. We will send you another selecting date email soon.");
