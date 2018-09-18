@@ -18,6 +18,7 @@ public class AppointedTimeAndApplicationDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private Timestamp startTime;
+    private String periods;
     private String cooperatorId;
     private ApplicationDTO applicationDTO;
 }

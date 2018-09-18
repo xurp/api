@@ -1,0 +1,1 @@
+alter table "appointed_time" add column "periods" varchar(255) null;

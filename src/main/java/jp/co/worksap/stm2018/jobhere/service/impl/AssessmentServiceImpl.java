@@ -92,6 +92,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                appointedTime.setPeriods(emailDto.getPeriods());
                 appointedTime.setOperationId(emailDto.getOperationId());
                 appointedTimeRepository.save(appointedTime);
             }

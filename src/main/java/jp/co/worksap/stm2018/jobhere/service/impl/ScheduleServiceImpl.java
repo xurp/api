@@ -97,6 +97,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .startDate(appointedTime.getStartDate())
                         .endDate(appointedTime.getEndDate())
                         .startDate(appointedTime.getStartDate())
+                        .periods(appointedTime.getPeriods())
                         .cooperatorId(appointedTime.getCooperatorId())
                         .applicationDTO(applicationDTO).build());
             }

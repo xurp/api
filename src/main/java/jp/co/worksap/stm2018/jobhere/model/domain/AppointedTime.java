@@ -32,6 +32,8 @@ public class AppointedTime {
     @Column(nullable = true)
     private Timestamp startTime;
     @Column(nullable = true)
+    private String periods;
+    @Column(nullable = true)
     private String cooperatorId;
     @Column(nullable = true)
     private String applicationId;

@@ -30,6 +30,7 @@ public class AppointedTimeController {
     @GetMapping("")
     ChooseDateDTO getArg(HttpServletRequest request) {
         //id:operationId
+        System.out.printf("?????????????????????????????AAAAAAAAAAAAAAAAA");
         String operationId = request.getParameter("operationId");
         String cooperatorId = request.getParameter("cooperatorId");
         List<AppointedTime> appointedTimeList = appointedTimeService.getByOperationIdAndCooperatorId(operationId, cooperatorId);
@@ -40,6 +41,7 @@ public class AppointedTimeController {
         ChooseDateDTO chooseDateDTO = new ChooseDateDTO();
         chooseDateDTO.setStartDate(appointedTimeList.get(0).getStartDate());
         chooseDateDTO.setEndDate(appointedTimeList.get(0).getEndDate());
+        chooseDateDTO.setPeriods(appointedTimeList.get(0).getPeriods());
         chooseDateDTO.setCooperatorId(cooperatorId);
         chooseDateDTO.setOperationId(operationId);
         chooseDateDTO.setNumber(appointedTimeList.size());
