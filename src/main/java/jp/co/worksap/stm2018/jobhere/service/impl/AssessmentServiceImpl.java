@@ -5,6 +5,8 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ItemDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ScoreDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
@@ -485,6 +487,14 @@ public class AssessmentServiceImpl implements AssessmentService {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             assessment.setAssessmentTime(timestamp);
             assessment.setPass(assessmentDTO.getPass());
+            List<ScoreDTO> itemList=assessmentDTO.getItems();
+            String score="";
+            for(ScoreDTO item:itemList){
+                String name=item.getName();
+                int s=item.getValue();
+                score+=name+":"+s+";";
+            }
+            assessment.setScore(score);
             if(assessmentDTO.getComment()==null)
                 assessment.setComment(" ");
             else
