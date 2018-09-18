@@ -1,10 +1,10 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
 import jp.co.worksap.stm2018.jobhere.dao.*;
-import jp.co.worksap.stm2018.jobhere.model.domain.Application;
-import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
-import jp.co.worksap.stm2018.jobhere.model.domain.Cooperator;
-import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.domain.*;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ApplicationDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.AppointedTimeDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.response.AppointedTimeAndApplicationDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private ApplicationRepository applicationRepository;
     @Autowired
-    private OfferRepository offerRepository;
+    private AppointedTimeRepository appointedTimeRepository;
 
     @Override
     public List<AssessmentDTO> getAssessments(String candidateId) {
@@ -63,5 +63,47 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         return assessmentDTOList;
+    }
+
+
+    @Override
+    public List<AppointedTimeAndApplicationDTO> getAppointments(String candidateId) {
+//        private String id;
+//        private String operationId;
+//        private Timestamp startDate;
+//        private Timestamp endDate;
+//        private Timestamp startTime;
+//        private String cooperatorId;
+//        private ApplicationDTO applicationDTO;
+
+        List<AppointedTimeAndApplicationDTO> appointedTimeAndApplicationDTOList =new ArrayList<>();
+        User user = userRepository.getOne(candidateId);
+        List<Application> applicationList=user.getApplications();
+        for (Application application : applicationList) {
+            List<AppointedTime> appointedTimeList= appointedTimeRepository.getByApplicationId(application.getId());
+            for (AppointedTime appointedTime : appointedTimeList) {
+                ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                        .id(application.getId())
+                        .resume(application.getResume())
+                        .job(application.getJob())
+                        .step(application.getStep())
+                        .user(application.getUser())
+                        .createTime(application.getCreateTime())
+                        .updateTime(application.getUpdateTime()).build();
+
+                appointedTimeAndApplicationDTOList.add(AppointedTimeAndApplicationDTO.builder()
+                        .id(appointedTime.getId())
+                        .operationId(appointedTime.getOperationId())
+                        .startDate(appointedTime.getStartDate())
+                        .endDate(appointedTime.getEndDate())
+                        .startDate(appointedTime.getStartDate())
+                        .cooperatorId(appointedTime.getCooperatorId())
+                        .applicationDTO(applicationDTO).build());
+            }
+        }
+
+        return appointedTimeAndApplicationDTOList;
+
+
     }
 }
