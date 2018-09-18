@@ -5,6 +5,8 @@ import jp.co.worksap.stm2018.jobhere.http.NotFoundException;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.EmailDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ItemDTO;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ScoreDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApplicationAndAssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.AssessmentDTO;
 import jp.co.worksap.stm2018.jobhere.service.AssessmentService;
@@ -415,7 +417,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                     .comment(assessment.getComment())
                     .step(assessment.getStep())
                     .pass(assessment.getPass())
-                    .interviewTime(assessment.getInterviewTime()).build());
+                    .interviewTime(assessment.getInterviewTime()).score(assessment.getScore()).build());
         }
         assessmentDTOList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
         return assessmentDTOList;
@@ -452,7 +454,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                             .interviewTime(assessment.getInterviewTime())
                             .comment(a.getComment())
                             .step(a.getStep())
-                            .pass(a.getPass()).build());
+                            .pass(a.getPass()).score(a.getScore()).build());
                 }
                 /*List<Assessment> assessmentListIncludingCooperator=new ArrayList<>();
                 Assessment assessment1=new Assessment();
@@ -485,6 +487,14 @@ public class AssessmentServiceImpl implements AssessmentService {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             assessment.setAssessmentTime(timestamp);
             assessment.setPass(assessmentDTO.getPass());
+            List<ScoreDTO> itemList=assessmentDTO.getItems();
+            String score="";
+            for(ScoreDTO item:itemList){
+                String name=item.getName();
+                int s=item.getValue();
+                score+=name+":"+s+";";
+            }
+            assessment.setScore(score);
             if(assessmentDTO.getComment()==null)
                 assessment.setComment(" ");
             else
