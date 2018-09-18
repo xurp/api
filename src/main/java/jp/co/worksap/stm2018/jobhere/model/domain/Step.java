@@ -33,7 +33,6 @@ public class Step {
 
     @Column(nullable = true)
     private String description;
-
     @OneToMany(mappedBy = "step",cascade= CascadeType.MERGE,fetch= FetchType.LAZY)
     private List<Item> items;
     public void addItem(Item item) {

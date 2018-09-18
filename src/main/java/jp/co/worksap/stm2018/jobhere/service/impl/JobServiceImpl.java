@@ -265,6 +265,8 @@ public class JobServiceImpl implements JobService {
                 for (Step step : stepList) {
                     if (newStep.getName().equals(step.getName())) {
                         newStep.setId(step.getId());
+                        //setDescription
+                        newStep.setItems(step.getItems());
                         break;
                     }
 
@@ -313,19 +315,21 @@ public class JobServiceImpl implements JobService {
         if(!stepOptional.isPresent())
             throw new ValidationException("StepId error.");
         Step step=stepOptional.get();
+
         List<Item> olditemList=step.getItems();
+        olditemList.forEach(a->System.out.println(a.getName()));
+
         List<Item> newitemList=itemDTO.getItemList();
+
         Optional<Job> jobOptional=jobRepository.findById(itemDTO.getJobId());
         if(!jobOptional.isPresent()){
             throw new ValidationException("Job id is wrong");
         }
+
         List<Application> applicationList=jobOptional.get().getApplications();
-        Set<String> stepSet=new HashSet<>();//steps that has applications, not all steps
-        for(Application application:applicationList) {
-                if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
-                    throw new ValidationException("You can't remove items which has assessments now.");
-                }
-        }
+
+
+
             for (Item newitem : newitemList) {
                 for (Item olditem : olditemList) {
                     if (newitem.getName().equals(olditem.getName())) {
@@ -334,9 +338,20 @@ public class JobServiceImpl implements JobService {
                     }
                 }
             }
-
-        olditemList.forEach(a->itemRepository.deleteById(a.getId()));
-        newitemList.forEach(a->itemRepository.save(a));
+        //olditemList.forEach(a->itemRepository.deleteById(a.getId()));
+        //newitemList.forEach(a->itemRepository.save(a));
+        List<String> todeletelist=new ArrayList<>();
+         for(Item item:olditemList){
+            //step.removeItem(item.getId());   olditemList is geted by step.getItems, so if remove it will influnce the loop
+            todeletelist.add(item.getId());//though remove all the items in the step, only steprepo.save will not delete(CASCADE:MERGE)
+        }
+        step.setItems(new ArrayList<Item>());//still should remove, just not in the loop
+        todeletelist.forEach(a->itemRepository.deleteById(a));
+        for(Item item:newitemList){
+            item.setStep(step);
+            step.addItem(item);
+        }
+        stepRepository.save(step);
 
 
     }
