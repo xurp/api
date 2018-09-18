@@ -91,6 +91,9 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
             //starttime is different
             chooseDateDTOList.add(ChooseDateDTO.builder().startTime(appointedTime.getStartTime()).build());
         }
+        if(chooseDateDTOList.size()==0){
+            throw new ValidationException("Sorry, there is no available time now. We will send you another selecting date email soon.");
+        }
         return chooseDateDTOList;
     }
 }

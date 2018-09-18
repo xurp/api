@@ -31,13 +31,15 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
     private final StepRepository stepRepository;
+    private final AssessmentRepository assessmentRepository;
     private final Mail mail;
 
     @Autowired
-    ApplicationServiceImpl(Mail mail, JobRepository jobRepository, OfferRepository offerRepository,
+    ApplicationServiceImpl(AssessmentRepository assessmentRepository,Mail mail, JobRepository jobRepository, OfferRepository offerRepository,
                            ResumeRepository resumeRepository, UserRepository userRepository,
 
                            ApplicationRepository applicationRepository, StepRepository stepRepository) {
+        this.assessmentRepository=assessmentRepository;
         this.mail = mail;
         this.offerRepository = offerRepository;
         this.jobRepository = jobRepository;
@@ -107,11 +109,19 @@ public class ApplicationServiceImpl implements ApplicationService {
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
+            List<Assessment> assessmentList=assessmentRepository.findByApplicationId(applicationId);
+            assessmentList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
+            String step=application.getStep();
+            if(assessmentList.size()>0) {
+                Assessment assessment = assessmentList.get(assessmentList.size() - 1);
+                if (assessment.getCooperator() != null && assessment.getPass().equals("assessing"))
+                    step = "++" + step;
+            }
             return ApplicationDTO.builder()
                     .id(application.getId())
                     .resume(application.getResume())
                     .job(application.getJob())
-                    .step(application.getStep())
+                    .step(step)
                     .user(application.getUser())
                     .createTime(application.getCreateTime())
                     .updateTime(application.getUpdateTime()).build();
@@ -129,11 +139,19 @@ public class ApplicationServiceImpl implements ApplicationService {
             for (Application application : job.getApplications()) {
                 //if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replaceAll("-",""))-Double.parseDouble(step.replaceAll("-","")))<0.01) {
                 if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - Double.parseDouble(step.replace("+", "").replace("-", ""))) < 0.01) {
+                    List<Assessment> assessmentList=assessmentRepository.findByApplicationId(application.getId());
+                    String applicationStep = application.getStep();
+                    if(assessmentList.size()>0) {//else, step =0 resume filter
+                        assessmentList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
+                        Assessment assessment = assessmentList.get(assessmentList.size() - 1);
+                        if (assessment.getCooperator() != null && assessment.getPass().equals("assessing"))
+                            applicationStep = "++" + applicationStep;
+                    }
                     applicationDTOList.add(ApplicationDTO.builder()
                             .id(application.getId())
                             .resume(application.getResume())
                             .job(application.getJob())
-                            .step(application.getStep())
+                            .step(applicationStep)
                             .user(application.getUser())
                             .createTime(application.getCreateTime())
                             .updateTime(application.getUpdateTime()).build());
