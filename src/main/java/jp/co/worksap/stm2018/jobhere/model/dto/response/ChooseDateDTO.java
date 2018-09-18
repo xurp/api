@@ -22,4 +22,5 @@ public class ChooseDateDTO {
     private String operationId;
     private String cooperatorId;
     private Timestamp startTime;
+    private Timestamp endTime;
 }

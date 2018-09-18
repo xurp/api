@@ -16,5 +16,6 @@ public class AppointedTimeDTO {
     private String operationId;
     private String cooperatorId;
     private List<Timestamp> startTimes;
+    private List<Timestamp> endTimes;
 }
 
