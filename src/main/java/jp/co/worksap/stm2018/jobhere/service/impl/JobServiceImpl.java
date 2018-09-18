@@ -1,11 +1,9 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
-import jp.co.worksap.stm2018.jobhere.dao.ApplicationRepository;
-import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
-import jp.co.worksap.stm2018.jobhere.dao.JobRepository;
-import jp.co.worksap.stm2018.jobhere.dao.StepRepository;
+import jp.co.worksap.stm2018.jobhere.dao.*;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.*;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ItemDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.JobStepDTO;
 import jp.co.worksap.stm2018.jobhere.service.JobService;
@@ -25,9 +23,11 @@ public class JobServiceImpl implements JobService {
     private final CompanyRepository companyRepository;
     private final StepRepository stepRepository;
     private final ApplicationRepository applicationRepository;
+    private final ItemRepository itemRepository;
 
     @Autowired
-    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,StepRepository stepRepository,ApplicationRepository applicationRepository) {
+    JobServiceImpl(JobRepository jobRepository, CompanyRepository companyRepository,StepRepository stepRepository,ApplicationRepository applicationRepository,ItemRepository itemRepository) {
+        this.itemRepository=itemRepository;
         this.companyRepository = companyRepository;
         this.jobRepository = jobRepository;
         this.stepRepository=stepRepository;
@@ -298,6 +298,46 @@ public class JobServiceImpl implements JobService {
             stepList.forEach(a->stepRepository.deleteById(a.getId()));
             newStepList.forEach(a->stepRepository.save(a));
         }
+
+    }
+
+    @Override
+    public List<Item> getItemList(String stepId) {
+        List<Item> itemList=stepRepository.findById(stepId).get().getItems();
+        return itemList;
+    }
+
+    @Override
+    public void updateStepItem(ItemDTO itemDTO) {
+        Optional<Step> stepOptional=stepRepository.findById(itemDTO.getStepId());
+        if(!stepOptional.isPresent())
+            throw new ValidationException("StepId error.");
+        Step step=stepOptional.get();
+        List<Item> olditemList=step.getItems();
+        List<Item> newitemList=itemDTO.getItemList();
+        Optional<Job> jobOptional=jobRepository.findById(itemDTO.getJobId());
+        if(!jobOptional.isPresent()){
+            throw new ValidationException("Job id is wrong");
+        }
+        List<Application> applicationList=jobOptional.get().getApplications();
+        Set<String> stepSet=new HashSet<>();//steps that has applications, not all steps
+        for(Application application:applicationList) {
+                if (Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - step.getIndex()) < 0.01) {
+                    throw new ValidationException("You can't remove items which has assessments now.");
+                }
+        }
+            for (Item newitem : newitemList) {
+                for (Item olditem : olditemList) {
+                    if (newitem.getName().equals(olditem.getName())) {
+                        newitem.setId(olditem.getId());
+                        break;
+                    }
+                }
+            }
+
+        olditemList.forEach(a->itemRepository.deleteById(a.getId()));
+        newitemList.forEach(a->itemRepository.save(a));
+
 
     }
 }

@@ -5,10 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,6 +33,22 @@ public class Step {
 
     @Column(nullable = true)
     private String description;
+
+    @OneToMany(mappedBy = "step",cascade= CascadeType.MERGE,fetch= FetchType.LAZY)
+    private List<Item> items;
+    public void addItem(Item item) {
+        if(this.items==null)
+            this.items=new ArrayList<>();
+        this.items.add(item);
+    }
+    public void removeItem(String userId) {
+        for (int index=0; index < this.items.size(); index ++ ) {
+            if (items.get(index).getId() .equals(userId)) {
+                this.items.remove(index);
+                break;
+            }
+        }
+    }
 
     public Step(){
         this.id=UUID.randomUUID().toString().replace("-", "");
