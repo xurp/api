@@ -111,10 +111,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             Application application = applicationOptional.get();
             List<Assessment> assessmentList=assessmentRepository.findByApplicationId(applicationId);
             assessmentList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
-            Assessment assessment=assessmentList.get(assessmentList.size()-1);
             String step=application.getStep();
-            if(assessment.getCooperator()!=null&&assessment.getPass().equals("assessing"))
-                step="++"+step;
+            if(assessmentList.size()>0) {
+                Assessment assessment = assessmentList.get(assessmentList.size() - 1);
+                if (assessment.getCooperator() != null && assessment.getPass().equals("assessing"))
+                    step = "++" + step;
+            }
             return ApplicationDTO.builder()
                     .id(application.getId())
                     .resume(application.getResume())
