@@ -2,8 +2,10 @@ package jp.co.worksap.stm2018.jobhere.controller;
 
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.model.domain.Company;
+import jp.co.worksap.stm2018.jobhere.model.domain.Item;
 import jp.co.worksap.stm2018.jobhere.model.domain.Step;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
+import jp.co.worksap.stm2018.jobhere.model.dto.request.ItemDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.JobDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.request.LoginDTO;
 import jp.co.worksap.stm2018.jobhere.model.dto.response.ApiTokenDTO;
@@ -74,6 +76,19 @@ public class JobController {
     @NeedLogin
     void updateJobStep(HttpServletRequest request,@RequestBody JobStepDTO jobStepDTO) {
         jobService.updateJobStep(jobStepDTO);
+    }
+
+    @GetMapping("/items")
+    @NeedLogin
+    List<Item> itemList(HttpServletRequest request) {
+        String stepId=request.getParameter("stepId");
+        return jobService.getItemList(stepId);
+    }
+
+    @PutMapping("/items")
+    @NeedLogin
+    void updateStepItem(HttpServletRequest request,@RequestBody ItemDTO itmDTO) {
+        jobService.updateStepItem(itmDTO);
     }
 
 }

@@ -53,4 +53,6 @@ public class Assessment {
     private String step;
     @Column(nullable = true)
     private String pass;
+    @Column(nullable = true)
+    private String score;
 }
