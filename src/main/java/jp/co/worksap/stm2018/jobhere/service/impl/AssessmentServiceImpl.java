@@ -191,6 +191,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             }
 
             if (assessment.getCooperator() != null) {//case 3
+                //last operationId's outbox has sent, so do not need to delete them. here, save outbox of new operationId
                 Outbox outbox = new Outbox();
                 outbox.setId(UUID.randomUUID().toString().replace("-", ""));
                 outbox.setOperationId(emailDTO.getOperationId());
@@ -226,7 +227,6 @@ public class AssessmentServiceImpl implements AssessmentService {
                     content = content.replaceAll("\\[operation_id\\]", emailDTO.getOperationId());
                     content = content.replaceAll("\\[cooperation_id\\]", emailDTO.getCooperatorId());
                     mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
-
                     assessmentRepository.deleteById(assessment.getId());
                     Assessment assessment1 = new Assessment();
                     assessment1.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -235,18 +235,71 @@ public class AssessmentServiceImpl implements AssessmentService {
                     assessment1.setCooperator(cooperator);
 
                     Application application = applicationRepository.findById(applicationId).get();
+                    mail.send("chorespore@163.com", application.getResume().getEmail(),"["+companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName()+"]Please repick your interview time" ,
+                            "Dear "+application.getResume().getName()+":\n\tWe are sorry to tell you that our interviewer has changed. You will receive another email to choose your new interview date. Thank you for supporting our recruitment!");
                     assessment1.setStep(application.getStep());
                     assessment1.setComment(" ");
                     assessment1.setPass("assessing");//if not assessing, exception has been thrown
-                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                    assessment1.setAssessmentTime(timestamp);
+                    //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    //assessment1.setAssessmentTime(timestamp);
                     assessmentRepository.save(assessment1);
 
 
-            } else {//case 1
-
             }
-        } else {//case 2
+        } else {
+            //case1 and case 2:appointedtime exists and cooperator&&interview time in assessment is null
+            List<String> toDeleteList=new ArrayList<>();
+            for(AppointedTime a:appointedTimeList){
+                toDeleteList.add(a.getId());
+            }
+            Optional<Assessment> assessmentOptional = assessmentRepository.findById(emailDTO.getAssessId());
+            if (!assessmentOptional.isPresent())
+                throw new ValidationException("The link is wrong, please contact HR.");
+            Assessment assessment = assessmentOptional.get();
+            if (!assessment.getPass().equals("assessing")) {
+                throw new ValidationException("Interviewer has assessed the candidate.");
+            }
+                //here, old outbox and appointedtime should be deleted
+                //delete appointedtime of this operation&&cooperator&&application,delete outbox of this operation&&application
+            outboxRepository.deleteByOperationIdAndApplicationId(emailDTO.getOperationId(),emailDTO.getApplicationId());
+                Outbox outbox = new Outbox();
+                outbox.setId(UUID.randomUUID().toString().replace("-", ""));
+                outbox.setOperationId(emailDTO.getOperationId());
+                outbox.setApplicationId(applicationId);
+                outbox.setContent("");
+                outbox.setLink("");
+                outbox.setSubject("");
+                outboxRepository.save(outbox);
+                //if candidate open the first email, exceptions has thrown. so the candidate can open the new email to select date.
+                appointedTimeRepository.deleteByOperationIdAndCooperatorIdAndApplicationId(emailDTO.getOperationId(),emailDTO.getCooperatorId(),emailDTO.getApplicationId());
+                for (int i = 0; i < 3; i++) {
+                    AppointedTime appointedTime = new AppointedTime();
+                    appointedTime.setId(UUID.randomUUID().toString().replace("-", ""));
+                    appointedTime.setApplicationId(applicationId);
+                    appointedTime.setCooperatorId(emailDTO.getCooperatorId());
+                    String startdate = emailDTO.getStartDate();
+                    String enddate = emailDTO.getEndDate();
+                    try {
+                        Timestamp t1 = Timestamp.valueOf(startdate);
+                        Timestamp t2 = Timestamp.valueOf(enddate);
+                        appointedTime.setStartDate(t1);
+                        appointedTime.setEndDate(t2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    appointedTime.setOperationId(emailDTO.getOperationId());
+                    appointedTimeRepository.save(appointedTime);
+
+                }
+
+
+                String content = emailDTO.getContent();
+                content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getName());
+                content = content.replaceAll("\\[company_name\\]", companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName());
+                content = content.replaceAll("\\[operation_id\\]", emailDTO.getOperationId());
+                content = content.replaceAll("\\[cooperation_id\\]", emailDTO.getCooperatorId());
+                mail.send("chorespore@163.com", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getEmail(), emailDTO.getSubject(), content);
+
 
         }
 
@@ -261,6 +314,12 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setPass("assessing");
             assessment.setComment("");
             assessmentRepository.save(assessment);
+            Optional<Application> applicationOptional=applicationRepository.findById(assessment.getApplicationId());
+            if(applicationOptional.isPresent()){
+                Application application=applicationOptional.get();
+                application.setStep(application.getStep().replace("+","").replaceAll("-",""));
+                applicationRepository.save(application);
+            }
             String content = emailDTO.getContent();
             content = content.replaceAll("\\[assessor_name\\]", cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getName());
             content = content.replaceAll("\\[assess_id\\]", emailDTO.getAssessId());

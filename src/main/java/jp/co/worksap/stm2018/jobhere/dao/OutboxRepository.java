@@ -11,4 +11,5 @@ import java.util.Optional;
 @Transactional
 public interface OutboxRepository extends JpaRepository<Outbox, String> {
     List<Outbox> findByOperationId(String id);
+    void deleteByOperationIdAndApplicationId(String id1, String id2);
 }

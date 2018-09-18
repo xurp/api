@@ -20,4 +20,6 @@ public interface AppointedTimeRepository extends JpaRepository<AppointedTime, St
 
     AppointedTime getFirstByStartTime(Timestamp startTime);
 
+    void deleteByOperationIdAndCooperatorIdAndApplicationId(String id1, String id2, String id3);
+
 }
