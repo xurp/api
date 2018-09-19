@@ -20,12 +20,11 @@ public class ExcelUtils {
 
     public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
         String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
-//        System.out.println(psth);
         Workbook webBook = readExcel(psth);
         createCellStyle(webBook);
         Sheet sheet = webBook.getSheetAt(0);
 
-        String[] fields = {"Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Interview", "Assessment", "Results"};
+        String[] fields = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Interview", "Assessment", "Results"};
 
         for (int i = 1, size = mapList.size(); i < size; i++) {
             Map<String, String> map = mapList.get(i - 1);
@@ -36,8 +35,9 @@ public class ExcelUtils {
         }
 
 //        //将生成excel文件保存到指定路径下
+//        System.out.println(psth);
 //        try {
-//            FileOutputStream fout = new FileOutputStream("C:\\Users\\Chao\\Desktop\\errorCondition.xls");
+//            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
 //            webBook.write(fout);
 //            fout.close();
 //        } catch (IOException e) {
