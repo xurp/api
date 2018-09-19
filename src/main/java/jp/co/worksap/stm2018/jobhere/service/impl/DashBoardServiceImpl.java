@@ -111,6 +111,7 @@ public class DashBoardServiceImpl implements DashboardService {
 
                 Map<String, String> map = new HashMap<>();
 
+                map.put("Position", application.getJob().getName());
                 map.put("Cooperator", cooperator.getName());
                 map.put("Candidate", application.getResume().getName());
                 map.put("Department", cooperator.getDepartment());
