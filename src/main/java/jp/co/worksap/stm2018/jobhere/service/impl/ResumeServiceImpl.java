@@ -37,6 +37,9 @@ public class ResumeServiceImpl implements ResumeService {
             resume.setDegree(resumeDTO.getDegree());
             resume.setSchool(resumeDTO.getSchool());
             resume.setMajor(resumeDTO.getMajor());
+            resume.setExperience(resumeDTO.getExperience());
+            resume.setSalary(resumeDTO.getSalary());
+            resume.setGraduation(resumeDTO.getGraduation());
             resume.setIntro(resumeDTO.getIntro());
             resume.setOpen(resumeDTO.isOpen());
             userRepository.save(user);
@@ -62,6 +65,9 @@ public class ResumeServiceImpl implements ResumeService {
                     .degree(resume.getDegree())
                     .school(resume.getSchool())
                     .major(resume.getMajor())
+                    .experience(resume.getExperience())
+                    .salary(resume.getSalary())
+                    .graduation(resume.getGraduation())
                     .intro(resume.getIntro())
                     .open(resume.isOpen())
                     .build();
@@ -95,6 +101,9 @@ public class ResumeServiceImpl implements ResumeService {
                 .degree(resume.getDegree())
                 .school(resume.getSchool())
                 .major(resume.getMajor())
+                .experience(resume.getExperience())
+                .salary(resume.getSalary())
+                .graduation(resume.getGraduation())
                 .intro(resume.getIntro())
                 .open(resume.isOpen())
                 .build();
@@ -122,6 +131,9 @@ public class ResumeServiceImpl implements ResumeService {
                         .degree(resume.getDegree())
                         .school(resume.getSchool())
                         .major(resume.getMajor())
+                        .experience(resume.getExperience())
+                        .salary(resume.getSalary())
+                        .graduation(resume.getGraduation())
                         .intro(resume.getIntro())
                         .open(resume.isOpen()).build());
         }
