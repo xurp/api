@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface AssessmentRepository extends JpaRepository<Assessment, String> {
     List<Assessment> findByApplicationId(String applicationId);
-//    List<Assessment> getByApplicationIdInOr
 }
