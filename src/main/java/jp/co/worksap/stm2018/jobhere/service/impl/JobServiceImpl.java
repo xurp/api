@@ -218,9 +218,25 @@ public class JobServiceImpl implements JobService {
         if(flag){//the job uses default steps, create its new steps
             List<Application> tosave=new ArrayList<>();
             for (Step newStep : newStepList) {
-                newStep.setId(UUID.randomUUID().toString().replace("-", ""));
+                String uuid=UUID.randomUUID().toString().replace("-", "");
+                newStep.setId(uuid);
                 newStep.setJobId(jobId);
-                stepRepository.save(newStep);
+                for (Step step : stepList) {
+                    if (newStep.getName().equals(step.getName())) {
+                        //step.items' item's step_id is default id 2 and 3, so the id should be set to the newstep id
+                        List<Item> items=step.getItems();
+                        newStep.setItems(new ArrayList<>());
+                        for(Item i:items){
+                            Item newitem=new Item();
+                            newitem.setId(UUID.randomUUID().toString().replace("-", ""));
+                            newitem.setStep(newStep);
+                            newitem.setName(i.getName());
+                            newStep.addItem(newitem);
+                        }
+                        break;
+                    }
+                }
+                stepRepository.save(newStep);//new items will be saved, too.
                 for(Application application:applicationList){
 
                     String stepName="";
@@ -245,7 +261,7 @@ public class JobServiceImpl implements JobService {
                         String pre="";
                         if(application.getStep().charAt(0)=='+'||application.getStep().charAt(0)=='-')
                             pre+=application.getStep().charAt(0);
-                        if(application.getStep().charAt(1)=='-')
+                        if(application.getStep().length()>1&&application.getStep().charAt(1)=='-')
                             pre+='-';
                         newApplication.setStep(pre+newStep.getIndex()+"");
                         tosave.add(newApplication);
@@ -266,6 +282,7 @@ public class JobServiceImpl implements JobService {
                     if (newStep.getName().equals(step.getName())) {
                         newStep.setId(step.getId());
                         //setDescription
+                        //here, step.items' item's step_id is old id, but newstep's id is old id too. need not change
                         newStep.setItems(step.getItems());
                         break;
                     }
