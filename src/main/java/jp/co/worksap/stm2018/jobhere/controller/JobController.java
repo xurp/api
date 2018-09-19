@@ -66,7 +66,6 @@ public class JobController {
         return jobDTOList;
     }
     @GetMapping("/steps")
-    @NeedLogin
     List<Step> stepList(HttpServletRequest request) {
         String jobid=request.getParameter("jobId");
         return jobService.getStepList(jobid);
@@ -79,7 +78,6 @@ public class JobController {
     }
 
     @GetMapping("/items")
-    @NeedLogin
     List<Item> itemList(HttpServletRequest request) {
         String stepId=request.getParameter("stepId");
         return jobService.getItemList(stepId);

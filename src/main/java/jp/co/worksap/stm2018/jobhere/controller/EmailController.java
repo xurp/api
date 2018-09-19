@@ -60,8 +60,8 @@ public class EmailController {
     @NeedLogin
     List<EmailTemplate> list2(HttpServletRequest request) {
         List<EmailTemplate> emailList=new ArrayList<>();
-        emailList.add(new EmailTemplate("template1","Congratulations"));
-        emailList.add(new EmailTemplate("template2","Congratulations! You passed all the assessment. Welcome to our company! Please click the link to choose whether to accept the offer or not."));
+        emailList.add(new EmailTemplate("template1","Dear [candidate_name]:\n\tCongratulations. We will give you the offer!\n\tWe will contact you soon.\n\tPosition name:[position_name]\n\tBest Regards,\n[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [candidate_name]:\n\tCongratulations! You passed all the assessment. Welcome to our company!\n\tWe will contact you soon.\n\tPosition name:[position_name]\n\tBest Regards,\n[company_name]"));
         return emailList;
 
     }

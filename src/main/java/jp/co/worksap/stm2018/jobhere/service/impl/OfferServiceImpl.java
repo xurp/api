@@ -1,9 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.service.impl;
 
-import jp.co.worksap.stm2018.jobhere.dao.ApplicationRepository;
-import jp.co.worksap.stm2018.jobhere.dao.OfferRepository;
-import jp.co.worksap.stm2018.jobhere.dao.ResumeRepository;
-import jp.co.worksap.stm2018.jobhere.dao.UserRepository;
+import jp.co.worksap.stm2018.jobhere.dao.*;
 import jp.co.worksap.stm2018.jobhere.http.ValidationException;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Offer;
@@ -36,6 +33,8 @@ public class OfferServiceImpl implements OfferService {
     private UserRepository userRepository;
     @Autowired
     private Mail mail;
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Override
     public List<OfferDTO> list(String companyId) {
@@ -137,7 +136,13 @@ public class OfferServiceImpl implements OfferService {
             Offer offer = offerOptional.get();
             offer.setSendStatus("1");
             offerRepository.save(offer);
-            mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
+            String content=emailDTO.getContent();
+            String applicationId=offer.getApplicationId();
+            String companyId=offer.getCompanyId();
+            content=content.replaceAll("\\[candidate_name\\]",applicationRepository.getOne(applicationId).getResume().getName());
+            content=content.replaceAll("\\[position_name\\]",applicationRepository.getOne(applicationId).getJob().getName());
+            content=content.replaceAll("\\[company_name\\]",companyRepository.getOne(companyId).getCompanyName());
+            mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
         } else {
             throw new ValidationException("Wrong offer ID.");
         }
