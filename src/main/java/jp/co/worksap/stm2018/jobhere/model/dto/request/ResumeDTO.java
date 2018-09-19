@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,6 +32,12 @@ public class ResumeDTO {
     private String school;
 
     private String major;
+
+    private int experience;
+
+    private int salary;
+
+    private Timestamp graduation;
 
     private String intro;
 
