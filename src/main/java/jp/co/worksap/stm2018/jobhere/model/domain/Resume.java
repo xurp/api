@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 
@@ -44,6 +45,15 @@ public class Resume {
 
     @Column(nullable = true)
     private String major;
+
+   @Column(nullable = false)
+    private int experience;
+
+    @Column(nullable = false)
+    private int salary;
+
+    @Column(nullable = true)
+    private Timestamp graduation;
 
     @Column(nullable = true, columnDefinition = "text")
     private String intro;

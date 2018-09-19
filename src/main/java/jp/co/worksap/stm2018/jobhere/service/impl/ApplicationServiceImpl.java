@@ -70,6 +70,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             resume.setOpen(r.isOpen());
             resume.setPhone(r.getPhone());
             resume.setSchool(r.getSchool());
+            resume.setExperience(r.getExperience());
+            resume.setSalary(r.getSalary());
+            resume.setGraduation(r.getGraduation());
 
             Application application = new Application();
             application.setId(uuid);
