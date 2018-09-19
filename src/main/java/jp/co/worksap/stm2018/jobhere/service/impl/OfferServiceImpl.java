@@ -130,11 +130,15 @@ public class OfferServiceImpl implements OfferService {
     @Transactional
     @Override
     public void update(EmailDTO emailDTO) {
+        System.out.println(emailDTO.getRemark());
         String offerId = emailDTO.getOfferId();
         Optional<Offer> offerOptional = offerRepository.findById(offerId);
         if (offerOptional.isPresent()) {
             Offer offer = offerOptional.get();
             offer.setSendStatus("1");
+            offer.setResult(emailDTO.getResult());
+            offer.setRespondTime(new Timestamp(System.currentTimeMillis()));
+            offer.setRemark(emailDTO.getRemark());
             offerRepository.save(offer);
             String content=emailDTO.getContent();
             String applicationId=offer.getApplicationId();

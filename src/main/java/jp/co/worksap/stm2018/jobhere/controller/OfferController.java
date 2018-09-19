@@ -55,12 +55,10 @@ public class OfferController {
     @PutMapping("")
     @NeedLogin
     void update(HttpServletRequest request, @RequestBody EmailDTO emailDTO) {
-        System.out.println(emailDTO.getOfferId());
-        System.out.println(emailDTO.getSubject());
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            String path = request.getHeader("Referer");
-            emailDTO.setContent(emailDTO.getContent() + "\n\n" + path + "#/o/" + emailDTO.getOfferId());
+            //String path = request.getHeader("Referer");
+            //emailDTO.setContent(emailDTO.getContent() + "\n\n" + path + "#/o/" + emailDTO.getOfferId());
             offerService.update(emailDTO);
         } else {
             throw new ValidationException("Permission Denied!");

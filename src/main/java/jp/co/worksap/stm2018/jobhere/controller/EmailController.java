@@ -102,5 +102,15 @@ public class EmailController {
 
     }
 
+    @GetMapping("/rejectoffer")
+    @NeedLogin
+    List<EmailTemplate> list5(HttpServletRequest request) {
+        List<EmailTemplate> emailList=new ArrayList<>();
+        emailList.add(new EmailTemplate("template1","Dear [candidate_name]:\n\tUnfortunately, you reject our offer. Best wishes for a successful job search. \n\tBest Regards,\n[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [candidate_name]:\n\tYou are the talent we really want. However, we hear that you reject our offer. Best wishes for a successful job search. \n\tBest Regards,\n[company_name]"));
+        return emailList;
+
+    }
+
 
 }
