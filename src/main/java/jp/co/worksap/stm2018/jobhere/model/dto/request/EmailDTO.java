@@ -30,4 +30,7 @@ public class EmailDTO {
     private String periods;
     private List<String> cooperatorIds;
     private List<String> applications;
+
+    private String result;
+    private String remark;
 }
