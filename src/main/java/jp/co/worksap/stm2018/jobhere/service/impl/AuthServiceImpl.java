@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
                 apiTokenRepository.save(apiToken);
             } else {
                 //save one and many at one time(many not exists, else use many to save one)
-                Company c = companyRepository.findFirstByCompanyNameAndLegalPerson(registerDTO.getCompanyName(), registerDTO.getLegalPerson());
+                Company c = companyRepository.findFirstByCompanyNameAndLegalPerson(registerDTO.getCompanyName().trim(), registerDTO.getLegalPerson().trim());
                 if (c == null || c.getStatus().equals("company-n")) {//this is a new company or the old company is company-n, insert new company
                     Company company = new Company();
                     company.setId(UUID.randomUUID().toString().replace("-", ""));
