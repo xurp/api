@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by bwju on 2016/12/06.
@@ -26,9 +24,42 @@ public class ExcelUtils {
 
         Workbook webBook = new HSSFWorkbook();
         createCellStyle(webBook);
-        Sheet sheet = webBook.createSheet("Data");
+//        Sheet sheet = webBook.createSheet("Data");
 
-        String[] arr = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email",
+        Map<String, Integer> sheetMap = new HashMap<>();
+        int cnt = 0;
+        for (Map<String, String> map : mapList) {
+            String position = map.get("Position");
+            if (!sheetMap.containsKey(position)) {
+                sheetMap.put(position, cnt++);
+                sheetMap.put(position + "-Row", 1);
+            }
+        }
+
+        Sheet[] sheets = new Sheet[cnt];
+        sheetMap.forEach((k, v) -> {
+            if (!k.contains("-Row"))
+                sheets[v] = webBook.createSheet(k);
+        });
+
+        for (Map<String, String> map : mapList) {
+            int col = 0;
+            String position = map.get("Position");
+            int rowIdx = sheetMap.get(position + "-Row");
+            Row row = sheets[sheetMap.get(position)].createRow(rowIdx);
+            sheetMap.put(position + "-Row", ++rowIdx);
+
+            System.out.println(rowIdx);
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (!entry.getKey().equals("Position")) {
+                    row.createCell(col++).setCellValue(entry.getValue());
+                }
+            }
+        }
+
+/*        String[] arr = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email",
                 "Phone", "Interview", "Assessment", "Results"};
 
         List<String> fields = new ArrayList<>();
@@ -39,7 +70,7 @@ public class ExcelUtils {
             for (int j = 0; j < fields.size(); j++) {
                 row.createCell(j).setCellValue(map.get(fields.get(j)));
             }
-        }
+        }*/
 
         //将生成excel文件保存到指定路径下
         try {
