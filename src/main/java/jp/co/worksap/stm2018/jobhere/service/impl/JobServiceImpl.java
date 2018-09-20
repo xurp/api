@@ -327,8 +327,8 @@ public class JobServiceImpl implements JobService {
                         String pre="";
                         if(application.getStep().charAt(0)=='+'||application.getStep().charAt(0)=='-')
                             pre+=application.getStep().charAt(0);
-                        if(application.getStep().charAt(1)=='-')
-                            pre+='-';
+                        if(application.getStep().charAt(1)=='-'||application.getStep().charAt(1)=='+')
+                            pre+=application.getStep().charAt(1);
                         newApplication.setStep(pre+newStep.getIndex()+"");
                         tosave.add(newApplication);
 
@@ -340,7 +340,8 @@ public class JobServiceImpl implements JobService {
                 applicationRepository.save(tosave.get(i));
             }
             stepList.forEach(a->stepRepository.deleteById(a.getId()));
-            newStepList.forEach(a->stepRepository.save(a));
+            stepRepository.saveAll(newStepList);
+            //newStepList.forEach(a->stepRepository.save(a));
         }
 
     }
@@ -375,15 +376,10 @@ public class JobServiceImpl implements JobService {
                     }
                 }
             }
-        //olditemList.forEach(a->itemRepository.deleteById(a.getId()));
-        //newitemList.forEach(a->itemRepository.save(a));
-        List<String> todeletelist=new ArrayList<>();
-         for(Item item:olditemList){
-            //step.removeItem(item.getId());   olditemList is geted by step.getItems, so if remove it will influnce the loop
-            todeletelist.add(item.getId());//though remove all the items in the step, only steprepo.save will not delete(CASCADE:MERGE)
-        }
+
+        //itemRepository.deleteAll(olditemList);
+        olditemList.forEach(a->itemRepository.deleteById(a.getId()));//though remove all the items in the step, only steprepo.save will not delete(CASCADE:MERGE)
         step.setItems(new ArrayList<Item>());//still should remove, just not in the loop
-        todeletelist.forEach(a->itemRepository.deleteById(a));
         for(Item item:newitemList){
             item.setStep(step);
             step.addItem(item);

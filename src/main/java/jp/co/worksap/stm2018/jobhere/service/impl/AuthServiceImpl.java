@@ -109,6 +109,7 @@ public class AuthServiceImpl implements AuthService {
                     userToSave.setCompany(company);
                     company.addUser(userToSave);
                     companyRepository.save(company);
+                    //I think the following save is unnecessary
                     userRepository.save(userToSave);
                     apiToken.setUser(userToSave);
                     apiTokenRepository.save(apiToken);
