@@ -75,7 +75,7 @@ public class ResumeServiceImpl implements ResumeService {
             throw new ValidationException("User id does not exist!");
         }
     }
-
+    //this method may not be used.
     @Override
     public ResumeDTO save(Resume resume) {
         /*Resume resume=new Resume();

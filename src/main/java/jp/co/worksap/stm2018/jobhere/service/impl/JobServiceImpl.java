@@ -107,7 +107,8 @@ public class JobServiceImpl implements JobService {
             job.setName(jobDTO.getName());
             job.setRemark(jobDTO.getRemark());
             jobRepository.save(job);
-            Company c = companyRepository.findById(company.getId()).get();//lazy, so it is necessary to search from db. if set it to eagar, all should be eagar
+            //here, I think it should use company.add(job) then companyrepo.save
+            Company c = companyRepository.findById(company.getId()).get();//lazy, so it is necessary to search from db. if set it to eager, all should be eager
             job.setCompany(c);
             c.addJob(job);
             return JobDTO.builder()
@@ -175,9 +176,33 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<Step> getStepList(String jobId) {
         List<Step> stepList=stepRepository.findByJobId(jobId);
-        if(stepList==null||stepList.size()==0)
-            stepList=stepRepository.findByJobId("-1");
-        List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        boolean flag=false;
+        if(stepList==null||stepList.size()==0) {
+            stepList = stepRepository.findByJobId("-1");
+            flag=true;
+        }
+        List<Step> sortedList;
+        if(flag){
+            JobStepDTO jobStepDTO=new JobStepDTO();//if hr change default step's items, deafult items will be changed.so the first time hr wants to set step, create new steps
+            jobStepDTO.setId(jobId);
+            //jobStepDTO.setStep(stepList);  identifier of an instance of jp.co.worksap.stm2018.jobhere.model.domain.Step was altered from 1 to
+            List<Step> newsteplist=new ArrayList<>();
+            for(Step step:stepList){
+                Step s=new Step();
+                s.setJobId(step.getJobId());
+                s.setItems(step.getItems());
+                s.setDescription(step.getDescription());
+                s.setIndex(step.getIndex());
+                s.setName(step.getName());
+                newsteplist.add(s);
+            }
+            jobStepDTO.setStep(newsteplist);
+            updateJobStep(jobStepDTO);
+            sortedList =stepRepository.findByJobId(jobId).stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        }
+        else{
+            sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        }
         return sortedList;
     }
 
@@ -302,8 +327,8 @@ public class JobServiceImpl implements JobService {
                         String pre="";
                         if(application.getStep().charAt(0)=='+'||application.getStep().charAt(0)=='-')
                             pre+=application.getStep().charAt(0);
-                        if(application.getStep().charAt(1)=='-')
-                            pre+='-';
+                        if(application.getStep().charAt(1)=='-'||application.getStep().charAt(1)=='+')
+                            pre+=application.getStep().charAt(1);
                         newApplication.setStep(pre+newStep.getIndex()+"");
                         tosave.add(newApplication);
 
@@ -315,7 +340,8 @@ public class JobServiceImpl implements JobService {
                 applicationRepository.save(tosave.get(i));
             }
             stepList.forEach(a->stepRepository.deleteById(a.getId()));
-            newStepList.forEach(a->stepRepository.save(a));
+            stepRepository.saveAll(newStepList);
+            //newStepList.forEach(a->stepRepository.save(a));
         }
 
     }
@@ -342,11 +368,6 @@ public class JobServiceImpl implements JobService {
         if(!jobOptional.isPresent()){
             throw new ValidationException("Job id is wrong");
         }
-
-        List<Application> applicationList=jobOptional.get().getApplications();
-
-
-
             for (Item newitem : newitemList) {
                 for (Item olditem : olditemList) {
                     if (newitem.getName().equals(olditem.getName())) {
@@ -355,15 +376,10 @@ public class JobServiceImpl implements JobService {
                     }
                 }
             }
-        //olditemList.forEach(a->itemRepository.deleteById(a.getId()));
-        //newitemList.forEach(a->itemRepository.save(a));
-        List<String> todeletelist=new ArrayList<>();
-         for(Item item:olditemList){
-            //step.removeItem(item.getId());   olditemList is geted by step.getItems, so if remove it will influnce the loop
-            todeletelist.add(item.getId());//though remove all the items in the step, only steprepo.save will not delete(CASCADE:MERGE)
-        }
+
+        //itemRepository.deleteAll(olditemList);
+        olditemList.forEach(a->itemRepository.deleteById(a.getId()));//though remove all the items in the step, only steprepo.save will not delete(CASCADE:MERGE)
         step.setItems(new ArrayList<Item>());//still should remove, just not in the loop
-        todeletelist.forEach(a->itemRepository.deleteById(a));
         for(Item item:newitemList){
             item.setStep(step);
             step.addItem(item);
