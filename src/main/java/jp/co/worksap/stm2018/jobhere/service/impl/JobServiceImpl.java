@@ -181,12 +181,27 @@ public class JobServiceImpl implements JobService {
             stepList = stepRepository.findByJobId("-1");
             flag=true;
         }
-        List<Step> sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        List<Step> sortedList;
         if(flag){
             JobStepDTO jobStepDTO=new JobStepDTO();//if hr change default step's items, deafult items will be changed.so the first time hr wants to set step, create new steps
             jobStepDTO.setId(jobId);
-            jobStepDTO.setStep(stepList);
+            //jobStepDTO.setStep(stepList);  identifier of an instance of jp.co.worksap.stm2018.jobhere.model.domain.Step was altered from 1 to
+            List<Step> newsteplist=new ArrayList<>();
+            for(Step step:stepList){
+                Step s=new Step();
+                s.setJobId(step.getJobId());
+                s.setItems(step.getItems());
+                s.setDescription(step.getDescription());
+                s.setIndex(step.getIndex());
+                s.setName(step.getName());
+                newsteplist.add(s);
+            }
+            jobStepDTO.setStep(newsteplist);
             updateJobStep(jobStepDTO);
+            sortedList =stepRepository.findByJobId(jobId).stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
+        }
+        else{
+            sortedList = stepList.stream().sorted((a, b) -> Double.compare(a.getIndex(),b.getIndex())).collect(Collectors.toList());
         }
         return sortedList;
     }
