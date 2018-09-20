@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,24 +20,28 @@ public class ExcelUtils {
     private static HSSFCellStyle cellstyle = null;
 
     public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
-        String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
-        Workbook webBook = readExcel(psth);
-        createCellStyle(webBook);
-        Sheet sheet = webBook.getSheetAt(0);
+//        String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
+//        Workbook webBook = readExcel(psth);
+//        System.out.println(psth);
 
-        String[] fields = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email",
-                "Phone", "Interview", "Assessment", "Score", "Results"};
+        Workbook webBook = new HSSFWorkbook();
+        createCellStyle(webBook);
+        Sheet sheet = webBook.createSheet("Data");
+
+        String[] arr = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email",
+                "Phone", "Interview", "Assessment", "Results"};
+
+        List<String> fields = new ArrayList<>();
 
         for (int i = 1, size = mapList.size(); i < size; i++) {
             Map<String, String> map = mapList.get(i - 1);
             Row row = sheet.createRow(i);
-            for (int j = 0; j < fields.length; j++) {
-                row.createCell(j).setCellValue(map.get(fields[j]));
+            for (int j = 0; j < fields.size(); j++) {
+                row.createCell(j).setCellValue(map.get(fields.get(j)));
             }
         }
 
         //将生成excel文件保存到指定路径下
-        System.out.println(psth);
         try {
             FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
             webBook.write(fout);
