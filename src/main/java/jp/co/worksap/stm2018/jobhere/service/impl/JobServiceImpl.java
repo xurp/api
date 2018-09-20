@@ -106,11 +106,12 @@ public class JobServiceImpl implements JobService {
             job.setDetail(jobDTO.getDetail());
             job.setName(jobDTO.getName());
             job.setRemark(jobDTO.getRemark());
-            jobRepository.save(job);
+            //jobRepository.save(job);
             //here, I think it should use company.add(job) then companyrepo.save
             Company c = companyRepository.findById(company.getId()).get();//lazy, so it is necessary to search from db. if set it to eager, all should be eager
             job.setCompany(c);
             c.addJob(job);
+            companyRepository.save(c);
             return JobDTO.builder()
                     .id(id)
                     .name(jobDTO.getName())
