@@ -9,4 +9,6 @@ import java.util.List;
 @Transactional
 public interface StepRepository extends JpaRepository<Step, String> {
     List<Step> findByJobId(String id);
+
+    Step getByJobIdAndIndex(String id, double index);
 }

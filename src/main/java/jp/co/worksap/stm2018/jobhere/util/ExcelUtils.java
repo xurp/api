@@ -9,8 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by bwju on 2016/12/06.
@@ -19,23 +18,61 @@ public class ExcelUtils {
     private static HSSFCellStyle cellstyle = null;
 
     public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
-        String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
-        Workbook webBook = readExcel(psth);
+
+        Workbook webBook = new HSSFWorkbook();
         createCellStyle(webBook);
-        Sheet sheet = webBook.getSheetAt(0);
+//        Sheet sheet = webBook.createSheet("Data");
 
-        String[] fields = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email", "Phone", "Interview", "Assessment", "Results"};
+        Map<String, Integer> sheetMap = new HashMap<>();
+        int cnt = 0;
+        for (Map<String, String> map : mapList) {
+            String position = map.get("Position");
+            if (!sheetMap.containsKey(position)) {
+                sheetMap.put(position, cnt++);
+                sheetMap.put(position + "@Row", 1);
+                sheetMap.put(position + "@Col", map.size());
+            } else {
+                if (sheetMap.get(position + "@Col") < map.size())
+                    sheetMap.put(position + "@Col", map.size());
+            }
+        }
 
-        for (int i = 1, size = mapList.size(); i < size; i++) {
-            Map<String, String> map = mapList.get(i - 1);
-            Row row = sheet.createRow(i);
-            for (int j = 0; j < fields.length; j++) {
-                row.createCell(j).setCellValue(map.get(fields[j]));
+        Sheet[] sheets = new Sheet[cnt];
+        sheetMap.forEach((k, v) -> {
+            if (!k.contains("@")) {
+                sheets[v] = webBook.createSheet(k);
+            }
+
+        });
+
+        for (Map<String, String> map : mapList) {
+
+            String position = map.get("Position");
+            int rowIdx = sheetMap.get(position + "@Row");
+            Row row = sheets[sheetMap.get(position)].createRow(rowIdx);
+            sheetMap.put(position + "@Row", ++rowIdx);
+
+            if (map.size() == sheetMap.get(position + "@Col")) {
+                Row head = sheets[sheetMap.get(position)].createRow(0);
+
+                int headCol = 0;
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (!entry.getKey().equals("Position")) {
+                        head.createCell(headCol++).setCellValue(entry.getKey());
+                    }
+                }
+                sheetMap.put(position + "@Col", Integer.MAX_VALUE);
+            }
+
+            int col = 0;
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (!entry.getKey().equals("Position")) {
+                    row.createCell(col++).setCellValue(entry.getValue());
+                }
             }
         }
 
 //        //将生成excel文件保存到指定路径下
-//        System.out.println(psth);
 //        try {
 //            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
 //            webBook.write(fout);
@@ -43,12 +80,10 @@ public class ExcelUtils {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-//
-//        System.out.println("Excel文件生成成功...");
+
+        System.out.println("Excel文件生成成功...");
 
         writeExcel(response, webBook, "RecruitRecord");
-
-
     }
 
 
