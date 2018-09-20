@@ -139,14 +139,15 @@ public class DashBoardServiceImpl implements DashboardService {
                 stepList.sort(Comparator.comparingDouble(Step::getIndex));
                 Optional<Step> stepOptional = stepList.stream().filter(x -> x.getIndex() >= Double.valueOf(assessment.getStep())).findFirst();
 //                Step step = stepRepository.getByJobIdAndIndex(job.getId(), Double.valueOf(assessment.getStep()));
+                String stepStr = assessment.getStep();
 
                 Cooperator cooperator = assessment.getCooperator();
-                map.put("Cooperator", cooperator.getName());
-                map.put("Step", stepOptional.get().getName());
-                parseScore(assessment.getStep(), assessment.getScore()).forEach((k, v) -> map.put(k, v));
-                map.put("Comment", assessment.getComment());
-                map.put("Pass", assessment.getPass());
-                map.put("Assessment", assessment.getAssessmentTime() == null ? "" : assessment.getAssessmentTime().toString());
+                map.put("Cooperator " + stepStr, cooperator.getName());
+                map.put("Step " + stepStr, stepOptional.get().getName());
+                parseScore(stepStr, assessment.getScore()).forEach((k, v) -> map.put(k, v));
+                map.put("Comment " + stepStr, assessment.getComment());
+                map.put("Pass " + stepStr, assessment.getPass());
+                map.put("Assessment " + stepStr, assessment.getAssessmentTime() == null ? "" : assessment.getAssessmentTime().toString());
             }
 
             if (offerList.size() == 1)
@@ -158,59 +159,6 @@ public class DashBoardServiceImpl implements DashboardService {
         });
 
         return mapList;
-
-/*
-        for (Assessment assessment : assessmentList) {
-            Cooperator cooperator = assessment.getCooperator();
-            if (cooperator != null && cooperator.getCompanyId().equals(company.getId())) {
-
-                Application application = applicationRepository.getOne(assessment.getApplicationId());
-                List<Offer> offerList = offerRepository.findByApplicationId(application.getId());
-                Job job = application.getJob();
-                Resume resume = application.getResume();
-                Step step = stepRepository.getByJobIdAndIndex(job.getId(), Double.valueOf(assessment.getStep()));
-                List<Step> stepList = stepRepository.findByJobId(job.getId());
-                if (stepList.size() == 0) {
-                    stepList = stepRepository.findByJobId("-1");
-                }
-                stepList.sort(Comparator.comparingDouble(Step::getIndex));
-
-                Double stepMax = stepList.stream().map(s -> s.getIndex()).reduce((max, i) -> max = max > i ? max : i).get();
-
-                if (!applicationMap.containsKey(assessment.getApplicationId())) {
-                    Map<String, String> map = new LinkedHashMap<>();
-                    map.put("Candidate", resume.getName());
-                    map.put("Email", resume.getEmail());
-                    map.put("Phone", resume.getPhone());
-                    map.put("Cooperator", cooperator.getName());
-                    map.put("Department", cooperator.getDepartment());
-                    map.put("Position", application.getJob().getName());
-                    map.put("Step", step.getName());
-                    map.put("Assessment", assessment.getAssessmentTime() == null ? "" : assessment.getAssessmentTime().toString());
-                    parseScore(assessment.getStep(), assessment.getScore()).forEach((k, v) -> map.put(k, v));
-                    map.put("Comment", assessment.getComment());
-                    map.put("Pass", assessment.getPass());
-
-                    if (Double.valueOf(assessment.getStep()) - stepMax < 0.01) {
-                        if (offerList.size() == 1)
-                            map.put("Results", "offer");
-                        else
-                            map.put("Results", "");
-                    }
-
-                    mapList.add(map);
-
-                } else {
-
-
-                }
-
-
-            }
-        }
-*/
-
-
     }
 
     Map<String, String> parseScore(String index, String score) {
