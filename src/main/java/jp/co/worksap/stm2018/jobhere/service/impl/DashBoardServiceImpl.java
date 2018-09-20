@@ -117,6 +117,7 @@ public class DashBoardServiceImpl implements DashboardService {
                 map.put("Department", cooperator.getDepartment());
                 map.put("Step", assessment.getStep());
                 map.put("Comment", assessment.getComment());
+                map.put("Score", assessment.getScore());
                 map.put("Pass", assessment.getPass());
                 map.put("Email", cooperator.getEmail());
                 map.put("Phone", cooperator.getPhone());
