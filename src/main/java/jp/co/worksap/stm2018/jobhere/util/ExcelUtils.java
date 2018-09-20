@@ -18,9 +18,6 @@ public class ExcelUtils {
     private static HSSFCellStyle cellstyle = null;
 
     public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
-//        String psth = ResourceUtils.getFile("classpath:RecruitRecord.xls").getPath();
-//        Workbook webBook = readExcel(psth);
-//        System.out.println(psth);
 
         Workbook webBook = new HSSFWorkbook();
         createCellStyle(webBook);
