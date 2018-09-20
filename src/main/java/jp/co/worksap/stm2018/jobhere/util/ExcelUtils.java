@@ -32,45 +32,48 @@ public class ExcelUtils {
             String position = map.get("Position");
             if (!sheetMap.containsKey(position)) {
                 sheetMap.put(position, cnt++);
-                sheetMap.put(position + "-Row", 1);
+                sheetMap.put(position + "@Row", 1);
+                sheetMap.put(position + "@Col", map.size());
+            } else {
+                if (sheetMap.get(position + "@Col") < map.size())
+                    sheetMap.put(position + "@Col", map.size());
             }
         }
 
         Sheet[] sheets = new Sheet[cnt];
         sheetMap.forEach((k, v) -> {
-            if (!k.contains("-Row"))
+            if (!k.contains("@")) {
                 sheets[v] = webBook.createSheet(k);
+            }
+
         });
 
         for (Map<String, String> map : mapList) {
-            int col = 0;
+
             String position = map.get("Position");
-            int rowIdx = sheetMap.get(position + "-Row");
+            int rowIdx = sheetMap.get(position + "@Row");
             Row row = sheets[sheetMap.get(position)].createRow(rowIdx);
-            sheetMap.put(position + "-Row", ++rowIdx);
+            sheetMap.put(position + "@Row", ++rowIdx);
 
-            System.out.println(rowIdx);
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            if (map.size() == sheetMap.get(position + "@Col")) {
+                Row head = sheets[sheetMap.get(position)].createRow(0);
 
+                int headCol = 0;
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (!entry.getKey().equals("Position")) {
+                        head.createCell(headCol++).setCellValue(entry.getKey());
+                    }
+                }
+                sheetMap.put(position + "@Col", Integer.MAX_VALUE);
+            }
+
+            int col = 0;
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (!entry.getKey().equals("Position")) {
                     row.createCell(col++).setCellValue(entry.getValue());
                 }
             }
         }
-
-/*        String[] arr = {"Position", "Cooperator", "Candidate", "Department", "Step", "Comment", "Pass", "Email",
-                "Phone", "Interview", "Assessment", "Results"};
-
-        List<String> fields = new ArrayList<>();
-
-        for (int i = 1, size = mapList.size(); i < size; i++) {
-            Map<String, String> map = mapList.get(i - 1);
-            Row row = sheet.createRow(i);
-            for (int j = 0; j < fields.size(); j++) {
-                row.createCell(j).setCellValue(map.get(fields.get(j)));
-            }
-        }*/
 
         //将生成excel文件保存到指定路径下
         try {
