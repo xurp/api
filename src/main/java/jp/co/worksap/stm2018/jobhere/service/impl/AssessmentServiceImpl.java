@@ -169,8 +169,8 @@ public class AssessmentServiceImpl implements AssessmentService {
             appointedTimeRepository.deleteById(appointedTime.getId());
         }
         String content = "Dear Evaluator:\n\t" +
-                "Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
-                "                                " + path + "#/assess/" + assessmentDTO.getId()+"\n\tinterview time:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(assessmentDTO.getInterviewTime())+"\n\tposition:"
+                "Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n\t" +
+                path + "#/assess/" + assessmentDTO.getId()+"\n\tinterview time:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(assessmentDTO.getInterviewTime())+"\n\tposition:"
                 +applicationRepository.getOne(assessment.getApplicationId()).getJob().getName()+"\n\tBest Regards,\n"+applicationRepository.getOne(assessment.getApplicationId()).getJob().getCompany().getCompanyName();
         mail.send("chorespore@163.com", cooperatorOptional.get().getEmail(), "Assessment Invitation to " + cooperatorOptional.get().getName(), content);
     }
