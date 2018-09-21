@@ -243,6 +243,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 String content = emailDTO.getContent();
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
                 content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
                 mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
             }
             //maybe the following two replace is unnecessary
@@ -252,6 +253,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 String content = emailDTO.getContent();
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
                 content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
                 mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
             } else {
                 throw new ValidationException("The interviewer has not rejected the candidate.");
