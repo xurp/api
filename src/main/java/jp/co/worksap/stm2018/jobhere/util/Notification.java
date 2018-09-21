@@ -36,7 +36,7 @@ public class Notification {
 
 
     @Transactional
-    @Scheduled(cron = "0 0 15 ? * *" )
+    @Scheduled(cron = "0 0 11 ? * *" )
     @NeedLogin
     public void reportCurrentTime() {
         List<Assessment> assessmentRepositoryList=assessmentRepository.findAll();
@@ -49,8 +49,8 @@ public class Notification {
                 if(year==now.getYear()&&month==now.getMonth()&&day-1==now.getDate()){
                     Application application=applicationRepository.findById(assessment.getApplicationId()).get();
                     String companyName=companyRepository.findById(assessment.getCooperator().getCompanyId()).get().getCompanyName();
-                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Assessment remind", "Dear "+assessment.getCooperator().getName()+",/n/t Your interview time for "+application.getResume().getName()+" is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
-                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Interview remind", "Dear "+application.getResume().getName()+",/n/t Your interview time is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
+                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Assessment remind", "Dear "+assessment.getCooperator().getName()+",\n\t Your interview time for "+application.getResume().getName()+" is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
+                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Interview remind", "Dear "+application.getResume().getName()+",\n\t Your interview time is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
 
                 }
             }

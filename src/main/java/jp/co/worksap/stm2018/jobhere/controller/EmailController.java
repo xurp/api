@@ -45,14 +45,12 @@ public class EmailController {
     List<EmailTemplate> list1(HttpServletRequest request) {
         List<EmailTemplate> emailList=new ArrayList<>();
         emailList.add(new EmailTemplate("template1","Dear [candidate_name]:\n" +
-                "\tThank you for your application for the position. As you can imagine, we received a large number of applications. I am sorry to inform you that you have not passed this position.\n" +
-                "\n" +
+                "\tThank you for your application for the position [[position_name]]. As you can imagine, we received a large number of applications. I am sorry to inform you that you have not passed this position.\n" +
                 "\tWe thanks you for the time you invested in applying for the shipping coordinator position. We encourage you to apply for future openings for which you qualify.\n" +
                 "\n" +
-                "Best wishes for a successful job search. Thank you, again, for your interest in our company."));
-        emailList.add(new EmailTemplate("template2","Dear [candidate_name]:\n\tThank you for your application for the position. I am sorry to inform you that you have not passed this position.\n" +
-                "\n" +
-                "Best wishes for a successful job search. Thank you, again, for your interest in our company."));
+                "Best wishes for a successful job search. Thank you, again, for your interest in our company.\n\tBest Regards,\n[company_name]"));
+        emailList.add(new EmailTemplate("template2","Dear [candidate_name]:\n\tThank you for your application for the position [[position_name]]. I am sorry to inform you that you have not passed this position.\n\t" +
+                "Best wishes for a successful job search. Thank you, again, for your interest in our company.\n\tBest Regards,\n[company_name]"));
         return emailList;
     }
 
