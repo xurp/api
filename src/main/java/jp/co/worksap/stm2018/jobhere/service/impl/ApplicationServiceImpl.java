@@ -35,11 +35,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final Mail mail;
 
     @Autowired
-    ApplicationServiceImpl(AssessmentRepository assessmentRepository,Mail mail, JobRepository jobRepository, OfferRepository offerRepository,
+    ApplicationServiceImpl(AssessmentRepository assessmentRepository, Mail mail, JobRepository jobRepository, OfferRepository offerRepository,
                            ResumeRepository resumeRepository, UserRepository userRepository,
 
                            ApplicationRepository applicationRepository, StepRepository stepRepository) {
-        this.assessmentRepository=assessmentRepository;
+        this.assessmentRepository = assessmentRepository;
         this.mail = mail;
         this.offerRepository = offerRepository;
         this.jobRepository = jobRepository;
@@ -112,10 +112,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
         if (applicationOptional.isPresent()) {
             Application application = applicationOptional.get();
-            List<Assessment> assessmentList=assessmentRepository.findByApplicationId(applicationId);
+            List<Assessment> assessmentList = assessmentRepository.findByApplicationId(applicationId);
             assessmentList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
-            String step=application.getStep();
-            if(assessmentList.size()>0) {
+            String step = application.getStep();
+            if (assessmentList.size() > 0) {
                 Assessment assessment = assessmentList.get(assessmentList.size() - 1);
                 if (assessment.getCooperator() != null && assessment.getPass().equals("assessing"))
                     step = "++" + step;
@@ -142,9 +142,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             for (Application application : job.getApplications()) {
                 //if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replaceAll("-",""))-Double.parseDouble(step.replaceAll("-","")))<0.01) {
                 if (step.equals("ALL") || Math.abs(Double.parseDouble(application.getStep().replace("+", "").replace("-", "")) - Double.parseDouble(step.replace("+", "").replace("-", ""))) < 0.01) {
-                    List<Assessment> assessmentList=assessmentRepository.findByApplicationId(application.getId());
+                    List<Assessment> assessmentList = assessmentRepository.findByApplicationId(application.getId());
                     String applicationStep = application.getStep();
-                    if(assessmentList.size()>0) {//else, step =0 resume filter
+                    if (assessmentList.size() > 0) {//else, step =0 resume filter
                         assessmentList.sort((a, b) -> Double.compare(Double.parseDouble(a.getStep()), Double.parseDouble(b.getStep())));
                         Assessment assessment = assessmentList.get(assessmentList.size() - 1);
                         if (assessment.getCooperator() != null && assessment.getPass().equals("assessing"))
@@ -241,20 +241,22 @@ public class ApplicationServiceImpl implements ApplicationService {
                 application.setStep("-" + step);
                 applicationRepository.save(application);
                 String content = emailDTO.getContent();
+                String companyName = application.getJob().getCompany().getCompanyName();
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
-                content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                content = content.replaceAll("\\[company_name\\]", companyName);
                 content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
             }
             //maybe the following two replace is unnecessary
             else if (Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex()) < 0.01) {
                 application.setStep("--" + step);
                 applicationRepository.save(application);
                 String content = emailDTO.getContent();
+                String companyName = application.getJob().getCompany().getCompanyName();
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
-                content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                content = content.replaceAll("\\[company_name\\]", companyName);
                 content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
             } else {
                 throw new ValidationException("The interviewer has not rejected the candidate.");
             }
@@ -267,13 +269,13 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<ApplicationDTO> candidateApplicationList(User user) {
-        String userId=user.getId();
-        List<Application> list=userRepository.findById(userId).get().getApplications();
-        List<ApplicationDTO> applicationDTOList=new ArrayList<>();
-        for(Application application:list){
-            List<Step> stepList=stepRepository.findByJobId(application.getJob().getId());
-            if(stepList==null||stepList.size()==0)
-                stepList=stepRepository.findByJobId("-1");
+        String userId = user.getId();
+        List<Application> list = userRepository.findById(userId).get().getApplications();
+        List<ApplicationDTO> applicationDTOList = new ArrayList<>();
+        for (Application application : list) {
+            List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
+            if (stepList == null || stepList.size() == 0)
+                stepList = stepRepository.findByJobId("-1");
             stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
             applicationDTOList.add(ApplicationDTO.builder()
                     .id(application.getId())

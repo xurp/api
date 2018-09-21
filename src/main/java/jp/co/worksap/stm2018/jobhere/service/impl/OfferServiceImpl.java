@@ -140,23 +140,25 @@ public class OfferServiceImpl implements OfferService {
             offer.setRespondTime(new Timestamp(System.currentTimeMillis()));
             offer.setRemark(emailDTO.getRemark());
             offerRepository.save(offer);
-            String content=emailDTO.getContent();
-            String applicationId=offer.getApplicationId();
-            String companyId=offer.getCompanyId();
-            Application application=applicationRepository.getOne(applicationId);
-            if(offer.getResult().trim().equals("accept"))
-                application.setStep("+"+application.getStep());
-            else if(offer.getResult().trim().equals("reject"))
-                application.setStep("--"+application.getStep());
+            String content = emailDTO.getContent();
+            String applicationId = offer.getApplicationId();
+            String companyId = offer.getCompanyId();
+            Application application = applicationRepository.getOne(applicationId);
+            if (offer.getResult().trim().equals("accept"))
+                application.setStep("+" + application.getStep());
+            else if (offer.getResult().trim().equals("reject"))
+                application.setStep("--" + application.getStep());
             applicationRepository.save(application);
-            content=content.replaceAll("\\[candidate_name\\]",application.getResume().getName());
-            content=content.replaceAll("\\[position_name\\]",application.getJob().getName());
-            content=content.replaceAll("\\[company_name\\]",companyRepository.getOne(companyId).getCompanyName());
-            mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
+            String companyName = companyRepository.getOne(companyId).getCompanyName();
+            content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
+            content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
+            content = content.replaceAll("\\[company_name\\]", companyName);
+            mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
         } else {
             throw new ValidationException("Wrong offer ID.");
         }
     }
+
     //this method may not be used.
     @Override
     public void offer(String offerId, String result) {
