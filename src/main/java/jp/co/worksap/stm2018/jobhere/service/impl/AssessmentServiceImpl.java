@@ -236,8 +236,8 @@ public class AssessmentServiceImpl implements AssessmentService {
                 Assessment assessment1 = new Assessment();
                 assessment1.setId(UUID.randomUUID().toString().replace("-", ""));
                 assessment1.setApplicationId(applicationId);
-                Cooperator cooperator = cooperatorRepository.findById(emailDTO.getCooperatorId()).get();
-                assessment1.setCooperator(cooperator);
+                //Cooperator cooperator = cooperatorRepository.findById(emailDTO.getCooperatorId()).get();
+                //assessment1.setCooperator(cooperator);
 
                 Application application = applicationRepository.findById(applicationId).get();
                 mail.send("chorespore@163.com", application.getResume().getEmail(), "[" + companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName() + "]Please repick your interview time",
@@ -320,6 +320,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         if (assessment != null) {
             assessment.setPass("assessing");
             assessment.setComment("");
+            assessment.setScore("");
             assessmentRepository.save(assessment);
             Optional<Application> applicationOptional = applicationRepository.findById(assessment.getApplicationId());
             if (applicationOptional.isPresent()) {
@@ -341,7 +342,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     }
 
-
+    //this method may not be used.
     @Transactional
     @Override
     public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content, String
@@ -375,40 +376,6 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .build();
     }
 
-    /*@Transactional
-    @Override
-    public AssessmentDTO save(String applicationId, String cooperatorId, String subject, String content,String assessId) {
-        //this function is before 'choose date' module
-        String newstep=hrUpdate(applicationId);
-        Assessment assessment = new Assessment();
-        assessment.setId(assessId);
-        assessment.setApplicationId(applicationId);
-        Cooperator cooperator=cooperatorRepository.findById(cooperatorId).get();
-        assessment.setCooperator(cooperator);//originally, assessment is onetoone cooperator, but does not need to save cooperator. here , cooperator will be overwrite but it's ok.
-        Application application = applicationRepository.findById(applicationId).get();
-        String step = application.getStep();
-        if (step.charAt(0) == '+' || step.charAt(0) == '-')
-            step = step.substring(1);
-        assessment.setStep(step);
-        assessment.setStep(newstep);
-        assessment.setComment(" ");
-        assessment.setPass("assessing");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        assessment.setAssessmentTime(timestamp);
-        assessmentRepository.save(assessment);
-        application.setStep(newstep);
-        applicationRepository.save(application);
-        Mail.send("chorespore@163.com", cooperator.getEmail(), subject,content);
-        return AssessmentDTO.builder()
-                .id(assessment.getId())
-                .cooperator(assessment.getCooperator())
-                .applicationId(assessment.getApplicationId())
-                .assessmentTime(assessment.getAssessmentTime())
-                .comment(assessment.getComment())
-                .step(assessment.getStep())
-                .pass(assessment.getPass())
-        .assessmentTime(timestamp).build();
-    }*/
 
     public List<AssessmentDTO> list(String applicationId) {
         List<AssessmentDTO> assessmentDTOList = new ArrayList<>();
