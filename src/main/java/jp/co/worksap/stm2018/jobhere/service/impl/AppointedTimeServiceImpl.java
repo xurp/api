@@ -76,7 +76,7 @@ public class AppointedTimeServiceImpl implements AppointedTimeService {
                     //path="https://sh-stm.paas.workslan/jobhere";
                     List<Assessment> sortedList= assessmentList.stream().sorted((a, b) -> Double.compare(Double.parseDouble(a.getStep()),Double.parseDouble(b.getStep()))).collect(Collectors.toList());
                     String content="Dear "+application.getResume().getName()+",\n\tPlease click the link to choose your interview time:\n\t"+path+"/#/schedule/candidate/"+appointedTimeDTO.getOperationId()+"/"+sortedList.get(sortedList.size()-1).getId();
-                    content+="\n\tBest Regards+\n"+application.getJob().getCompany().getCompanyName();
+                    content+="\n\tBest Regards,\n"+application.getJob().getCompany().getCompanyName();
                     mail.send("chorespore@163.com", email, "["+application.getJob().getCompany().getCompanyName()+"] Please choose your interview time",content);
                 }
             }

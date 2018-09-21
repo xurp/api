@@ -240,15 +240,19 @@ public class ApplicationServiceImpl implements ApplicationService {
             } else if (step.charAt(0) == '-') {
                 application.setStep("-" + step);
                 applicationRepository.save(application);
-
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
+                String content = emailDTO.getContent();
+                content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
+                content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
             }
             //maybe the following two replace is unnecessary
             else if (Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex()) < 0.01) {
                 application.setStep("--" + step);
                 applicationRepository.save(application);
-
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), emailDTO.getContent());
+                String content = emailDTO.getContent();
+                content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
+                content = content.replaceAll("\\[company_name\\]", application.getJob().getCompany().getCompanyName());
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(), content);
             } else {
                 throw new ValidationException("The interviewer has not rejected the candidate.");
             }
@@ -281,43 +285,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         return applicationDTOList;
     }
-    
-    /*@Transactional
-    @Override
-    public void decline(EmailDTO emailDTO) {
-        Optional<Application> applicationOptional = applicationRepository.findById(emailDTO.getApplicationId());
-        if (applicationOptional.isPresent()) {
-            Application application = applicationOptional.get();
-            String step=application.getStep();
-
-            List<Step> stepList = stepRepository.findByJobId(application.getJob().getId());
-            if (stepList == null || stepList.size() == 0)
-                stepList = stepRepository.findByJobId("-1");
-            stepList.sort((a, b) -> Double.compare(a.getIndex(), b.getIndex()));
-            if(step.charAt(0) == '-'&&step.charAt(1)== '-'){
-                throw new ValidationException("The rejection email has been sent.");
-            }
-            else if(step.charAt(0) == '-'){
-                application.setStep("-"+step);
-                applicationRepository.save(application);
-                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
-            }
-            //maybe the following two replace is unnecessary
-            else if(Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex())<0.01){
-                application.setStep("--"+step);
-                applicationRepository.save(application);
-                Mail.send("chorespore@163.com", emailDTO.getReceiver(), emailDTO.getSubject(),emailDTO.getContent());
-            }
-            else{
-                throw new ValidationException("The interviewer has not rejected the candidate.");
-            }
-
-        }
-        else {
-            throw new NotFoundException("Application no found");
-        }
-
-    }*/
 
 }
 

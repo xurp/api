@@ -9,7 +9,7 @@ import java.util.List;
 public interface ReviewService {
     List<UserDTO> list(User user);
 
-    List<CooperatorDTO> listCooperator();
+    List<CooperatorDTO> listCooperator(String id);
 
     void inspect(User inspector,String id, String pass);
 }

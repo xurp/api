@@ -44,7 +44,7 @@ public class ReviewController {
 
         User user = (User) request.getAttribute("getuser");
         if (user.getRole().equals("hr")) {
-            return reviewService.listCooperator();
+            return reviewService.listCooperator(user.getId());
         } else {
             throw new ValidationException("Permission Denied!");
         }

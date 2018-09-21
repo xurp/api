@@ -73,8 +73,9 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<CooperatorDTO> listCooperator() {
-        List<Cooperator> cooperatorList = cooperatorRepository.findAll();
+    public List<CooperatorDTO> listCooperator(String id) {
+        String companyId=userRepository.findById(id).get().getCompany().getId();
+        List<Cooperator> cooperatorList = cooperatorRepository.findByCompanyId(companyId);
         List<CooperatorDTO> cooperatorDTOList = new ArrayList<>();
         for (Cooperator cooperator : cooperatorList) {
             cooperatorDTOList.add(CooperatorDTO.builder()
