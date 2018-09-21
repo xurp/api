@@ -168,11 +168,34 @@ public class AssessmentServiceImpl implements AssessmentService {
         } else {
             appointedTimeRepository.deleteById(appointedTime.getId());
         }
+
+//        Westgate Mall 9F, No.1038 West Nanjing Road, Jing An District, Shanghai
+        Application application = applicationRepository.getOne(assessment.getApplicationId());
+        Resume resume = application.getResume();
+        Job job = application.getJob();
+        Company company = job.getCompany();
+        Cooperator cooperator = cooperatorOptional.get();
+        String timeStr = assessment.getInterviewTime().toString();
+
         String content = "Dear Evaluator:\n\t" +
-                "Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
-                "                                " + path + "#/assess/" + assessmentDTO.getId()+"\n\tinterview time:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(assessmentDTO.getInterviewTime())+"\n\tposition:"
-                +applicationRepository.getOne(assessment.getApplicationId()).getJob().getName()+"\n\tBest Regards,\n"+applicationRepository.getOne(assessment.getApplicationId()).getJob().getCompany().getCompanyName();
-        mail.send("chorespore@163.com", cooperatorOptional.get().getEmail(), "Assessment Invitation to " + cooperatorOptional.get().getName(), content);
+                "Please help to give assessment to this job seeker, detailed information about this person is listed in the link below. " +
+                "The assessment can only be make once, so please MADE YOUR DECISION CAUTIOUSLY! \n" +
+                "  Interview time:" + timeStr.substring(0, timeStr.lastIndexOf(":")) + "\n" +
+                "　Interview place: Westgate Mall 9F, No.1038 West Nanjing Road, Jing An District, Shanghai \n" +
+                "                                " + path + "#/assess/" + assessmentDTO.getId() + "\n\tinterview time:"
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(assessmentDTO.getInterviewTime()) +
+                "\n\tposition:" + job.getName() + "\n\tBest Regards,\n" + company.getCompanyName();
+        mail.send("chorespore@163.com", cooperator.getEmail(), "[" + company.getCompanyName() + "] " + "Assessment Invitation to " + resume.getName(), content);
+
+
+        String msgToCandidate = "Dear " + resume.getName() + ":\n\t" +
+                "　Our company human resources department has received your feedback of time preference, thank you for your cooperation.\n" +
+                "  We officially inform you to our company to participate in the interview. Specific requirements are as follows.\n" +
+                "  Interview time:" + timeStr.substring(0, timeStr.lastIndexOf(":")) + "\n" +
+                "　Interview place: Westgate Mall 9F, No.1038 West Nanjing Road, Jing An District, Shanghai" +
+                "\n\tposition:" + job.getName() + "\n\tBest Regards,\n" + company.getCompanyName();
+        mail.send("chorespore@163.com", resume.getEmail(), "[" + company.getCompanyName() + "] " + "Interview Invitation of " + job.getName(), msgToCandidate);
+
     }
 
     public void resendEmail(EmailDTO emailDTO) {
