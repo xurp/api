@@ -3,6 +3,7 @@ package jp.co.worksap.stm2018.jobhere.util;
 import jp.co.worksap.stm2018.jobhere.annotation.NeedLogin;
 import jp.co.worksap.stm2018.jobhere.dao.ApplicationRepository;
 import jp.co.worksap.stm2018.jobhere.dao.AssessmentRepository;
+import jp.co.worksap.stm2018.jobhere.dao.CompanyRepository;
 import jp.co.worksap.stm2018.jobhere.model.domain.Application;
 import jp.co.worksap.stm2018.jobhere.model.domain.Assessment;
 import jp.co.worksap.stm2018.jobhere.model.domain.User;
@@ -29,6 +30,8 @@ public class Notification {
     @Autowired
     private ApplicationRepository applicationRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private Mail mail;
 
 
@@ -43,9 +46,12 @@ public class Notification {
                 int month=new Date(assessment.getInterviewTime().getTime()).getMonth();
                 int day=new Date(assessment.getInterviewTime().getTime()).getDate();
                 Date now=new Date();
-                if(year==now.getYear()&&month==now.getMonth()&&day-3==now.getDate()){
+                if(year==now.getYear()&&month==now.getMonth()&&day-1==now.getDate()){
                     Application application=applicationRepository.findById(assessment.getApplicationId()).get();
-                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Assessment remind", "Hi, Your assessment time for "+application.getResume().getName()+" is "+assessment.getInterviewTime()+". Do not forget it. Thank you.");
+                    String companyName=companyRepository.findById(assessment.getCooperator().getCompanyId()).get().getCompanyName();
+                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Assessment remind", "Dear "+assessment.getCooperator().getName()+",/n/t Your interview time for "+application.getResume().getName()+" is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
+                    mail.send("chorespore@163.com", assessment.getCooperator().getEmail(), "Interview remind", "Dear "+application.getResume().getName()+",/n/t Your interview time is "+assessment.getInterviewTime()+"(tomorrow). Do not forget it. Thank you.\n\tBest Regards,\n"+companyName);
+
                 }
             }
         }
