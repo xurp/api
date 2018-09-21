@@ -20,8 +20,12 @@ public class ExcelUtils {
     public static void exportRecruitRecord(HttpServletRequest request, HttpServletResponse response, List<Map<String, String>> mapList) throws IOException {
 
         Workbook webBook = new HSSFWorkbook();
-        createCellStyle(webBook);
-//        Sheet sheet = webBook.createSheet("Data");
+
+        Map<Integer, Short> colorMap = new HashMap<>();
+        colorMap.put(0, IndexedColors.LIME.getIndex());
+        colorMap.put(1, IndexedColors.SKY_BLUE.getIndex());
+        colorMap.put(2, IndexedColors.ROSE.getIndex());
+        colorMap.put(3, IndexedColors.YELLOW.getIndex());
 
         Map<String, Integer> sheetMap = new HashMap<>();
         int cnt = 0;
@@ -41,6 +45,7 @@ public class ExcelUtils {
         sheetMap.forEach((k, v) -> {
             if (!k.contains("@")) {
                 sheets[v] = webBook.createSheet(k);
+                sheets[v].autoSizeColumn(1, true);
             }
 
         });
@@ -58,7 +63,18 @@ public class ExcelUtils {
                 int headCol = 0;
                 for (Map.Entry<String, String> entry : map.entrySet()) {
                     if (!entry.getKey().equals("Position")) {
-                        head.createCell(headCol++).setCellValue(entry.getKey());
+                        Cell cell = head.createCell(headCol++);
+                        String title = entry.getKey();
+                        if (title.contains(".")) {
+                            int step = (int) Double.valueOf(title.substring(title.lastIndexOf(" "))).doubleValue();
+                            CellStyle style = webBook.createCellStyle();
+                            style.setFillForegroundColor(colorMap.get(step % 4));
+                            style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+                            cell.setCellValue(title);
+                            cell.setCellStyle(style);
+                        } else
+                            cell.setCellValue(title);
                     }
                 }
                 sheetMap.put(position + "@Col", Integer.MAX_VALUE);
@@ -67,19 +83,20 @@ public class ExcelUtils {
             int col = 0;
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (!entry.getKey().equals("Position")) {
-                    row.createCell(col++).setCellValue(entry.getValue());
+                    Cell cell = row.createCell(col++);
+                    cell.setCellValue(entry.getValue());
                 }
             }
         }
 
-//        //将生成excel文件保存到指定路径下
-//        try {
-//            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
-//            webBook.write(fout);
-//            fout.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        //将生成excel文件保存到指定路径下
+/*        try {
+            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
+            webBook.write(fout);
+            fout.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         System.out.println("Excel文件生成成功...");
 
