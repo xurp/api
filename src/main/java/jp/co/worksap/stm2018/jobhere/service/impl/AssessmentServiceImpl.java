@@ -241,7 +241,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
                 Application application = applicationRepository.findById(applicationId).get();
                 mail.send("chorespore@163.com", application.getResume().getEmail(), "[" + companyRepository.findById(cooperatorRepository.findById(emailDTO.getCooperatorId()).get().getCompanyId()).get().getCompanyName() + "]Please repick your interview time",
-                        "Dear " + application.getResume().getName() + ":\n\tWe are sorry to tell you that our interviewer has changed. You will receive another email to choose your new interview date. Thank you for supporting our recruitment!");
+                        "Dear " + application.getResume().getName() + ":\n\tWe are sorry to tell you that your interview time will be changed. You will receive another email to choose your new interview date. Thank you for supporting our recruitment!");
                 assessment1.setStep(application.getStep());
                 assessment1.setComment(" ");
                 assessment1.setPass("assessing");//if not assessing, exception has been thrown
