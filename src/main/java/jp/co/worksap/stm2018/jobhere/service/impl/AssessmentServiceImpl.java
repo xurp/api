@@ -146,7 +146,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         List<AppointedTime> appointedTimeAllList = appointedTimeRepository.getByOperationId(assessmentDTO.getOperationId());
         if (appointedTimeList == null || appointedTimeList.size() == 0)
             throw new ValidationException("Sorry, this time is selected just now");
-        //case1:appointedTimeList=1 and appointedTimeAllList=3 and the same cooperator; ->single
+        //case1:appointedTimeList=1 and appointedTimeAllList=3 and the same cooperator; ->single   or 3candidate vs 1 cooperator
         //case2:appointedTimeList=1 and appointedTimeAllList=3 and different cooperators selected the same time;
         // case3:other
         AppointedTime appointedTime = appointedTimeList.get(0);
@@ -163,9 +163,14 @@ public class AssessmentServiceImpl implements AssessmentService {
                 flag = false;
         }
         if (appointedTimeAllList.size() == 3 && flag) {//case1
-            List<String> deleteList = new ArrayList<>();
-            appointedTimeAllList.forEach(a -> deleteList.add(a.getId()));
-            deleteList.forEach(id -> appointedTimeRepository.deleteById(id));
+            if(appointedTimeAllList.get(0).getApplicationId().equals(appointedTimeAllList.get(1).getApplicationId())) {//case 1.1
+                List<String> deleteList = new ArrayList<>();
+                appointedTimeAllList.forEach(a -> deleteList.add(a.getId()));
+                deleteList.forEach(id -> appointedTimeRepository.deleteById(id));
+            }
+            else{//case 1.2
+                appointedTimeRepository.deleteById(appointedTime.getId());
+            }
         } else {
             appointedTimeRepository.deleteById(appointedTime.getId());
         }
