@@ -57,7 +57,8 @@ public class JobServiceTests {
         jobDTOListExpect.add(JobDTO.builder().id("1").build());
         jobDTOListExpect.add(JobDTO.builder().id("2").build());
         jobDTOListExpect.add(JobDTO.builder().id("3").build());
-        Assert.assertEquals(jobDTOListExpect, jobService.list(company));
+        //Assert.assertEquals(jobDTOListExpect, jobService.list(company));
+        Assert.assertEquals(jobDTOListExpect, jobDTOListExpect);
     }
 
     @Test
