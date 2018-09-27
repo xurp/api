@@ -51,6 +51,7 @@ public class JobServiceImpl implements JobService {
                     .createTime(job.getCreateTime())
                     .updateTime(job.getUpdateTime()).company(job.getCompany()).build());
         }
+        jobDTOList.stream().sorted((a, b) -> a.getName().compareTo(b.getName())).collect(Collectors.toList());
         return jobDTOList;
     }
 

@@ -10,6 +10,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,11 @@ public class Mail {
 
         try {
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from));
+            String nick="";	      try{
+                nick=javax.mail.internet.MimeUtility.encodeText("FedEx Recruit");	      }
+                catch(UnsupportedEncodingException e){	    	  e.printStackTrace();	      }
+            //form
+            message.setFrom(new InternetAddress(nick+" <"+from+">"));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject(subject);
             message.setText(text);

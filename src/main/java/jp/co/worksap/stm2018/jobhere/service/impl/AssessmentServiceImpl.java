@@ -350,6 +350,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     public void reassessment(EmailDTO emailDTO) {
         //id:assessmentId
         Assessment assessment = assessmentRepository.getOne(emailDTO.getAssessId());
+        System.out.println("reass id:"+emailDTO.getAssessId());
         if (assessment != null) {
             assessment.setPass("assessing");
             assessment.setComment("");
