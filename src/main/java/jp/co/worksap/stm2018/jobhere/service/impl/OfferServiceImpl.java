@@ -153,7 +153,7 @@ public class OfferServiceImpl implements OfferService {
             content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
             content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
             content = content.replaceAll("\\[company_name\\]", companyName);
-            mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
+            mail.send("chorespore@163.com", emailDTO.getReceiver(),  application.getResume().getName()+" -- "+ emailDTO.getSubject(), content);
         } else {
             throw new ValidationException("Wrong offer ID.");
         }

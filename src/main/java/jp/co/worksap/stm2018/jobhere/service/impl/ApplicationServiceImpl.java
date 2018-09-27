@@ -245,7 +245,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
                 content = content.replaceAll("\\[company_name\\]", companyName);
                 content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), application.getResume().getName()+ " -- "+emailDTO.getSubject(), content);
             }
             //maybe the following two replace is unnecessary
             else if (Math.abs(Double.valueOf(step.replace("+", "").replace("-", "")) - stepList.get(0).getIndex()) < 0.01) {
@@ -256,7 +256,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 content = content.replaceAll("\\[position_name\\]", application.getJob().getName());
                 content = content.replaceAll("\\[company_name\\]", companyName);
                 content = content.replaceAll("\\[candidate_name\\]", application.getResume().getName());
-                mail.send("chorespore@163.com", emailDTO.getReceiver(), "[" + companyName + "] " + emailDTO.getSubject(), content);
+                mail.send("chorespore@163.com", emailDTO.getReceiver(), application.getResume().getName()+ " -- "+emailDTO.getSubject(), content);
             } else {
                 throw new ValidationException("The interviewer has not rejected the candidate.");
             }
