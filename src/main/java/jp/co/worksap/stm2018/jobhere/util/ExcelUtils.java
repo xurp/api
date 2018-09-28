@@ -1,5 +1,6 @@
 package jp.co.worksap.stm2018.jobhere.util;
 
+import io.swagger.models.auth.In;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -28,6 +29,8 @@ public class ExcelUtils {
         colorMap.put(3, IndexedColors.YELLOW.getIndex());
 
         Map<String, Integer> sheetMap = new HashMap<>();
+        Map<String, Integer[]> interviewerMap = new HashMap<>();
+
         int cnt = 0;
         for (Map<String, String> map : mapList) {
             String position = map.get("Position");
@@ -41,14 +44,15 @@ public class ExcelUtils {
             }
         }
 
-        Sheet[] sheets = new Sheet[cnt];
+        Sheet[] sheets = new Sheet[cnt + 1];
         sheetMap.forEach((k, v) -> {
             if (!k.contains("@")) {
                 sheets[v] = webBook.createSheet(k);
                 sheets[v].autoSizeColumn(1, true);
             }
-
         });
+
+        sheets[cnt] = webBook.createSheet("Statistics");
 
         for (Map<String, String> map : mapList) {
 
@@ -81,26 +85,63 @@ public class ExcelUtils {
             }
 
             int col = 0;
+            String interviewer = null;
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (!entry.getKey().equals("Position")) {
                     Cell cell = row.createCell(col++);
                     cell.setCellValue(entry.getValue());
+
+
+                    if (entry.getKey().contains("Cooperator")) {
+                        interviewer = entry.getValue();
+                        if (!interviewerMap.containsKey(interviewer)) {
+                            Integer[] stat = {0, 0};
+                            interviewerMap.put(interviewer, stat);
+                        }
+                    }
+
+                    String mark = entry.getValue();
+                    if (mark != null && mark.length() > 0 && mark.length() <= 3 && '0' <= mark.charAt(0) && mark.charAt(0) <= '9') {
+                        Integer[] stat = interviewerMap.get(interviewer);
+                        stat[0] += Integer.valueOf(mark);
+                        stat[1]++;
+                        interviewerMap.put(interviewer, stat);
+                    }
                 }
             }
         }
 
-        //将生成excel文件保存到指定路径下
-/*        try {
-            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
-            webBook.write(fout);
-            fout.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        //Write date to the sheet of statistics
 
-        System.out.println("Excel文件生成成功...");
+        Row head = sheets[cnt].createRow(0);
+        head.createCell(0).setCellValue("Name");
+        head.createCell(1).setCellValue("Average Score");
+
+        int interviewerRow = 1;
+        for (Map.Entry<String, Integer[]> entry : interviewerMap.entrySet()) {
+            Integer[] stat = entry.getValue();
+            if (stat[1] > 0) {
+                Row rows = sheets[cnt].createRow(interviewerRow++);
+                rows.createCell(0).setCellValue(entry.getKey());
+                rows.createCell(1).setCellValue(Double.valueOf(stat[0].toString()) / stat[1]);
+            }
+        }
+
 
         writeExcel(response, webBook, "RecruitRecord");
+
+
+        //将生成excel文件保存到指定路径下
+//        try {
+//            FileOutputStream fout = new FileOutputStream("/home/chao/Desktop/RecruitRecord.xls");
+//            webBook.write(fout);
+//            fout.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("Excel文件生成成功...");
+
     }
 
 
